@@ -141,7 +141,7 @@ public class AuthServiceImpl implements AuthService {
                 .requireNonNull(AuthenticationUtil.getUserDetail()), TokenType.ACCESS_TOKEN,currentDeviceId),response);
 
         CookieUtil.setRefreshTokenCookieHttpOnly(securityUtil.generateToken(Objects
-                .requireNonNull(AuthenticationUtil.getUserDetail()), TokenType.REFRESH_TOKEN,null),response);
+                .requireNonNull(AuthenticationUtil.getUserDetail()), TokenType.REFRESH_TOKEN, currentDeviceId), response);
 
         return AuthResponse.builder()
                 .authenticated(true)
@@ -218,7 +218,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String refreshToken(String refreshToken, HttpServletResponse response) throws ParseException {
+    public void refreshToken(String refreshToken, HttpServletResponse response) throws ParseException {
 
         boolean check = introspect(refreshToken,TokenType.REFRESH_TOKEN);
         if (!check) {
@@ -226,17 +226,17 @@ public class AuthServiceImpl implements AuthService {
         }
 
         String username = SecurityUtil.extractUsernameByToken(refreshToken);
+        String deviceId = SecurityUtil.extractDeviceIdByToken(refreshToken);
 
         CustomUserDetail user = (CustomUserDetail)userDetailsService.loadUserByUsername(username);
+
 
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities());
 
         CookieUtil.setAccessTokenCookieHttpOnly(securityUtil.generateToken(Objects
-                .requireNonNull(AuthenticationUtil.getUserDetail()), TokenType.ACCESS_TOKEN,null),response);
+                .requireNonNull(user), TokenType.ACCESS_TOKEN, deviceId), response);
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-
-        return securityUtil.generateToken(Objects.requireNonNull(AuthenticationUtil.getUserDetail()), TokenType.ACCESS_TOKEN,null);
     }
 
 

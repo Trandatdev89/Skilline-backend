@@ -3,21 +3,19 @@ package com.project01.skillineserver.utils;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.crypto.MACVerifier;
-import com.nimbusds.jose.util.Base64;
 import com.nimbusds.jwt.SignedJWT;
 import com.project01.skillineserver.config.CustomUserDetail;
 import com.project01.skillineserver.entity.UserDevice;
-import com.project01.skillineserver.entity.UserEntity;
 import com.project01.skillineserver.enums.ErrorCode;
 import com.project01.skillineserver.enums.TokenType;
 import com.project01.skillineserver.excepion.CustomException.AppException;
 import com.project01.skillineserver.repository.UserDeviceRepository;
 import com.project01.skillineserver.service.Impl.RedisService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
@@ -25,6 +23,7 @@ import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -40,6 +39,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Component
+@Slf4j
 public class SecurityUtil {
 
     @Autowired
@@ -70,7 +70,7 @@ public class SecurityUtil {
     @Autowired
     private UserDeviceRepository userDeviceRepository;
 
-    public String generateToken(CustomUserDetail customUserDetail, TokenType tokenType,String deviceId) {
+    public String generateToken(CustomUserDetail customUserDetail, TokenType tokenType, String deviceId) {
         JwsHeader jwsHeader = JwsHeader.with(MacAlgorithm.HS256).build();
 
 
@@ -78,7 +78,7 @@ public class SecurityUtil {
                 .subject(customUserDetail.getUser().getId().toString())
                 .issuedAt(Instant.now())
                 .expiresAt(Instant.now().plus(tokenType.equals(TokenType.ACCESS_TOKEN) ? expirationAccess : expirationRefresh, ChronoUnit.SECONDS))
-                .claims(setClaims(customUserDetail,tokenType,deviceId))
+                .claims(setClaims(customUserDetail, tokenType, deviceId))
                 .issuer(customUserDetail.getUsername())
                 .id(UUID.randomUUID().toString())
                 .build();
@@ -96,6 +96,10 @@ public class SecurityUtil {
 
 
     public SignedJWT verifyToken(String token, TokenType tokenType) throws ParseException, JOSEException {
+        if (!StringUtils.hasText(token)) {
+            throw new AppException(ErrorCode.INVALID_TOKEN);
+        }
+
         SignedJWT signedJWT = SignedJWT.parse(token);
         JWSVerifier verifier = new MACVerifier(tokenType.equals(TokenType.ACCESS_TOKEN)
                 ? secretKey() : secretRefreshKey());
@@ -104,6 +108,7 @@ public class SecurityUtil {
         String deviceIdFromToken = signedJWT.getJWTClaimsSet().getClaim("deviceId").toString();
 
         if (!(verified && signedJWT.getJWTClaimsSet().getExpirationTime().after(new Date()))) {
+            log.info("nhay vao day");
             throw new AppException(ErrorCode.INVALID_TOKEN);
         }
 
@@ -112,7 +117,7 @@ public class SecurityUtil {
         }
 
         Optional<UserDevice> device = userDeviceRepository.findByDeviceId(deviceIdFromToken);
-        if(device.isEmpty() || !device.get().isActive()){
+        if (device.isEmpty() || !device.get().isActive()) {
             throw new AppException(ErrorCode.ACCOUNT_LOGINED);
         }
 
@@ -136,12 +141,12 @@ public class SecurityUtil {
                 .collect(Collectors.joining(" "));
     }
 
-    private Consumer<Map<String, Object>> setClaims(CustomUserDetail customUserDetail,TokenType tokenType,String deviceId) {
+    private Consumer<Map<String, Object>> setClaims(CustomUserDetail customUserDetail, TokenType tokenType, String deviceId) {
         return stringObjectMap -> {
             stringObjectMap.put("scope", getAuthorities(customUserDetail));
             stringObjectMap.put("loginAt", LocalDateTime.now().toString());
             stringObjectMap.put("typeToken", tokenType);
-            if(deviceId!=null){
+            if (deviceId != null) {
                 stringObjectMap.put("deviceId", deviceId);
             }
         };
@@ -150,5 +155,10 @@ public class SecurityUtil {
     public static String extractUsernameByToken(String token) throws ParseException {
         SignedJWT signedJWT = SignedJWT.parse(token);
         return signedJWT.getJWTClaimsSet().getIssuer();
+    }
+
+    public static String extractDeviceIdByToken(String token) throws ParseException {
+        SignedJWT signedJWT = SignedJWT.parse(token);
+        return signedJWT.getJWTClaimsSet().getClaim("deviceId").toString();
     }
 }

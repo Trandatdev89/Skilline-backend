@@ -2,7 +2,6 @@ package com.project01.skillineserver.excepion;
 
 
 import com.project01.skillineserver.dto.ApiResponse;
-import com.project01.skillineserver.enums.ErrorCode;
 import com.project01.skillineserver.excepion.CustomException.AppException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -43,15 +42,15 @@ public class GolbalException {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(apiResponse);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<?>> handleAll(Exception ex) {
-        ErrorCode errorCode = ErrorCode.INTERNAL_SERVER;
-        ApiResponse<?> apiResponse = ApiResponse.builder()
-                .message(ex.getMessage())
-                .code(errorCode.getCode())
-                .build();
-        return ResponseEntity.status(errorCode.getStatusCode()).body(apiResponse);
-    }
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<ApiResponse<?>> handleAll(Exception ex) {
+//        ErrorCode errorCode = ErrorCode.INTERNAL_SERVER;
+//        ApiResponse<?> apiResponse = ApiResponse.builder()
+//                .message(ex.getMessage())
+//                .code(errorCode.getCode())
+//                .build();
+//        return ResponseEntity.status(errorCode.getStatusCode()).body(apiResponse);
+//    }
 
 
 }
