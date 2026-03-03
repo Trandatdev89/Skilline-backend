@@ -16,10 +16,10 @@ import java.util.Optional;
 public interface CourseRepository extends JpaRepository<CourseEntity,Long>, JpaSpecificationExecutor<CourseEntity> {
     List<CourseEntity> findAllByCategoryId(Long categoryId);
 
-    @Query("select c from CourseEntity c where c.status = true and c.categoryId in :id")
+    @Query("select c from CourseEntity c where c.status = true and c.id in :id")
     List<CourseEntity> findAllByCourseIdIn(List<Long> id);
 
-    @Query("select c from CourseEntity c where c.status = true and c.categoryId = :id")
+    @Query("select c from CourseEntity c where c.status = true and c.id = :id")
     Optional<CourseEntity> findByCourseId(Long id);
 
     @Modifying
