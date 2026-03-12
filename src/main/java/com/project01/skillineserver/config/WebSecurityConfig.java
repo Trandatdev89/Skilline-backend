@@ -47,7 +47,7 @@ import org.springframework.web.filter.CorsFilter;
 public class WebSecurityConfig {
 
     private static final String[] PUBLIC_ENTRYPOINT = {"/auth/**", "/api/file/**", "/chat/**",
-            "/vnpay-payment/**", "/api/lecture/**", "/api/course/**","/api/push/**","/api/test/**"};
+            "/vnpay-payment/**", "/api/lecture/**", "/api/course/**", "/api/push/**", "/api/test", "/ws/**"};
 
     @Lazy
     @Autowired
@@ -107,7 +107,7 @@ public class WebSecurityConfig {
                         .csrfTokenRepository(csrfTokenRepository)
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
                         .sessionAuthenticationStrategy(new NullAuthenticatedSessionStrategy())
-                        .ignoringRequestMatchers("/auth/**","/api/file/**"))
+                        .ignoringRequestMatchers("/auth/**", "/api/file/**", "/ws/**"))
                 .addFilterBefore(new CsrfValidationFilter(csrfTokenRepository), CsrfFilter.class)
                 .authorizeHttpRequests(http -> http
                         .requestMatchers(HttpMethod.GET, "/product/**").permitAll()

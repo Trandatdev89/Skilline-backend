@@ -14,7 +14,8 @@ public class CookieBearerTokenResolver implements BearerTokenResolver {
     @Override
     public String resolve(HttpServletRequest request) {
         log.info("URI of browser request: {}", request.getRequestURI());
-        if (request.getRequestURI().startsWith("/auth/")) {
+        if (request.getRequestURI().startsWith("/auth/")
+                || request.getRequestURI().startsWith("/ws")) { // ← thêm dòng này
             return null;
         }
 
