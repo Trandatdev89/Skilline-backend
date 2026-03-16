@@ -11,21 +11,21 @@ import lombok.extern.slf4j.Slf4j;
 public class CookieUtil {
 
     public static void setAccessTokenCookieHttpOnly(String accessToken, HttpServletResponse response){
-        Cookie accessTokenCookie  = new Cookie("accessToken",accessToken);
+        Cookie accessTokenCookie = new Cookie(AppConstants.ACCESS_TOKEN, accessToken);
         accessTokenCookie.setHttpOnly(true);
         accessTokenCookie.setSecure(false);
         accessTokenCookie.setPath("/");
-        accessTokenCookie.setMaxAge(24 * 60 * 60); //1 ngay
+        accessTokenCookie.setMaxAge(60); //1 ngay
         accessTokenCookie.setAttribute("SameSite", "Strict");
         response.addCookie(accessTokenCookie);
     }
 
     public static void setRefreshTokenCookieHttpOnly(String refreshTokenCookieHttpOnly, HttpServletResponse response){
-        Cookie refreshTokenCookie  = new Cookie("refreshToken",refreshTokenCookieHttpOnly);
+        Cookie refreshTokenCookie = new Cookie(AppConstants.REFRESH_TOKEN, refreshTokenCookieHttpOnly);
         refreshTokenCookie.setHttpOnly(true);
         refreshTokenCookie.setSecure(false);
         refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge(7 * 24 * 60 * 60);
+        refreshTokenCookie.setMaxAge(60);
         refreshTokenCookie.setAttribute("SameSite", "Strict");
         response.addCookie(refreshTokenCookie);
     }
@@ -57,7 +57,7 @@ public class CookieUtil {
         cookie.setHttpOnly(true);
         cookie.setSecure(false);
         cookie.setPath("/");
-        cookie.setMaxAge(0); // ← Set 0 để xóa ngay lập tức
+        cookie.setMaxAge(0);
         cookie.setAttribute("SameSite", "Strict");
         response.addCookie(cookie);
         log.info("Deleted cookie: {}", name);

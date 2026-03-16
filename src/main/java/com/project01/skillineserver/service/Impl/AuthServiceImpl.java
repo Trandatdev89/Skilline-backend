@@ -221,15 +221,16 @@ public class AuthServiceImpl implements AuthService {
     public void refreshToken(String refreshToken, HttpServletResponse response) throws ParseException {
 
         boolean check = introspect(refreshToken,TokenType.REFRESH_TOKEN);
+
         if (!check) {
-            throw new AppException(ErrorCode.INVALID_TOKEN);
+            log.info("Refresh token in cookie is expire!");
+            throw new AppException(ErrorCode.REFRESH_TOKEN_EXPIRE);
         }
 
         String username = SecurityUtil.extractUsernameByToken(refreshToken);
         String deviceId = SecurityUtil.extractDeviceIdByToken(refreshToken);
 
         CustomUserDetail user = (CustomUserDetail)userDetailsService.loadUserByUsername(username);
-
 
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities());

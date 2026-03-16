@@ -11,6 +11,7 @@ import com.project01.skillineserver.enums.TokenType;
 import com.project01.skillineserver.excepion.CustomException.AppException;
 import com.project01.skillineserver.repository.UserDeviceRepository;
 import com.project01.skillineserver.service.Impl.RedisService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,6 +25,8 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -108,7 +111,18 @@ public class SecurityUtil {
         String deviceIdFromToken = signedJWT.getJWTClaimsSet().getClaim("deviceId").toString();
 
         if (!(verified && signedJWT.getJWTClaimsSet().getExpirationTime().after(new Date()))) {
-            log.info("nhay vao day");
+
+            log.info("Token {} with type {} invalid", token, tokenType);
+
+            if (tokenType.equals(TokenType.REFRESH_TOKEN)) {
+                ServletRequestAttributes attrs = (ServletRequestAttributes)
+                        RequestContextHolder.getRequestAttributes();
+                if (attrs != null) {
+                    HttpServletResponse response = attrs.getResponse();
+                    CookieUtil.clearAllAuthCookies(response);
+                }
+            }
+
             throw new AppException(ErrorCode.INVALID_TOKEN);
         }
 
