@@ -45,6 +45,23 @@ jwt:
   secretKeyAccess: LuNVqXkIK/leKNt+xBkwXK+K25U9cFa2E6v735ZSOQuEIF3B2bvwpEd9UDXiXsZ9SLC1kh4MyTaAxU6Vnq+NeQ==
   secretKeyRefresh: 5bh77qh5vEfCrE3gkrPenjdd5tkk0zmKnz1cDNpIc4w=
 
+cloud:
+  aws:
+    credentials:
+      access-key: AKIAYRHRVUQWHEGIZGFO
+      secret-key: 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
+    region:
+      static: ap-southeast-1
+    s3:
+      bucket: skilline-image-586769867820-ap-southeast-1-an
+
+aws:
+  access-key:
+  secret-key:
+  region:
+  s3:
+    bucket: skilline-image-586769867820-ap-southeast-1-an
+
 url:
   verify-account: http://localhost:8080/auth
 

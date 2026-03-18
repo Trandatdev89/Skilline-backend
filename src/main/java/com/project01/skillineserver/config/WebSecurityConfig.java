@@ -107,7 +107,7 @@ public class WebSecurityConfig {
                         .csrfTokenRepository(csrfTokenRepository)
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
                         .sessionAuthenticationStrategy(new NullAuthenticatedSessionStrategy())
-                        .ignoringRequestMatchers("/auth/**", "/api/file/**", "/ws/**"))
+                        .ignoringRequestMatchers("/auth/**", "/api/file/**", "/ws/**", "/api/test"))
                 .addFilterBefore(new CsrfValidationFilter(csrfTokenRepository), CsrfFilter.class)
                 .authorizeHttpRequests(http -> http
                         .requestMatchers(HttpMethod.GET, "/product/**").permitAll()

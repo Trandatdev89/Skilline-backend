@@ -25,9 +25,21 @@ public class CsrfValidationFilter extends OncePerRequestFilter {
 
     private final CsrfTokenRepository csrfTokenRepository;
 
+    private static final String[] IGNORED_PATHS = {
+            "/auth/", "/api/file/", "/ws/", "/api/test"
+    };
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String method = request.getMethod();
+        String path = request.getRequestURI();
+
+        // Skip nếu là path được ignore
+        if (isIgnoredPath(path)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         if (!"GET".equals(method) && !"HEAD".equals(method) &&
                 !"TRACE".equals(method) && !"OPTIONS".equals(method)) {
 
@@ -55,5 +67,12 @@ public class CsrfValidationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private boolean isIgnoredPath(String path) {
+        for (String ignored : IGNORED_PATHS) {
+            if (path.startsWith(ignored)) return true;
+        }
+        return false;
     }
 }
