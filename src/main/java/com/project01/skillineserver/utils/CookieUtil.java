@@ -15,7 +15,7 @@ public class CookieUtil {
         accessTokenCookie.setHttpOnly(true);
         accessTokenCookie.setSecure(false);
         accessTokenCookie.setPath("/");
-        accessTokenCookie.setMaxAge(60); //1 ngay
+        accessTokenCookie.setMaxAge(24 * 60 * 60);
         accessTokenCookie.setAttribute("SameSite", "Strict");
         response.addCookie(accessTokenCookie);
     }
@@ -25,7 +25,7 @@ public class CookieUtil {
         refreshTokenCookie.setHttpOnly(true);
         refreshTokenCookie.setSecure(false);
         refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge(60);
+        refreshTokenCookie.setMaxAge(7 * 24 * 60 * 60);
         refreshTokenCookie.setAttribute("SameSite", "Strict");
         response.addCookie(refreshTokenCookie);
     }
