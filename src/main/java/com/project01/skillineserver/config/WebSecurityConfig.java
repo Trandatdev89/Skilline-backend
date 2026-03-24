@@ -1,10 +1,8 @@
 package com.project01.skillineserver.config;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
-import com.project01.skillineserver.dto.request.TokenRequest;
 import com.project01.skillineserver.entity.UserEntity;
 import com.project01.skillineserver.enums.ErrorCode;
-import com.project01.skillineserver.enums.TokenType;
 import com.project01.skillineserver.excepion.CustomException.AppException;
 import com.project01.skillineserver.repository.UserRepository;
 import com.project01.skillineserver.service.AuthService;
@@ -32,8 +30,6 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -44,7 +40,7 @@ import org.springframework.web.filter.CorsFilter;
 @EnableMethodSecurity
 public class WebSecurityConfig {
 
-    private static final String[] PUBLIC_ENTRYPOINT = {"/auth/**", "/file/**", "/chat/**",
+    private static final String[] PUBLIC_ENTRYPOINT = {"/auth/**", "/api/file/**", "/chat/**",
             "/vnpay-payment/**", "/api/lecture/**", "/api/course/**","/api/push/**","/api/test/**"};
 
     @Lazy
@@ -139,13 +135,10 @@ public class WebSecurityConfig {
                 .withSecretKey(securityUtil.secretKey()).macAlgorithm(MacAlgorithm.HS256).build();
         return token -> {
             try {
-                var responseToken = authService.introspect(token, TokenType.ACCESS_TOKEN);
-                if (!responseToken) {
-                    throw new AppException(ErrorCode.INVALID_TOKEN);
-                }
+//               authService.introspect(token, TokenType.ACCESS_TOKEN);
                 return nimbusJwtDecoder.decode(token);
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+                System.out.println("Access token " + e.getMessage());
                 throw e;
             }
         };

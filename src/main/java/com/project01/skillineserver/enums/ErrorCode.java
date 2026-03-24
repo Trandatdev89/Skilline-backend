@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 
 
 @AllArgsConstructor
@@ -39,6 +38,7 @@ public enum ErrorCode {
     QUESTION_NOT_EXITS(1025,"question is not exits",HttpStatus.NOT_FOUND),
     QUESTION_EMPTY(1026,"question is not exits",HttpStatus.BAD_REQUEST),
     QUIZ_MAX_FIVE(1027,"That is max 5 Quiz",HttpStatus.CONFLICT),
+    TOKEN_IS_BLANK(1028, "Token is blank", HttpStatus.BAD_REQUEST),
 
     INTERNAL_SERVER(9999,"Server error",HttpStatus.INTERNAL_SERVER_ERROR);
 

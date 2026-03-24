@@ -7,20 +7,17 @@ import com.project01.skillineserver.constants.AppConstants;
 import com.project01.skillineserver.dto.reponse.AuthResponse;
 import com.project01.skillineserver.dto.request.LoginRequest;
 import com.project01.skillineserver.dto.request.RegisterRequest;
-import com.project01.skillineserver.dto.request.TokenRequest;
 import com.project01.skillineserver.dto.request.VerifyAccountRequest;
 import com.project01.skillineserver.entity.UserDevice;
 import com.project01.skillineserver.entity.UserEntity;
 import com.project01.skillineserver.enums.EmailType;
 import com.project01.skillineserver.enums.ErrorCode;
-import com.project01.skillineserver.enums.Role;
 import com.project01.skillineserver.enums.TokenType;
 import com.project01.skillineserver.excepion.CustomException.AppException;
 import com.project01.skillineserver.repository.UserDeviceRepository;
 import com.project01.skillineserver.repository.UserRepository;
 import com.project01.skillineserver.service.AuthService;
 import com.project01.skillineserver.service.EmailService;
-import com.project01.skillineserver.service.UserService;
 import com.project01.skillineserver.utils.AuthenticationUtil;
 import com.project01.skillineserver.utils.CookieUtil;
 import com.project01.skillineserver.utils.SecurityUtil;
@@ -30,9 +27,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -47,6 +42,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -221,7 +217,7 @@ public class AuthServiceImpl implements AuthService {
 
         boolean check = introspect(refreshToken,TokenType.REFRESH_TOKEN);
         if (!check) {
-            throw new AppException(ErrorCode.INVALID_TOKEN);
+            log.info("refreshToken is not valid :{}", refreshToken);
         }
 
         String username = SecurityUtil.extractUsernameByToken(refreshToken);
@@ -288,7 +284,7 @@ public class AuthServiceImpl implements AuthService {
     public void logout(String token) throws ParseException {
         SignedJWT signedJWT = SignedJWT.parse(token);
         String tokenId = signedJWT.getJWTClaimsSet().getJWTID();
-        redisService.saveData(tokenId, token);
+        redisService.saveDataOnTime(tokenId, token, 5, TimeUnit.MILLISECONDS);
     }
 
     @Override
