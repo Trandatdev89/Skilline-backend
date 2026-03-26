@@ -1,7 +1,10 @@
 package com.project01.skillineserver.config;
 
+import com.project01.skillineserver.properties.CdnProperties;
+import com.project01.skillineserver.properties.KafkaTopicProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -12,6 +15,7 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 @Configuration
 @RequiredArgsConstructor
+@EnableConfigurationProperties({CdnProperties.class, KafkaTopicProperties.class, com.project01.skillineserver.config.properties.StorageProperties.class})
 public class AWSConfig {
 
     @Value("${cloud.aws.credentials.access-key}")

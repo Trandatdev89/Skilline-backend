@@ -12,18 +12,27 @@ import java.time.Instant;
 @Getter
 @Setter
 @Entity
-@Table(name = "users")
+@Table(name = "users",
+        indexes = {
+                @Index(name = "idx_users_email", columnList = "email"),
+                @Index(name = "idx_users_username", columnList = "username")
+        },
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_users_email", columnNames = "email"),
+                @UniqueConstraint(name = "uk_users_username", columnNames = "username")
+        })
 public class UserEntity extends BaseEntity<Long> {
     private String username;
     private String password;
     private String email;
     private String phone;
     private String fullname;
-    private String avatar;
+    @Column(name = "avatar_asset_id")
+    private String avatarAssetId;
     private String address;
     @Enumerated(EnumType.STRING)
     private Role role;
-    private boolean isLocked = true;
+    private boolean isLocked = false;
     private boolean isDisable = false;
     private boolean isAccountNonExpired = true;
     private boolean isCredentialsNonExpired = true;

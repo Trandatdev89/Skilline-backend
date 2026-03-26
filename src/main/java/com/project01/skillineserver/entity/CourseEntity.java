@@ -14,17 +14,17 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "courses")
 public class CourseEntity extends BaseEntity<Long> {
-
     private String title;
     private String description;
     @Column(name = "category_id")
     private Long categoryId;
     @Enumerated(EnumType.STRING)
     private LevelEnum level;
-    private String thumbnail_url;
+    @Column(name = "thumbnail_asset_id")
+    private String thumbnailAssetId;
     private boolean status;
     private BigDecimal price;
     private Double rate;
-    @Column(name = "discount_price")
-    private String discountPrice;
+    @Column(name = "discount_price", precision = 12, scale = 2)
+    private BigDecimal discountPrice;
 }

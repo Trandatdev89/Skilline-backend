@@ -4,5 +4,5 @@ import lombok.Getter;
 
 @Getter
 public enum ProcessStatus {
-    PROCESSING,FAILED,COMPLETED
+    PROCESSING, FAILED, COMPLETED, PENDING
 }
