@@ -13,6 +13,8 @@
             <column name="lecture_id" type="varchar(225)"/>
             <column name="is_completed" type="TINYINT(1)"/>
             <column name="completed_at" type="timestamp"/>
+            <column name="watch_duration_seconds" type="bigint"/>
+            <column name="last_watched_at" type="timestamp"/>
         </createTable>
 
         <addForeignKeyConstraint

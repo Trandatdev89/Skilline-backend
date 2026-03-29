@@ -3,12 +3,11 @@ package com.project01.skillineserver.service.Impl;
 import com.project01.skillineserver.dto.reponse.CourseResponse;
 import com.project01.skillineserver.dto.reponse.PageResponse;
 import com.project01.skillineserver.dto.request.OrderReq;
-import com.project01.skillineserver.dto.request.PaymentReq;
 import com.project01.skillineserver.entity.CourseEntity;
 import com.project01.skillineserver.entity.OrderDetailEntity;
 import com.project01.skillineserver.entity.OrderEntity;
 import com.project01.skillineserver.entity.UserEntity;
-import com.project01.skillineserver.enums.*;
+import com.project01.skillineserver.enums.ErrorCode;
 import com.project01.skillineserver.excepion.CustomException.AppException;
 import com.project01.skillineserver.mapper.CourseMapper;
 import com.project01.skillineserver.projection.OrderProjection;
@@ -16,9 +15,7 @@ import com.project01.skillineserver.repository.CourseRepository;
 import com.project01.skillineserver.repository.OrderDetailRepository;
 import com.project01.skillineserver.repository.OrderRepository;
 import com.project01.skillineserver.repository.UserRepository;
-import com.project01.skillineserver.service.CourseService;
 import com.project01.skillineserver.service.OrderService;
-import com.project01.skillineserver.service.PaymentService;
 import com.project01.skillineserver.utils.MapUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,7 +60,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderEntity getOrderById(Long id) {
+    public OrderEntity getOrderById(String id) {
         return orderRepository.findById(id).orElseThrow(()->new AppException(ErrorCode.LECTURE_NOT_FOUND));
     }
 
@@ -76,8 +74,7 @@ public class OrderServiceImpl implements OrderService {
                 .userId(user.getId())
                 .status(orderReq.getStatus())
                 .totalPrice(orderReq.getTotalPrice())
-                .createdAt(Instant.now())
-                .quantity(orderReq.getQuantity())
+                .expiresAt(Instant.now().plus(7, ChronoUnit.DAYS))
                 .build();
 
         OrderEntity order = orderRepository.save(orderEntity);

@@ -10,7 +10,8 @@ import java.util.List;
 
 public interface OrderService {
     PageResponse<OrderProjection> getOrders(int page, int size, String sort, String keyword);
-    OrderEntity getOrderById(Long id);
+
+    OrderEntity getOrderById(String id);
     OrderEntity saveOrder(OrderReq orderReq);
     List<CourseResponse> getOrderDetailByOrderId(Long orderId);
 }

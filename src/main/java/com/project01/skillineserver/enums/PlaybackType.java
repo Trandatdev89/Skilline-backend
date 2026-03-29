@@ -1,6 +1,6 @@
 package com.project01.skillineserver.enums;
 
 public enum PlaybackType {
-    FILE,
-    HLS
+    DIRECT,      // truy cập trực tiếp (ảnh)
+    HLS          // streaming HLS (video)
 }

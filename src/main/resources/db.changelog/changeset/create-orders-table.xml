@@ -6,14 +6,13 @@
 
     <changeSet id="7" author="datmacay_v1">
         <createTable tableName="orders">
-            <column name="id" type="bigint" autoIncrement="true">
+            <column name="id" type="varchar(225)">
                 <constraints primaryKey="true" />
             </column>
             <column name="user_id" type="bigint"/>
             <column name="total_price" type="decimal"/>
             <column name="status" type="varchar(225)"/>
-            <column name="created_at" type="timestamp"/>
-            <column name="quantity" type="bigint"/>
+            <column name="expires_at" type="timestamp"/>
         </createTable>
 
         <addForeignKeyConstraint

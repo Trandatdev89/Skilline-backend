@@ -1,4 +1,4 @@
-package com.project01.skillineserver.config.properties;
+package com.project01.skillineserver.properties;
 
 import lombok.Getter;
 import lombok.Setter;

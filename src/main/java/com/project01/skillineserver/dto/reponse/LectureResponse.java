@@ -1,6 +1,6 @@
 package com.project01.skillineserver.dto.reponse;
 
-import com.project01.skillineserver.enums.ProcessStatus;
+import com.project01.skillineserver.enums.PublishStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,10 +15,10 @@ public class LectureResponse {
     private Integer position;
     private String title;
     private String urlThumbnail;
-    private String CategoryName;
-    private String duration;
     private String createAt;
     private String updateAt;
-    private ProcessStatus processStatus;
     private String urlVideo;
+    private Long durationSeconds;
+    private boolean previewable;
+    private PublishStatus publishStatus;
 }

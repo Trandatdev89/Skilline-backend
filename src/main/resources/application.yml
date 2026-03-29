@@ -2,15 +2,17 @@ spring:
   application:
     name: skilline-server
   datasource:
-    url: jdbc:mysql://localhost:6000/skiline?createDatabaseIfNotExist=true
-    username: tranquocdat
-    password: tranquocdat
+    url: jdbc:mysql://localhost:3306/original?createDatabaseIfNotExist=true
+    username: root
+    password: longga@12
   data:
     redis:
       host: localhost
       port: 6379
       ssl:
         enabled: false
+  kafka:
+    bootstrap-servers: localhost:9092
 #    mongodb:
 #      uri: mongodb://root:root@localhost:27017/Chat-service?auth=admin
 
@@ -33,8 +35,8 @@ spring:
     enabled: true
   servlet:
     multipart:
-      max-file-size: 50MB
-      max-request-size: 50MB
+      max-file-size: 100MB
+      max-request-size: 100MB
 
 
 jwt:
@@ -48,19 +50,12 @@ jwt:
 cloud:
   aws:
     credentials:
-      access-key: AKIAYRHRVUQWHEGIZGFO
-      secret-key: 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
+      access-key: ${ACCESS_KEY_AWS}
+      secret-key: ${SECRET_KEY_AWS}
     region:
       static: ap-southeast-1
     s3:
-      bucket: skilline-image-586769867820-ap-southeast-1-an
-
-aws:
-  access-key:
-  secret-key:
-  region:
-  s3:
-    bucket: skilline-image-586769867820-ap-southeast-1-an
+      bucket: ${BUCKET_STORAGE}
 
 url:
   verify-account: http://localhost:8080/auth
@@ -69,12 +64,6 @@ mailjet:
   api-key: ${MAILJET_KEY:61a7d3173515fb84be6d8a2c6ce433fe}
   api-secretKey: ${MAILJET_SECRET:470eeb057bc489f636bbe96ee0b952aa}
 
-upload:
-  directory:
-    video: uploads/lecture
-    hls: uploads/hls
-    image: uploads/image
-    pdf: uploads/pdf
 
 domain:
   server: http://localhost:8080/
@@ -94,5 +83,19 @@ scheduler:
     retention-days: 10
     batch-size: 1000
 
+app:
+  cdn:
+    domain: ${CDN_DOMAIN}
+    key-pair-id: ${CF_KEY_PAIR_ID}
+    private-key-path: ${CF_PRIVATE_KEY_PATH:private_key.pem}
+    cookie-domain: ${CF_COOKIE_DOMAIN:localhost}
+  ffmpeg:
+    path: ${FFMPEG_PATH:ffmpeg}
+  kafka:
+    media-uploaded-topic: media.uploaded
+    media-processed-topic: media.processed
+    media-failed-topic: media.failed
+  storage:
+    private-bucket: ${BUCKET_STORAGE}
 
 

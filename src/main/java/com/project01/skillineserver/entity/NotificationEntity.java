@@ -3,6 +3,7 @@ package com.project01.skillineserver.entity;
 import com.project01.skillineserver.enums.NotificationType;
 import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
@@ -24,8 +25,11 @@ public class NotificationEntity {
     private String nameUser;
     private String title;
     private String linkAttachment;
-    private boolean isActive;
     private Instant timePush;
     private Instant createdAt;
+    private boolean isRead = false;        // đã đọc chưa
+    @Field("read_at")
+    private Instant readAt;                // đọc lúc nào
+    private boolean isDeleted = false;     // soft delete
 
 }

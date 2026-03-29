@@ -4,28 +4,20 @@ import com.project01.skillineserver.dto.reponse.CategoryResponse;
 import com.project01.skillineserver.dto.reponse.PageResponse;
 import com.project01.skillineserver.dto.request.CategoryReq;
 import com.project01.skillineserver.entity.CategoryEntity;
-import com.project01.skillineserver.entity.CourseEntity;
-import com.project01.skillineserver.entity.OrderEntity;
 import com.project01.skillineserver.enums.ErrorCode;
-import com.project01.skillineserver.enums.FileType;
-import com.project01.skillineserver.enums.SortField;
 import com.project01.skillineserver.excepion.CustomException.AppException;
 import com.project01.skillineserver.mapper.CategoryMapper;
 import com.project01.skillineserver.repository.CategoryRepository;
-import com.project01.skillineserver.repository.CourseRepository;
 import com.project01.skillineserver.service.CategoryService;
 import com.project01.skillineserver.utils.MapUtil;
-import com.project01.skillineserver.utils.UploadUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,7 +27,6 @@ import java.util.Optional;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
-    private final UploadUtil uploadUtil;
     private final CategoryMapper categoryMapper;
 
     @Override
@@ -45,11 +36,9 @@ public class CategoryServiceImpl implements CategoryService {
                 .flatMap(categoryRepository::findById)
                 .orElse(new CategoryEntity());
 
-        String pathImage = resolveImagePath(category.path(),categoryInDB.getPath());
-
         categoryInDB.setName(category.name());
-        categoryInDB.setPath(pathImage);
         categoryInDB.setActive(true);
+        categoryInDB.setSlug(category.slug());
 
         categoryRepository.save(categoryInDB);
     }
@@ -98,15 +87,6 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         categoryRepository.deleteCategoryByIds(categoryIds);
-    }
-
-
-    private String resolveImagePath(Object inputPath, String exitingPath) throws IOException {
-        if(inputPath instanceof MultipartFile multipartFile){
-            return uploadUtil.createPathFile(multipartFile,FileType.IMAGE).toString();
-        }else{
-            return exitingPath;
-        }
     }
 
 }

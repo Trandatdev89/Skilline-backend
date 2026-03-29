@@ -1,8 +1,9 @@
 package com.project01.skillineserver.enums;
 
 public enum JobStatus {
-    PENDING,
+    QUEUED,
     RUNNING,
-    SUCCESS,
-    FAILED
+    COMPLETED,
+    FAILED,
+    RETRYING
 }

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!-- ===== media_asset ===== -->
+    <changeSet id="create-media-asset-table" author="datmacay_v1">
+        <createTable tableName="media_asset">
+            <column name="id" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="asset_type" type="VARCHAR(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="bucket" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="object_key" type="VARCHAR(768)">
+                <constraints nullable="false" unique="true"
+                             uniqueConstraintName="uk_media_asset_object_key"/>
+            </column>
+            <column name="original_file_name" type="VARCHAR(255)"/>
+            <column name="mime_type" type="VARCHAR(150)"/>
+            <column name="size_bytes" type="BIGINT"/>
+            <column name="etag" type="VARCHAR(255)"/>
+            <column name="checksum_sha256" type="VARCHAR(255)"/>
+            <column name="width_px" type="INT"/>
+            <column name="height_px" type="INT"/>
+            <column name="duration_seconds" type="BIGINT"/>
+            <column name="playback_type" type="VARCHAR(20)"/>
+            <column name="hls_master_key" type="VARCHAR(768)"/>
+            <column name="upload_status" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="process_status" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="transcode_job_id" type="VARCHAR(255)"/>
+            <column name="error_message" type="TEXT"/>
+            <column name="is_private" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+            <column name="created_by" type="BIGINT"/>
+            <column name="updated_by" type="BIGINT"/>
+        </createTable>
+
+        <createIndex indexName="idx_media_asset_asset_type" tableName="media_asset">
+            <column name="asset_type"/>
+        </createIndex>
+        <createIndex indexName="idx_media_asset_upload_status" tableName="media_asset">
+            <column name="upload_status"/>
+        </createIndex>
+        <createIndex indexName="idx_media_asset_process_status" tableName="media_asset">
+            <column name="process_status"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- ===== media_asset_variant ===== -->
+    <changeSet id="create-media-asset-variant-table" author="datmacay_v1">
+        <createTable tableName="media_asset_variant">
+            <column name="id" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="asset_id" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="variant_type" type="VARCHAR(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="bucket" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="object_key" type="VARCHAR(768)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="mime_type" type="VARCHAR(150)"/>
+            <column name="width_px" type="INT"/>
+            <column name="height_px" type="INT"/>
+            <column name="bitrate" type="BIGINT"/>
+            <column name="sort_order" type="INT"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+            <column name="created_by" type="BIGINT"/>
+            <column name="updated_by" type="BIGINT"/>
+        </createTable>
+
+        <createIndex indexName="idx_media_asset_variant_asset_id" tableName="media_asset_variant">
+            <column name="asset_id"/>
+        </createIndex>
+
+        <addForeignKeyConstraint
+                baseTableName="media_asset_variant"
+                baseColumnNames="asset_id"
+                referencedTableName="media_asset"
+                referencedColumnNames="id"
+                constraintName="fk_media_asset_variant_asset_id"
+                onDelete="CASCADE"/>
+    </changeSet>
+
+    <!-- ===== media_job ===== -->
+    <changeSet id="create-media-job-table" author="datmacay_v1">
+        <createTable tableName="media_job">
+            <column name="id" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="asset_id" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="job_type" type="VARCHAR(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="retry_count" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="error_message" type="TEXT"/>
+            <column name="started_at" type="TIMESTAMP"/>
+            <column name="finished_at" type="TIMESTAMP"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+            <column name="created_by" type="BIGINT"/>
+            <column name="updated_by" type="BIGINT"/>
+        </createTable>
+
+        <createIndex indexName="idx_media_job_asset_id" tableName="media_job">
+            <column name="asset_id"/>
+        </createIndex>
+        <createIndex indexName="idx_media_job_status" tableName="media_job">
+            <column name="status"/>
+        </createIndex>
+
+        <addForeignKeyConstraint
+                baseTableName="media_job"
+                baseColumnNames="asset_id"
+                referencedTableName="media_asset"
+                referencedColumnNames="id"
+                constraintName="fk_media_job_asset_id"
+                onDelete="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>

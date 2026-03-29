@@ -16,6 +16,7 @@
             <column name="address" type="varchar(255)"/>
             <column name="fullname" type="varchar(255)"/>
             <column name="avatar" type="varchar(255)"/>
+            <column name="avatar_asset_id" type="varchar(255)"/>
             <column name="created_at" type="timestamp"/>
             <column name="updated_at" type="timestamp"/>
             <column name="is_locked" type="TINYINT(1)"/>

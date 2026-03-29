@@ -5,8 +5,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.*;
 
-import java.time.Instant;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -19,6 +17,7 @@ public class QuizEntity extends BaseEntity<Long> {
     private String lectureId;
     private String title;
     private String description;
-    private Instant timeLimit;
+    @Column(name = "time_limit")
+    private Integer timeLimit;
     private Integer maxAttempt;
 }

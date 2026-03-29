@@ -38,12 +38,12 @@ public class OrderController {
 
     @GetMapping(value = "/{id}")
     @PreAuthorize("@authorizationService.isCanAccessApi()")
-    public ApiResponse<OrderEntity> getOrderById(@PathVariable Long id) {
+    public ApiResponse<OrderEntity> getOrderById(@PathVariable String orderId) {
 
         return ApiResponse.<OrderEntity>builder()
                 .code(200)
                 .message("Success")
-                .data(orderService.getOrderById(id))
+                .data(orderService.getOrderById(orderId))
                 .build();
     }
 

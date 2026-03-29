@@ -11,19 +11,16 @@ import com.project01.skillineserver.repository.LectureRepository;
 import com.project01.skillineserver.service.LectureService;
 import com.project01.skillineserver.service.MediaService;
 import com.project01.skillineserver.utils.MapUtil;
-import com.project01.skillineserver.utils.UploadUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +28,6 @@ import java.util.Map;
 public class LectureServiceImpl implements LectureService {
 
     private final LectureRepository lectureRepository;
-    private final UploadUtil uploadUtil;
     private final MediaService mediaService;
     private final LectureMapper lectureMapper;
 
@@ -56,22 +52,7 @@ public class LectureServiceImpl implements LectureService {
             lectureEntity.setCreatedAt(Instant.now());
         }
 
-        //handle Video upload only if new file
-        if(lectureReq.videoFile()!=null && !lectureReq.videoFile().isEmpty()){
-            Map<String,Object> videoInfo = resolveVideoPath(lectureReq.videoFile());
-
-            if (videoInfo != null) {
-                lectureEntity.setFilePath((String) videoInfo.get("filePath"));
-                lectureEntity.setContentType((String) videoInfo.get("contentType"));
-                lectureEntity.setDuration((String) videoInfo.get("duration"));
-                lectureEntity.setImage((String) videoInfo.get("image"));
-            }
-        }
         LectureEntity lectureNeedSave = lectureRepository.save(lectureEntity);
-
-        if (lectureReq.videoFile() != null && !lectureReq.videoFile().isEmpty()) {
-            mediaService.processVideoAsync(lectureNeedSave.getId());
-        }
 
         return lectureNeedSave;
     }
@@ -103,20 +84,6 @@ public class LectureServiceImpl implements LectureService {
     @Override
     public Long countLectureInCourse(Long courseId) {
         return lectureRepository.countLectureByCourseId(courseId);
-    }
-
-    private Map<String,Object> resolveVideoPath(MultipartFile inputFile){
-        if(inputFile==null || inputFile.isEmpty()){
-            return null;
-        }
-        try{
-           return uploadUtil.generateVideoUrl(inputFile);
-        }catch (InterruptedException e){
-            Thread.currentThread().interrupt();
-            throw new AppException(ErrorCode.VIDEO_PROCESSING_FAILED);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
 }

@@ -20,8 +20,7 @@ public class TestController {
 
     @PostMapping
     public ResponseEntity<?> test(@ModelAttribute MultipartFile file) throws IOException {
-        String key = service.uploadFile(file);
-        return ResponseEntity.ok().body(key);
+        return ResponseEntity.ok().body(null);
     }
 
     @GetMapping

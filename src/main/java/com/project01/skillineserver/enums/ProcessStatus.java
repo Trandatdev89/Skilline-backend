@@ -4,5 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum ProcessStatus {
-    PROCESSING, FAILED, COMPLETED, PENDING
+    PENDING,         // chờ xử lý (transcode HLS)
+    PROCESSING,      // đang transcode
+    COMPLETED,       // transcode xong, sẵn sàng stream
+    FAILED           // transcode thất bại
 }

@@ -12,9 +12,7 @@
             <column name="lecture_id" type="varchar(225)"/>
             <column name="title" type="varchar(225)"/>
             <column name="description" type="varchar(225)"/>
-            <column name="created_at" type="timestamp"/>
-            <column name="updated_at" type="timestamp"/>
-            <column name="time_limit" type="timestamp"/>
+            <column name="time_limit" type="int"/>
             <column name="max_attempt" type="int"/>
         </createTable>
 

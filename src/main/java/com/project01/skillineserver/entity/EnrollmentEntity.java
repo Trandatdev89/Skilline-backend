@@ -3,7 +3,6 @@ package com.project01.skillineserver.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 
 @AllArgsConstructor
@@ -23,5 +22,6 @@ public class EnrollmentEntity {
     private Long courseId;
     @Column(name = "enrolled_at")
     private Instant enrolledAt;
-    private Long progress;
+    @Column(name = "progress_percent", nullable = false)
+    private Integer progressPercent = 0;
 }

@@ -10,7 +10,8 @@
                 <constraints primaryKey="true" />
             </column>
             <column name="name" type="varchar(255)"/>
-            <column name="path" type="varchar(255)"/>
+            <column name="slug" type="varchar(255)"/>
+            <column name="thumbnail_asset_id" type="varchar(255)"/>
         </createTable>
     </changeSet>
 </databaseChangeLog>

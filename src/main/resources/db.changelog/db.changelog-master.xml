@@ -23,5 +23,6 @@
     <include file="db.changelog/changeset/create-history-score-user-table.xml"/>
     <include file="db.changelog/changeset/create-history-answer-user-choice.xml"/>
     <include file="db.changelog/changeset/create-user-sub-webpush.xml"/>
+    <include file="db.changelog/changeset/create-media-table.xml"/>
 
 </databaseChangeLog>

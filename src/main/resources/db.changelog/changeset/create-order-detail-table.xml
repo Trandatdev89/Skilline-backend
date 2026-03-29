@@ -9,7 +9,7 @@
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" />
             </column>
-            <column name="order_id" type="bigint"/>
+            <column name="order_id" type="varchar(225)"/>
             <column name="course_id" type="bigint"/>
             <column name="price" type="decimal"/>
         </createTable>

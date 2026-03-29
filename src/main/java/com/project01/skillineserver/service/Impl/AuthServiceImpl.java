@@ -37,7 +37,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.Optional;
@@ -110,7 +109,7 @@ public class AuthServiceImpl implements AuthService {
                 log.info("Kicked old device for user: {}", userInDB.getId());
             } else {
                 // Cùng thiết bị → Cập nhật thời gian
-                device.setLastLogin(LocalDateTime.now());
+                device.setLastLogin(Instant.now());
                 device.setIpAddress(getClientIP(request));
                 userDeviceRepository.save(device);
             }
@@ -123,11 +122,11 @@ public class AuthServiceImpl implements AuthService {
         newDevice.setDeviceId(currentDeviceId);
         newDevice.setIpAddress(getClientIP(request));
         newDevice.setUserAgent(request.getHeader("User-Agent"));
-        newDevice.setLastLogin(LocalDateTime.now());
+        newDevice.setLastLogin(Instant.now());
         newDevice.setActive(true);
 
         if (newDevice.getFirstLogin() == null) {
-            newDevice.setFirstLogin(LocalDateTime.now());
+            newDevice.setFirstLogin(Instant.now());
         }
 
         userDeviceRepository.save(newDevice);
@@ -150,7 +149,7 @@ public class AuthServiceImpl implements AuthService {
                 .role(user.getUser().getRole())
                 .deviceId(currentDeviceId)
                 .role(user.getUser().getRole())
-                .avatar(user.getUser().getAvatar())
+                .avatar(user.getUser().getAvatarAssetId())
                 .build();
     }
 

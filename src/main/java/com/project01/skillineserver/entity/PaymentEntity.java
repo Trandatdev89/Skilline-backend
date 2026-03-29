@@ -19,15 +19,26 @@ public class PaymentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(name = "order_id")
-    private Long orderId;
+    private String orderId;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_method")
     private PaymentMethod paymentMethod;
+
     @Column
     private BigDecimal amount;
+
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
+
     @Column(name = "paid_at")
     private Instant paidAt;
+
+    @Column(name = "transaction_id", length = 255) // ← THÊM: mã giao dịch VNPay/Momo
+    private String transactionId;
+
+    @Column(name = "gateway_response", columnDefinition = "TEXT") // ← THÊM: raw response
+    private String gatewayResponse;
 }

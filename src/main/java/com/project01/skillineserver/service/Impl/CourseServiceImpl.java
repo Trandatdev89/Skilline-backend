@@ -3,12 +3,9 @@ package com.project01.skillineserver.service.Impl;
 import com.project01.skillineserver.dto.reponse.CourseResponse;
 import com.project01.skillineserver.dto.reponse.PageResponse;
 import com.project01.skillineserver.dto.request.CourseReq;
-import com.project01.skillineserver.entity.CategoryEntity;
 import com.project01.skillineserver.entity.CourseEntity;
 import com.project01.skillineserver.entity.EnrollmentEntity;
 import com.project01.skillineserver.enums.ErrorCode;
-import com.project01.skillineserver.enums.FileType;
-import com.project01.skillineserver.enums.SortField;
 import com.project01.skillineserver.excepion.CustomException.AppException;
 import com.project01.skillineserver.mapper.CourseMapper;
 import com.project01.skillineserver.repository.CourseRepository;
@@ -18,9 +15,6 @@ import com.project01.skillineserver.service.CourseService;
 import com.project01.skillineserver.specification.SearchCriteria;
 import com.project01.skillineserver.specification.SearchSpecification;
 import com.project01.skillineserver.utils.MapUtil;
-import com.project01.skillineserver.utils.UploadUtil;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -31,12 +25,13 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -49,7 +44,6 @@ public class CourseServiceImpl implements CourseService {
     private final CourseRepository courseRepository;
     private final EnrollmentRepository enrollmentRepository;
     private final CourseMapper courseMapper;
-    private final UploadUtil uploadUtil;
     private final CustomCourseRepository customCourseRepository;
 
     @Override
@@ -60,18 +54,15 @@ public class CourseServiceImpl implements CourseService {
                 .flatMap(courseRepository::findById)
                 .orElse(new CourseEntity());
 
-        String pathImage = resolvePathFile(courseReq.thumbnail(), courseEntityInDB.getThumbnail_url());
 
         courseEntityInDB.setCategoryId(courseReq.categoryId());
         courseEntityInDB.setDescription(courseReq.desc());
-        courseEntityInDB.setStatus(true);
+        courseEntityInDB.setDelete(courseReq.isDeleted() != null ? courseReq.isDeleted() : false);
         courseEntityInDB.setPrice(courseReq.price());
         courseEntityInDB.setLevel(courseReq.level());
         courseEntityInDB.setDiscountPrice(courseReq.discount());
         courseEntityInDB.setTitle(courseReq.title());
         courseEntityInDB.setRate(courseReq.rate());
-        courseEntityInDB.setThumbnail_url(pathImage);
-
 
         return courseRepository.save(courseEntityInDB);
     }
@@ -80,7 +71,7 @@ public class CourseServiceImpl implements CourseService {
     public void delete(List<Long> courseId) {
         List<CourseEntity> courseEntityListInDB = courseRepository.findAllByCourseIdIn(courseId);
         courseEntityListInDB.forEach(courseEntity -> {
-            courseEntity.setStatus(false);
+            courseEntity.setDelete(false);
         });
         courseRepository.saveAll(courseEntityListInDB);
     }
@@ -110,7 +101,7 @@ public class CourseServiceImpl implements CourseService {
                         .userId(userId)
                         .courseId(courseId)
                         .enrolledAt(Instant.now())
-                        .progress(0L)
+                        .progressPercent(0)
                         .build())
                 .collect(Collectors.toList());
 
@@ -221,14 +212,6 @@ public class CourseServiceImpl implements CourseService {
                 .totalElements(pageCourses.getTotalElements())
                 .totalPages(pageCourses.getTotalPages())
                 .build();
-    }
-
-    private String resolvePathFile(Object inputFile, String pathFile) throws IOException {
-        if (inputFile instanceof MultipartFile multipartFile) {
-            return uploadUtil.createPathFile(multipartFile, FileType.IMAGE).toString();
-        } else {
-            return pathFile;
-        }
     }
 
 }

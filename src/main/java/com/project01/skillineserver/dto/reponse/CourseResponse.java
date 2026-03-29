@@ -1,6 +1,7 @@
 package com.project01.skillineserver.dto.reponse;
 
 import com.project01.skillineserver.enums.LevelEnum;
+import com.project01.skillineserver.enums.PublishStatus;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -13,15 +14,15 @@ import java.math.BigDecimal;
 public class CourseResponse {
     private Long id;
     private String title;
-    private String categoryName;
     private LevelEnum level;
     private String thumbnail_url;
     private String description;
     private boolean status;
     private BigDecimal price;
-    private String discount;
+    private BigDecimal discount;
     private Double rate;
     private String createAt;
     private String updateAt;
     private Long categoryId;
+    private PublishStatus publishStatus;
 }

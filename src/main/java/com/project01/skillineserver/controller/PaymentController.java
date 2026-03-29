@@ -74,9 +74,9 @@ public class PaymentController {
 
     @GetMapping("/vnpay-payment/{id}")
     @Transactional
-    public ResponseEntity<Void> createPayment(@PathVariable int id, @RequestParam Map<String, String> params) throws JsonProcessingException {
+    public ResponseEntity<Void> createPayment(@PathVariable String orderId, @RequestParam Map<String, String> params) throws JsonProcessingException {
 
-        OrderEntity order = orderRepository.findById((long) id).orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+        OrderEntity order = orderRepository.findById(orderId).orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
         order.setStatus(OrderStatus.PAID);
         orderRepository.save(order);
 
@@ -99,7 +99,7 @@ public class PaymentController {
                 .paymentMethod(PaymentMethod.VNPAY)
                 .status(PaymentStatus.SUCCESS)
                 .amount(BigDecimal.valueOf(Double.valueOf(params.get("vnp_Amount")) / 100))
-                .orderId((long) id)
+                .orderId(orderId)
                 .build();
 
         paymentRepository.save(paymentEntity);

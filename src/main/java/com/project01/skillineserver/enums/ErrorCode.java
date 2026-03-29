@@ -39,6 +39,8 @@ public enum ErrorCode {
     QUESTION_EMPTY(1026,"question is not exits",HttpStatus.BAD_REQUEST),
     QUIZ_MAX_FIVE(1027,"That is max 5 Quiz",HttpStatus.CONFLICT),
     REFRESH_TOKEN_EXPIRE(1028, "Session of you is exprire", HttpStatus.UNAUTHORIZED),
+    MEDIA_ASSET_NOT_FOUND(1029, "Assest not found!", HttpStatus.NOT_FOUND),
+    MEDIA_ASSET_ALREADY_PROCESSED(1030, "Assest not found!", HttpStatus.BAD_REQUEST),
 
     INTERNAL_SERVER(9999,"Server error",HttpStatus.INTERNAL_SERVER_ERROR);
 

@@ -11,12 +11,11 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 
-public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
+public interface OrderRepository extends JpaRepository<OrderEntity, String> {
 
     @Query("SELECT od.id AS id, " +
             "od.status AS status, " +
             "od.createdAt AS createdAt, " +
-            "od.quantity AS quantity, " +
             "od.totalPrice AS totalPrice, " +
             "us.username AS username, " +
             "us.address AS address, " +

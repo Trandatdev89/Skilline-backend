@@ -26,7 +26,7 @@ public class CsrfValidationFilter extends OncePerRequestFilter {
     private final CsrfTokenRepository csrfTokenRepository;
 
     private static final String[] IGNORED_PATHS = {
-            "/auth/", "/api/file/", "/ws/", "/api/test"
+            "/auth/", "/api/file/", "/ws/", "/api/test", "/api/media/"
     };
 
     @Override

@@ -17,4 +17,5 @@ public class NotificationResponse {
     private String createdAt;
     private String linkAttachment;
     private boolean isActive;
+    private String readAt;
 }

@@ -29,7 +29,7 @@ public interface LectureRepository extends JpaRepository<LectureEntity, String> 
 
     @Query("select le from LectureEntity le " +
             "inner join CourseEntity co on co.id=le.courseId " +
-            "where le.courseId=?2 and co.status = true and" +
+            "where le.courseId=?2 and co.isDelete = false and" +
             "(?1 is null or le.title like lower(concat('%',?1,'%')))")
     Page<LectureEntity> getLectures(String keyword, Long courseId, PageRequest pageRequest);
 

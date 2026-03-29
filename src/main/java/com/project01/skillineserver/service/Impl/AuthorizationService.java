@@ -5,10 +5,10 @@ import com.project01.skillineserver.enums.ErrorCode;
 import com.project01.skillineserver.enums.Role;
 import com.project01.skillineserver.excepion.CustomException.AppException;
 import com.project01.skillineserver.utils.AuthenticationUtil;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.AccessDeniedException;
 
 @Service(value = "authorizationService")
 public class AuthorizationService {

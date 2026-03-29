@@ -41,9 +41,6 @@ public class MediaAssetVariantEntity extends UuidEntity<String> {
     @Column(name = "bitrate")
     private Long bitrate;
 
-    @Column(name = "size_bytes")
-    private Long sizeBytes;
-
     @Column(name = "sort_order")
     private Integer sortOrder;
 }
