@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CourseResponse {
-    private Long id;
+    private String id;
     private String title;
     private LevelEnum level;
     private String thumbnail_url;

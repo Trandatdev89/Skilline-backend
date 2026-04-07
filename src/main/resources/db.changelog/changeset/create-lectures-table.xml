@@ -10,13 +10,11 @@
                 <constraints primaryKey="true" />
             </column>
             <column name="title" type="varchar(255)"/>
-            <column name="duration" type="varchar(255)"/>
+            <column name="duration_seconds" type="bigint"/>
             <column name="position" type="int"/>
             <column name="course_id" type="bigint"/>
-            <column name="created_at" type="timestamp"/>
-            <column name="image" type="varchar(255)"/>
             <column name="content_type" type="varchar(255)"/>
-            <column name="file_path" type="varchar(255)"/>
+
         </createTable>
 
         <addForeignKeyConstraint

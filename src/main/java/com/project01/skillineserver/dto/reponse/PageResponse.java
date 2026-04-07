@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.util.List;
 
 @Data
@@ -17,4 +18,6 @@ public class PageResponse <T>{
     private List<T> list;
     private int totalPages;
     private long totalElements;
+    private Instant nextCursor;
+    private boolean hasNextPage;
 }

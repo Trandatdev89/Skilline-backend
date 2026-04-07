@@ -16,6 +16,8 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -92,6 +94,31 @@ public class HlsTranscodeService {
             deleteDirectory(workDir);
             log.info("[{}] Cleaned up work dir", assetId);
         }
+    }
+
+    private void extractMetaDataImageOfFile(MediaAssetEntity asset, Path fileImage) throws IOException {
+        BufferedImage imageIO = ImageIO.read(fileImage.toFile());
+        if (imageIO != null) {
+            asset.setWidthPx(imageIO.getWidth());
+            asset.setHeightPx(imageIO.getHeight());
+        }
+    }
+
+    private void extractMetaDataVideoOfFile(MediaAssetEntity asset, Path fileImage) throws IOException, InterruptedException {
+        List<String> cmd = List.of(
+                "ffprobe",
+                "-v", "quiet",
+                "-print_format", "json",
+                "-show_streams",
+                fileImage.toAbsolutePath().toString()
+        );
+        Process process = new ProcessBuilder(cmd)
+                .redirectErrorStream(true)
+                .start();
+
+        String output = new String(process.getInputStream().readAllBytes());
+
+        process.waitFor();
     }
 
     // =====================================================================

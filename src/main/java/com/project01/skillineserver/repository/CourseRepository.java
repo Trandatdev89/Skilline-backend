@@ -9,10 +9,11 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-public interface CourseRepository extends JpaRepository<CourseEntity,Long>, JpaSpecificationExecutor<CourseEntity> {
+public interface CourseRepository extends JpaRepository<CourseEntity, String>, JpaSpecificationExecutor<CourseEntity> {
     List<CourseEntity> findAllByCategoryId(Long categoryId);
 
     @Query("select c from CourseEntity c where c.isDelete = false and c.id in :id")
@@ -22,20 +23,28 @@ public interface CourseRepository extends JpaRepository<CourseEntity,Long>, JpaS
     Optional<CourseEntity> findByCourseId(Long id);
 
     @Modifying
-    @Query("delete from CourseEntity c where c.categoryId in :categoryIds")
-    void deleteAllByCategoryIdIn(List<Long> categoryIds);
+    @Query("update CourseEntity c set c.isDelete = true where c.categoryId in :courseIds")
+    void deleteAllByCourseIdIn(List<String> courseIds);
 
     @Query("select c " +
             "from CourseEntity c " +
             "where c.isDelete = false and (?1 is null or c.title like lower(concat('%',?1,'%'))) " +
             "and (?2 is null or c.categoryId = ?2 )")
-    Page<CourseEntity> getCourses(String title,Long category_id, Pageable pageable);
+    Page<CourseEntity> getCourses(String title, String category_id, Pageable pageable);
+
+    @Query("select c " +
+            "from CourseEntity c " +
+            "where c.isDelete = false and (?1 is null or c.title like lower(concat('%',?1,'%'))) " +
+            "and (?2 is null or c.categoryId = ?2 ) " +
+            "and c.createdAt <= ?3 " +
+            "order by c.createdAt desc")
+    Page<CourseEntity> getCoursesWithCursor(String title, String category_id, Instant cursorNext, int size);
 
     @Query("select c " +
             "from CourseEntity c " +
             "where c.isDelete = false and c.createdBy=?3 and(?1 is null or c.title like lower(concat('%',?1,'%'))) " +
             "and (?2 is null or c.categoryId = ?2 )")
-    Page<CourseEntity> getCoursesByMySelf(String title,Long category_id,Long userId,Pageable pageable);
+    Page<CourseEntity> getCoursesByMySelf(String title, String category_id, Long userId, Pageable pageable);
 
     @Query("SELECT c.id FROM CourseEntity c WHERE c.id IN :ids")
     List<Long> findAllIdsByIdIn(@Param("ids") List<Long> ids);

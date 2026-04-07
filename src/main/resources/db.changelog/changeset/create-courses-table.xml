@@ -19,6 +19,8 @@
             <column name="is_delete" type="TINYINT(1)"/>
             <column name="rate" type="double"/>
             <column name="category_id" type="bigint"/>
+            <column name="access_duration_value" type="bigint"/>
+            <column name="access_duration_unit" type="varchar(255)"/>
         </createTable>
 
         <addForeignKeyConstraint

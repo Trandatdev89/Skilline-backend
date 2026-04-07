@@ -11,13 +11,17 @@ import lombok.*;
 @Builder
 @Entity
 @Table(name = "email_template")
-public class EmailTemplate extends BaseEntity<Long> {
+public class EmailTemplate extends UuidEntity<String> {
 
     @Enumerated(EnumType.STRING)
     private EmailType type;
+
     private String subject;
+
     @Column(columnDefinition = "TEXT")
     private String htmlContent;
+
     private String language;
+
     private boolean active;
 }

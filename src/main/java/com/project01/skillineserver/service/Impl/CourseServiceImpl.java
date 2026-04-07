@@ -10,7 +10,6 @@ import com.project01.skillineserver.excepion.CustomException.AppException;
 import com.project01.skillineserver.mapper.CourseMapper;
 import com.project01.skillineserver.repository.CourseRepository;
 import com.project01.skillineserver.repository.EnrollmentRepository;
-import com.project01.skillineserver.repository.custom.CustomCourseRepository;
 import com.project01.skillineserver.service.CourseService;
 import com.project01.skillineserver.specification.SearchCriteria;
 import com.project01.skillineserver.specification.SearchSpecification;
@@ -28,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -44,7 +42,6 @@ public class CourseServiceImpl implements CourseService {
     private final CourseRepository courseRepository;
     private final EnrollmentRepository enrollmentRepository;
     private final CourseMapper courseMapper;
-    private final CustomCourseRepository customCourseRepository;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = {AppException.class})
@@ -56,24 +53,29 @@ public class CourseServiceImpl implements CourseService {
 
 
         courseEntityInDB.setCategoryId(courseReq.categoryId());
-        courseEntityInDB.setDescription(courseReq.desc());
-        courseEntityInDB.setDelete(courseReq.isDeleted() != null ? courseReq.isDeleted() : false);
+        courseEntityInDB.setDescription(courseReq.description());
+        courseEntityInDB.setDelete(true);
         courseEntityInDB.setPrice(courseReq.price());
         courseEntityInDB.setLevel(courseReq.level());
         courseEntityInDB.setDiscountPrice(courseReq.discount());
         courseEntityInDB.setTitle(courseReq.title());
         courseEntityInDB.setRate(courseReq.rate());
+        courseEntityInDB.setPublishStatus(courseReq.publishStatus());
+        courseEntityInDB.setAccessDurationUnit(courseReq.accessDurationUnit());
+        courseEntityInDB.setAccessDurationValue(courseReq.accessDurationValue());
+        courseEntityInDB.setThumbnailAssetId(courseReq.assetId());
 
         return courseRepository.save(courseEntityInDB);
     }
 
     @Override
-    public void delete(List<Long> courseId) {
-        List<CourseEntity> courseEntityListInDB = courseRepository.findAllByCourseIdIn(courseId);
-        courseEntityListInDB.forEach(courseEntity -> {
-            courseEntity.setDelete(false);
-        });
-        courseRepository.saveAll(courseEntityListInDB);
+    public void delete(List<String> courseId) {
+
+        if (courseId == null || courseId.isEmpty()) {
+            throw new AppException(ErrorCode.LIST_ID_EMPTY);
+        }
+
+        courseRepository.deleteAllByCourseIdIn(courseId);
     }
 
     @Override
@@ -109,17 +111,12 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public List<CourseResponse> getListCourseById(List<Long> ids) {
-        return courseRepository.findAllByCourseIdIn(ids).stream().map(courseMapper::toLectureResponse).toList();
-    }
-
-    @Override
-    public PageResponse<CourseResponse> getCourses(int page, int size, String sort, String keyword,Long categoryId) {
+    public PageResponse<CourseResponse> getCourses(int page, int size, String sort, String keyword, String categoryId) {
         Sort sortField = MapUtil.parseSort(sort);
 
         PageRequest pageRequest = PageRequest.of(page - 1, size, sortField);
 
-        Page<CourseEntity> pageCourses = courseRepository.getCourses(keyword,categoryId,pageRequest);
+        Page<CourseEntity> pageCourses = courseRepository.getCourses(keyword, categoryId, pageRequest);
 
         List<CourseResponse> courseResponseList = pageCourses.getContent().stream().map(courseMapper::toLectureResponse).toList();
 
@@ -186,22 +183,32 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public PageResponse<CourseResponse> getCoursesWithCursor(LocalDateTime cursor, String sort, String keyword, int size) {
+    public PageResponse<CourseResponse> getCoursesWithCursor(Instant cursor, String sort, String keyword, int size, String categoryId) {
 
-//        Map<String,String> sortField = JavaUtil.extractFieldToMap(sort);
-//        Map<String,String> keywordField = JavaUtil.extractFieldToMap(keyword);
-//
-//        Page<CourseEntity> pages = courseRepository.findAllByCursor(cursor,sortField.get,keywordField,size);
-        return null;
+        Page<CourseEntity> pages = courseRepository.getCoursesWithCursor(keyword, categoryId, cursor, size);
+
+        List<CourseResponse> courseResponseList = pages.getContent().stream().map(courseMapper::toLectureResponse).toList();
+
+        int indexLast = pages.getContent().size();
+        Instant nextCursor = pages.getContent().get(indexLast - 1).getCreatedAt();
+
+        return PageResponse.<CourseResponse>builder()
+                .list(courseResponseList)
+                .size(size)
+                .nextCursor(nextCursor)
+                .hasNextPage(size == indexLast)
+                .totalElements(pages.getTotalElements())
+                .totalPages(pages.getTotalPages())
+                .build();
     }
 
     @Override
-    public PageResponse<CourseResponse> getCoursesByMySelf(int page, int size, String sort, String keyword, Long categoryId, Long userId) {
+    public PageResponse<CourseResponse> getCoursesByMySelf(int page, int size, String sort, String keyword, String categoryId, Long userId) {
         Sort sortField = MapUtil.parseSort(sort);
 
         PageRequest pageRequest = PageRequest.of(page - 1, size, sortField);
 
-        Page<CourseEntity> pageCourses = courseRepository.getCoursesByMySelf(keyword,categoryId,userId,pageRequest);
+        Page<CourseEntity> pageCourses = courseRepository.getCoursesByMySelf(keyword, categoryId, userId, pageRequest);
 
         List<CourseResponse> courseResponseList = pageCourses.getContent().stream().map(courseMapper::toLectureResponse).toList();
 

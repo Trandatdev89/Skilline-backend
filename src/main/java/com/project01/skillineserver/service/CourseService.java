@@ -4,21 +4,22 @@ import com.project01.skillineserver.dto.reponse.CourseResponse;
 import com.project01.skillineserver.dto.reponse.PageResponse;
 import com.project01.skillineserver.dto.request.CourseReq;
 import com.project01.skillineserver.entity.CourseEntity;
-import com.project01.skillineserver.entity.UserEntity;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 
 public interface CourseService {
     CourseEntity save(CourseReq courseReq) throws IOException;
-    void delete(List<Long> courseId);
+
+    void delete(List<String> courseId);
     CourseResponse getCourseById(Long id);
     void purchaseCourse(List<Long> idCourse,Long userId);
-    List<CourseResponse> getListCourseById(List<Long> ids);
-    PageResponse<CourseResponse> getCourses(int page, int size, String sort, String keyword,Long categoryId);
+
+    PageResponse<CourseResponse> getCourses(int page, int size, String sort, String keyword, String categoryId);
     PageResponse<CourseResponse> searchAdvanceCourse(String[] search,int page,int size,String sort);
-    PageResponse<CourseResponse> getCoursesWithCursor(LocalDateTime cursor,String sort,String keyword,int size);
-    PageResponse<CourseResponse> getCoursesByMySelf(int page, int size, String sort, String keyword,Long categoryId,Long userId);
+
+    PageResponse<CourseResponse> getCoursesWithCursor(Instant cursor, String sort, String keyword, int size, String categoryId);
+
+    PageResponse<CourseResponse> getCoursesByMySelf(int page, int size, String sort, String keyword, String categoryId, Long userId);
 }
