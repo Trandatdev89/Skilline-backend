@@ -12,15 +12,11 @@ import lombok.*;
 @Setter
 @Entity
 @Table(name = "category")
-public class CategoryEntity extends UuidEntity<String> {
-
+public class CategoryEntity extends BaseEntity<Long> {
     private String name;
-
-    @Column(name = "slug", unique = true)
+    @Column(name = "slug", unique = true) // ← nên đổi "path" thành "slug" cho rõ
     private String slug;
-
     private boolean isActive;
-
     @Column(name = "thumbnail_asset_id")
     private String thumbnailAssetId;
 }

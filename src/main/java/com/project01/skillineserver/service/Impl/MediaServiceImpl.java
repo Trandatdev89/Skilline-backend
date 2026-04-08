@@ -75,7 +75,6 @@ public class MediaServiceImpl implements MediaService {
                 .isPrivate(req.assetType() == AssetType.VIDEO) // video private, ảnh public
                 .build();
 
-
         mediaAssetRepository.save(asset);
         log.info("Created media asset [{}] for objectKey [{}]", asset.getId(), objectKey);
 
@@ -192,7 +191,7 @@ public class MediaServiceImpl implements MediaService {
      * - Video: https://cdn.example.com/videos/hls/2025/06/uuid/master.m3u8
      */
     private String buildCdnUrl(MediaAssetEntity asset) {
-        String cdnDomain = cdnProperties.getDomain();
+        String cdnDomain = cdnProperties.getDomain(); // ví dụ: https://d1234abcd.cloudfront.net
 
         if (asset.getAssetType() == AssetType.VIDEO) {
             // HLS master playlist

@@ -13,7 +13,6 @@ import java.time.Instant;
 @Entity
 @Table(name = "course_progress")
 public class CourseProgressEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,9 +29,9 @@ public class CourseProgressEntity {
     @Column(name = "completed_at")
     private Instant completedAt;
 
-    @Column(name = "watch_duration_seconds")
+    @Column(name = "watch_duration_seconds") // ← nên thêm: đã xem bao nhiêu giây
     private Long watchDurationSeconds;
 
-    @Column(name = "last_watched_at")
+    @Column(name = "last_watched_at")        // ← nên thêm: lần cuối xem
     private Instant lastWatchedAt;
 }

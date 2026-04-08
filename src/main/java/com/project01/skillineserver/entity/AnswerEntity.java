@@ -12,12 +12,10 @@ import lombok.*;
 @Getter
 @Setter
 @Entity
-@Table(name = "answer")
+@Table(name = "answer") //dap an chuan cua teacher
 public class AnswerEntity extends BaseEntity<Long> {
-
     @Column(name = "question_id")
     private Long questionId;
-
     private String content;
 
     @Column(name = "is_correct", nullable = false)

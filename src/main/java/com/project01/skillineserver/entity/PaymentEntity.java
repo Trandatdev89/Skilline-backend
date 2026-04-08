@@ -17,8 +17,8 @@ import java.time.Instant;
 @Table(name = "payment")
 public class PaymentEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(name = "order_id")
     private String orderId;

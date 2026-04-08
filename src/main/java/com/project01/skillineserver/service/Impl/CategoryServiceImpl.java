@@ -7,7 +7,6 @@ import com.project01.skillineserver.entity.CategoryEntity;
 import com.project01.skillineserver.enums.ErrorCode;
 import com.project01.skillineserver.excepion.CustomException.AppException;
 import com.project01.skillineserver.mapper.CategoryMapper;
-import com.project01.skillineserver.projection.CategoryProjection;
 import com.project01.skillineserver.repository.CategoryRepository;
 import com.project01.skillineserver.service.CategoryService;
 import com.project01.skillineserver.utils.MapUtil;
@@ -31,9 +30,8 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryMapper categoryMapper;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = AppException.class)
     public void save(CategoryReq category) throws IOException {
-
         CategoryEntity categoryInDB = Optional.ofNullable(category.id())
                 .flatMap(categoryRepository::findById)
                 .orElse(new CategoryEntity());
@@ -41,7 +39,6 @@ public class CategoryServiceImpl implements CategoryService {
         categoryInDB.setName(category.name());
         categoryInDB.setActive(true);
         categoryInDB.setSlug(category.slug());
-        categoryInDB.setThumbnailAssetId(category.assetId());
 
         categoryRepository.save(categoryInDB);
     }
@@ -51,7 +48,7 @@ public class CategoryServiceImpl implements CategoryService {
         Sort sortField = MapUtil.parseSort(sort);
         PageRequest pageRequest  = PageRequest.of(page-1, size,sortField);
 
-        Page<CategoryProjection> pageCategories = categoryRepository.getCategories(keyword, pageRequest);
+        Page<CategoryEntity> pageCategories = categoryRepository.getCategories(keyword,pageRequest);
 
         List<CategoryResponse> list = pageCategories.getContent().stream().map(categoryMapper::toCategoriesResponse).toList();
 
@@ -69,7 +66,7 @@ public class CategoryServiceImpl implements CategoryService {
         Sort sortField = MapUtil.parseSort(sort);
         PageRequest pageRequest  = PageRequest.of(page-1, size,sortField);
 
-        Page<CategoryProjection> pageCategories = categoryRepository.getCategoriesMySelf(keyword, userId, pageRequest);
+        Page<CategoryEntity> pageCategories = categoryRepository.getCategoriesMySelf(keyword,userId,pageRequest);
 
         List<CategoryResponse> list = pageCategories.getContent().stream().map(categoryMapper::toCategoriesResponse).toList();
 
@@ -83,7 +80,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = {AppException.class})
     public void delete(List<Long> categoryIds) {
         if(categoryIds == null || categoryIds.isEmpty()){
             throw new AppException(ErrorCode.LIST_ID_EMPTY);

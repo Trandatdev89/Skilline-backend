@@ -1,13 +1,11 @@
 package com.project01.skillineserver.dto.request;
 
-import com.project01.skillineserver.enums.ExpireUnit;
 import com.project01.skillineserver.enums.LevelEnum;
-import com.project01.skillineserver.enums.PublishStatus;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 
-public record CourseReq(String id, String title, String description, Double rate,
+public record CourseReq(Long id, String title, String desc,Double rate,
                         LevelEnum level, BigDecimal price, BigDecimal discount,
-                        String assetId, String categoryId, Integer accessDurationValue,
-                        ExpireUnit accessDurationUnit, PublishStatus publishStatus) {
+                        MultipartFile thumbnail, Long categoryId, Boolean isDeleted) {
 }

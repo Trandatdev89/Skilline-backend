@@ -1,0 +1,1727 @@
+{
+	"info": {
+		"_postman_id": "532254ac-0ace-4747-9b6a-5e1a7d4ad97d",
+		"name": "Project-course",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "44972404",
+		"_collection_link": "https://trandat-187314.postman.co/workspace/Tran-Dat's-Workspace~1348a2c3-d9cc-47bf-8702-88d39b43e549/collection/44972404-532254ac-0ace-4747-9b6a-5e1a7d4ad97d?action=share&source=collection_link&creator=44972404"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "introspect-token",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"accessToken\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwic2NvcGUiOiJBRE1JTiIsImlzcyI6ImFkbWluIiwidHlwZVRva2VuIjoiQUNDRVNTX1RPS0VOIiwibG9naW5BdCI6IjIwMjUtMTItMTFUMTQ6NTc6NTguMzgyMjIyNjgxIiwiZXhwIjoxNzY1NDM5OTM4LCJpYXQiOjE3NjU0Mzk4NzgsImp0aSI6ImFjY2EzM2U2LWJkNjUtNDhmZC05NTk1LWNkY2M5NmViOWU3NSJ9.YgXTZuCOs4CXH7Ixug8gG-aFq2dSpf1eskqkWDzAqJI\",\n    \"refreshToken\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwic2NvcGUiOiJBRE1JTiIsImlzcyI6ImFkbWluIiwibG9naW5BdCI6IjIwMjUtMTItMDJUMTQ6Mjc6MjAuODY3MDI4MjczIiwiZXhwIjoxNzY1OTU2NDQwLCJpYXQiOjE3NjQ2NjA0NDAsImp0aSI6IjhmMDM5ZDAwLTUyMjEtNDQwMi04YzcxLTY5OTZlYWZmNjNjNCJ9.iZ_chipNJGAbwhGYuzBaUMSzm9wmRqBvYWDUeLVyejY\",\n    \"tokenType\":\"ACCESS_TOKEN\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/auth/introspect-token",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"auth",
+								"introspect-token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\":\"admin\",\n    \"password\": \"admin\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"auth",
+								"login"
+							],
+							"query": [
+								{
+									"key": "commentParentId",
+									"value": "10523c8a216013d4d40aab00adb4eab4a79",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "size",
+									"value": "5",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "register",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\":\"datmacay_v2\",\n    \"password\": \"Longga@12\",\n    \"fullname\":\"tran van nghia\",\n    \"phone\":\"0599559595\",\n    \"email\":\"datma123@yopmail.com\",\n    \"address\":\"HY\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/auth/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"auth",
+								"register"
+							],
+							"query": [
+								{
+									"key": "commentParentId",
+									"value": "10523c8a216013d4d40aab00adb4eab4a79",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "size",
+									"value": "5",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh-token",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"accessToken\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwic2NvcGUiOiJBRE1JTiIsImlzcyI6ImFkbWluIiwibG9naW5BdCI6IjIwMjUtMTItMDJUMTQ6Mjc6MjAuODM1NzI3NDMxIiwiZXhwIjoxNzY0NzQ2ODQwLCJpYXQiOjE3NjQ2NjA0NDAsImp0aSI6IjVkOTZkMGVhLTg5ZDktNDY1Ni1hYTRhLTVlODc5YTY2ODNmZSJ9.li3lLGeu6Acp67PBxfknpOxe66m3l3Au_6nfWjmnss0\",\n    \"refreshToken\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwic2NvcGUiOiJBRE1JTiIsImlzcyI6ImFkbWluIiwidHlwZVRva2VuIjoiUkVGUkVTSF9UT0tFTiIsImxvZ2luQXQiOiIyMDI1LTEyLTExVDEzOjQxOjQ0LjU3MDg3OTYyOSIsImV4cCI6MTc2NjczMTMwNCwiaWF0IjoxNzY1NDM1MzA0LCJqdGkiOiI5MzRmMGJhZS0xZGNlLTRmYTQtYmMzOS02YTZlZWYxY2I5NjUifQ.oLZ0-BOMGPeQAC4G-VDZDTefZUEjQvpPLhFLl3WD_5s\",\n    \"tokenType\":\"REFRESH_TOKEN\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/auth/refresh-token",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"auth",
+								"refresh-token"
+							],
+							"query": [
+								{
+									"key": "commentParentId",
+									"value": "10523c8a216013d4d40aab00adb4eab4a79",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "size",
+									"value": "5",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "logout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/user/logout",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"user",
+								"logout"
+							],
+							"query": [
+								{
+									"key": "commentParentId",
+									"value": "10523c8a216013d4d40aab00adb4eab4a79",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "size",
+									"value": "5",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Category",
+			"item": [
+				{
+					"name": "save-cate",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "multipart/form-data",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "IT",
+									"type": "text"
+								},
+								{
+									"key": "path",
+									"type": "file",
+									"src": "/home/rb091/Pictures/Screenshots/Screenshot from 2025-12-12 15-24-20.png"
+								},
+								{
+									"key": "id",
+									"value": "7",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/category",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"category"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/category/6,7",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"category",
+								"6,7"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "cateory-pagi",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Marketing",
+									"type": "text"
+								},
+								{
+									"key": "path",
+									"type": "file",
+									"src": "/C:/Users/admin/Pictures/Saved Pictures/anh8.jpg",
+									"disabled": true
+								},
+								{
+									"key": "id",
+									"value": "7",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/category/pagination?page=1&size=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"category",
+								"pagination"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "sort",
+									"value": "name:ASC",
+									"disabled": true
+								},
+								{
+									"key": "keyword",
+									"value": "it",
+									"disabled": true
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Course",
+			"item": [
+				{
+					"name": "save-course",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "multipart/form-data",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Mechinlearning   ",
+									"type": "text"
+								},
+								{
+									"key": "desc",
+									"value": "Khoa hoc gia re moi",
+									"type": "text"
+								},
+								{
+									"key": "level",
+									"value": "MASTER",
+									"type": "text"
+								},
+								{
+									"key": "price",
+									"value": "250000",
+									"type": "text"
+								},
+								{
+									"key": "discount",
+									"value": "20",
+									"type": "text"
+								},
+								{
+									"key": "thumbnail",
+									"type": "file",
+									"src": "/home/rb091/Pictures/Screenshots/Screenshot from 2025-12-04 16-00-28.png"
+								},
+								{
+									"key": "categoryId",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "id",
+									"value": "2",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/course/save",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"course",
+								"save"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "10523c8a216013d4d40aab00adb4eab4a79",
+									"disabled": true
+								},
+								{
+									"key": "",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "siz",
+									"value": "5",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getListCourseByCateId",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "multipart/form-data",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Lap trinh Java core",
+									"type": "text"
+								},
+								{
+									"key": "desc",
+									"value": "Khoa hoc gia re moi",
+									"type": "text"
+								},
+								{
+									"key": "level",
+									"value": "BEGINNER",
+									"type": "text"
+								},
+								{
+									"key": "price",
+									"value": "16000000",
+									"type": "text"
+								},
+								{
+									"key": "discount",
+									"value": "100",
+									"type": "text"
+								},
+								{
+									"key": "thumbnail",
+									"type": "file",
+									"src": [],
+									"disabled": true
+								},
+								{
+									"key": "categoryId",
+									"value": "3",
+									"type": "text"
+								},
+								{
+									"key": "id",
+									"value": "2",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/course?categoryId=3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"course"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "categoryId",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get Course-not-pagi",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/course/not-pagi",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"course",
+								"not-pagi"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get Course pagi",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/course/all?page=1&size=10&sort=price:DESC",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"course",
+								"all"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "categoryId",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "keyword",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "price:DESC"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "detele-course",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/course/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"course",
+								"2"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Lecture",
+			"item": [
+				{
+					"name": "save-lecture",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "multipart/form-data",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "loi mo dau gioi thieu ve lap trinh",
+									"type": "text"
+								},
+								{
+									"key": "courseId",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "position",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "videoFile",
+									"type": "file",
+									"src": "/home/rb091/Videos/video1.mp4"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/lecture/save",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"lecture",
+								"save"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-list-lecture",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/lecture?page=1&size=10&courseId=2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"lecture"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sort",
+									"value": "ASC",
+									"disabled": true
+								},
+								{
+									"key": "keyword",
+									"value": "abc",
+									"disabled": true
+								},
+								{
+									"key": "courseId",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Order",
+			"item": [
+				{
+					"name": "save",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"totalPrice\":\"100000\",\n    \"status\":\"PENDING\",\n    \"courseId\":[\n        1\n    ],\n    \"quantity\":1\n\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/order",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"order"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-orders",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/order?sort=createAt:ASC&keyword=user&page=1&size=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"order"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": "createAt:ASC"
+								},
+								{
+									"key": "keyword",
+									"value": "user"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "payment",
+			"item": [
+				{
+					"name": "payment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/payment?orderId=2&amount=100000&courses=1&userId=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"payment"
+							],
+							"query": [
+								{
+									"key": "orderId",
+									"value": "2"
+								},
+								{
+									"key": "amount",
+									"value": "100000"
+								},
+								{
+									"key": "courses",
+									"value": "1"
+								},
+								{
+									"key": "userId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "enrollment",
+			"item": [
+				{
+					"name": "check-enrolment-course",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/enrollment/check?courseId=3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"enrollment",
+								"check"
+							],
+							"query": [
+								{
+									"key": "courseId",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-list-couse-user-buy",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/enrollment/buy",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"enrollment",
+								"buy"
+							],
+							"query": [
+								{
+									"key": "categoryId",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "keyword",
+									"value": "1",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "search",
+			"item": [
+				{
+					"name": "search-course-advance",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/course/search-advance?page=1&size=1&sort=title:asc&title=Lap t&level=BEGINNER&discount_price=50&rateStart=&category_id=1&priceStart=100000&priceEnd=170000&rateEnd",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"course",
+								"search-advance"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "size",
+									"value": "1"
+								},
+								{
+									"key": "sort",
+									"value": "title:asc"
+								},
+								{
+									"key": "title",
+									"value": "Lap t"
+								},
+								{
+									"key": "level",
+									"value": "BEGINNER"
+								},
+								{
+									"key": "discount_price",
+									"value": "50"
+								},
+								{
+									"key": "rateStart",
+									"value": ""
+								},
+								{
+									"key": "category_id",
+									"value": "1"
+								},
+								{
+									"key": "priceStart",
+									"value": "100000"
+								},
+								{
+									"key": "priceEnd",
+									"value": "170000"
+								},
+								{
+									"key": "rateEnd",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "test",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/course/search-advance?search=level:BEGINNER&page=1&size=5",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"course",
+								"search-advance"
+							],
+							"query": [
+								{
+									"key": "title",
+									"value": "L",
+									"disabled": true
+								},
+								{
+									"key": "level",
+									"value": "BEGINNER",
+									"disabled": true
+								},
+								{
+									"key": "categoryId",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "id",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "priceStart",
+									"value": "7000000",
+									"disabled": true
+								},
+								{
+									"key": "priceEnd",
+									"value": "55000000",
+									"disabled": true
+								},
+								{
+									"key": "search",
+									"value": "level:BEGINNER"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "size",
+									"value": "5"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "progress",
+			"item": [
+				{
+					"name": "save",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/progress?lectureId=b4858305-1822-402b-8c3a-e0b84c5d41bb&enrollmentId=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"progress"
+							],
+							"query": [
+								{
+									"key": "lectureId",
+									"value": "b4858305-1822-402b-8c3a-e0b84c5d41bb"
+								},
+								{
+									"key": "enrollmentId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check-list",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8080/api/progress?enrollmentId=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"progress"
+							],
+							"query": [
+								{
+									"key": "lectureId",
+									"value": "b4858305-1822-402b-8c3a-e0b84c5d41bb",
+									"disabled": true
+								},
+								{
+									"key": "enrollmentId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "quiz",
+			"item": [
+				{
+					"name": "save-quiz",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\":1,\n    \"title\":\"Bai kiem tra so 1\",\n    \"lectureId\":\"1f0cd373-b14d-499f-8125-dfc1e0fadd73\",\n    \"desc\":\"day la mo ta lai nhes\",\n    \"position\":1,\n    \"timeLimit\":null,\n    \"maxAttempt\":10\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/quiz",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"quiz"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "question",
+			"item": [
+				{
+					"name": "save-question",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quizId\": 1,\n    \"questions\": [\n        {\n            \"id\": 8,\n            \"content\": \"Việt Nam là một trong những cái nôi của loài người vì\\nA. xuất hiện những dấu tích của Người tối cổ trên phạm vi cả nước.\\nB. có lịch sử hình thành từ rất lâu đời.\\nC. tiếp giáp với khu vực phát hiện ra dấu tích của Người tối cổ ở Campuchia.\\nD. xuất hiện dấu tích của vượn người trên phạm vi cả nước.Vay theo ban la dap an nao\",\n            \"type\": \"SINGLE\",\n            \"position\": 1,\n            \"score\": 1.0,\n            \"answerReqs\": [\n                {\n                    \"id\":21,\n                    \"content\": \"A. xuất hiện những dấu tích của Người tối cổ trên phạm vi cả nước.\",\n                    \"isCorrect\": false\n                },\n                {\n                    \"id\":22,\n                    \"content\": \"B. có lịch sử hình thành từ rất lâu đời.\",\n                    \"isCorrect\": false\n                },\n                {\n                    \"id\":23,\n                    \"content\": \"C. tiếp giáp với khu vực phát hiện ra dấu tích của Người tối cổ ở Campuchia.\",\n                    \"isCorrect\": false\n                },\n                {\n                    \"id\":24,\n                    \"content\": \"D. xuất hiện dấu tích của vượn người trên phạm vi cả nước.\",\n                    \"isCorrect\": true\n                }\n            ]\n        },{\n            \"id\": 9,\n            \"content\": \"Nguyên nhân chính của kiểu tiến hóa đồng quy\\nA. một loài phân bố ở nhiều môi trường khác nhau.\\nB. các kiểu gen khác nhau nhưng đột biến như nhau.\\nC. môi trường ổn định rất lâu\\nD. các loài khác nhau sống ở cùng môi trường như nhau.\",\n            \"type\": \"MULTIPLE\",\n            \"position\": 2,\n            \"score\": 1.0,\n            \"answerReqs\": [\n                {\n                    \"id\":25,\n                    \"content\": \"A. một loài phân bố ở nhiều môi trường khác nhau.\",\n                    \"isCorrect\": false\n                },\n                {\n                    \"id\":26,\n                    \"content\": \"B. các kiểu gen khác nhau nhưng đột biến như nhau.\",\n                    \"isCorrect\": true\n                },\n                {\n                    \"id\":27,\n                    \"content\": \"C. môi trường ổn định rất lâu nhung kem.\",\n                    \"isCorrect\": true\n                },\n                {\n                    \"id\":28,\n                    \"content\": \"D. các loài khác nhau sống ở cùng môi trường như nhau.\",\n                    \"isCorrect\": false\n                }\n            ]\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/question",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"question"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "attempt-quiz",
+			"item": [
+				{
+					"name": "submit-quiz",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quizId\": 1,\n    \"answerUserReqs\": [\n        {\n            \"questionId\": 8,\n            \"answerId\": 24,\n            \"answerText\": \"D. xuất hiện dấu tích của vượn người trên phạm vi cả nước.\",\n            \"score\": 1.0\n        },\n        {\n            \"questionId\": 9,\n            \"answerId\": 25,\n            \"answerText\": \"A. một loài phân bố ở nhiều môi trường khác nhau.\",\n            \"score\": 0.5\n        },\n        {\n            \"questionId\": 9,\n            \"answerId\": 26,\n            \"answerText\": \"B. các kiểu gen khác nhau nhưng đột biến như nhau.\",\n            \"score\": 0.5\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/attempt-quiz",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"attempt-quiz"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "get-info",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/user/info",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"user",
+						"info"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": "10523c8a216013d4d40aab00adb4eab4a79",
+							"disabled": true
+						},
+						{
+							"key": "",
+							"value": "1",
+							"disabled": true
+						},
+						{
+							"key": "siz",
+							"value": "5",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
