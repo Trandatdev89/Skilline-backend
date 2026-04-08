@@ -1,5 +1,6 @@
 package com.project01.skillineserver.entity;
 
+import com.project01.skillineserver.enums.ExpireUnit;
 import com.project01.skillineserver.enums.LevelEnum;
 import com.project01.skillineserver.enums.PublishStatus;
 import jakarta.persistence.*;
@@ -42,4 +43,11 @@ public class CourseEntity extends BaseEntity<Long> {
 
     @Column(name = "discount_price", precision = 12, scale = 2)
     private BigDecimal discountPrice;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "access_duration_unit", length = 20)
+    private ExpireUnit accessDurationUnit;
+
+    @Column(name = "access_duration_value")
+    private Integer accessDurationValue;
 }

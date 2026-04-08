@@ -11,7 +11,15 @@
             </column>
             <column name="name" type="varchar(255)"/>
             <column name="slug" type="varchar(255)"/>
+            <column name="is_active" type="TINYINT"/>
             <column name="thumbnail_asset_id" type="varchar(255)"/>
         </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="category"
+                baseColumnNames="thumbnail_asset_id"
+                referencedTableName="media_asset"
+                referencedColumnNames="id"
+                constraintName="fk_category_media_asset"/>
     </changeSet>
 </databaseChangeLog>

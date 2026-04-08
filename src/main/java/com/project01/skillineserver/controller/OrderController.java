@@ -60,14 +60,10 @@ public class OrderController {
     @PostMapping
     @PreAuthorize("@authorizationService.isCanAccessApi()")
     public ApiResponse<OrderEntity> saveOrder(@RequestBody OrderReq orderReq, @AuthenticationPrincipal CustomUserDetail customUserDetail) {
-        Long userId = customUserDetail.getUser().getId();
-
-        orderReq.setUserId(userId);
-
         return ApiResponse.<OrderEntity>builder()
                 .code(200)
-                .data(orderService.saveOrder(orderReq))
                 .message("Success")
+                .data(orderService.saveOrder(orderReq))
                 .build();
     }
 }

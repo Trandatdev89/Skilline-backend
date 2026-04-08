@@ -6,7 +6,6 @@ import com.project01.skillineserver.enums.Role;
 import com.project01.skillineserver.excepion.CustomException.AppException;
 import com.project01.skillineserver.utils.AuthenticationUtil;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 
@@ -47,11 +46,4 @@ public class AuthorizationService {
         return customUserDetail != null;
     }
 
-    private boolean checkAuthen() {
-        Authentication authentication = AuthenticationUtil.getAuthentication();
-        if (!AuthenticationUtil.isAuthenticated(authentication)) {
-            return true;
-        }
-        return false;
-    }
 }

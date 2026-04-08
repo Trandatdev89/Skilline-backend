@@ -9,4 +9,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "app.kafka")
 public class KafkaTopicProperties {
     private String mediaUploadedTopic;
+    private String paymentTransaction;
 }

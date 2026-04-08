@@ -8,7 +8,9 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface MediaAssetRepository extends JpaRepository<MediaAssetEntity, String> {
 
@@ -23,5 +25,7 @@ public interface MediaAssetRepository extends JpaRepository<MediaAssetEntity, St
     void updateProcessStatus(@Param("id") String id,
                              @Param("status") ProcessStatus status,
                              @Param("hlsKey") String hlsMasterKey);
+
+    List<MediaAssetEntity> findAllByIdIn(Set<String> ids);
 }
 

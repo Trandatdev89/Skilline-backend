@@ -94,6 +94,7 @@ app:
   kafka:
     media-uploaded-topic: media.uploaded
     media-processed-topic: media.processed
+    payment-transaction: payment.transaction
     media-failed-topic: media.failed
   storage:
     private-bucket: ${BUCKET_STORAGE}

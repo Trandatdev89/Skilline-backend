@@ -82,6 +82,14 @@ public class KafkaConfig {
     }
 
     @Bean
+    public NewTopic paymentTransactionTopic() {
+        return TopicBuilder.name("payment.transaction")
+                .partitions(3)
+                .replicas(1)
+                .build();
+    }
+
+    @Bean
     public NewTopic mediaProcessedTopic() {
         return TopicBuilder.name("media.processed")
                 .partitions(3)

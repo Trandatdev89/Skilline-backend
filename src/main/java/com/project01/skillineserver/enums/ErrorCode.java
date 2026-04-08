@@ -41,6 +41,8 @@ public enum ErrorCode {
     REFRESH_TOKEN_EXPIRE(1028, "Session of you is exprire", HttpStatus.UNAUTHORIZED),
     MEDIA_ASSET_NOT_FOUND(1029, "Assest not found!", HttpStatus.NOT_FOUND),
     MEDIA_ASSET_ALREADY_PROCESSED(1030, "Assest not found!", HttpStatus.BAD_REQUEST),
+    COURSE_NOT_PUBLISHER(1031, "Course dont public!", HttpStatus.BAD_REQUEST),
+    COURSE_BOUGHT_ALREADY(1032, "You have bought course already!", HttpStatus.BAD_REQUEST),
 
     INTERNAL_SERVER(9999,"Server error",HttpStatus.INTERNAL_SERVER_ERROR);
 

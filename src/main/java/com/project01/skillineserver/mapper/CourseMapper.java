@@ -12,22 +12,24 @@ public class CourseMapper {
     @Autowired
     private DateUtil dateUtil;
 
-    public CourseResponse toLectureResponse(CourseEntity courseEntity) {
+    public CourseResponse toCourseResponse(CourseEntity courseEntity, String thumbnailUrl) {
 
         return CourseResponse.builder()
                 .id(courseEntity.getId())
                 .title(courseEntity.getTitle())
-                .thumbnail_url(courseEntity.getThumbnailAssetId())
+                .thumbnail_url(thumbnailUrl)
                 .level(courseEntity.getLevel())
                 .price(courseEntity.getPrice())
                 .description(courseEntity.getDescription())
                 .rate(courseEntity.getRate())
                 .discount(courseEntity.getDiscountPrice())
-                .status(courseEntity.isDelete())
+                .isDelete(courseEntity.isDelete())
                 .categoryId(courseEntity.getCategoryId())
                 .publishStatus(courseEntity.getPublishStatus())
-                .createAt(dateUtil.format(courseEntity.getCreatedAt()))
-                .updateAt(dateUtil.format(courseEntity.getUpdatedAt()))
+                .createdAt(dateUtil.format(courseEntity.getCreatedAt()))
+                .updatedAt(dateUtil.format(courseEntity.getUpdatedAt()))
+                .createdBy(courseEntity.getCreatedBy())
+                .updatedBy(courseEntity.getUpdatedBy())
                 .build();
     }
 }
