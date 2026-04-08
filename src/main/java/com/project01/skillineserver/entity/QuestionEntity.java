@@ -13,11 +13,16 @@ import lombok.*;
 @Entity
 @Table(name = "questions")
 public class QuestionEntity extends BaseEntity<Long> {
+
     @Column(name = "quiz_id")
     private Long quizId;
+
     private String content;
+
     @Enumerated(EnumType.STRING)
     private QuestionType type;
+
     private Double score;
+
     private Integer position;
 }

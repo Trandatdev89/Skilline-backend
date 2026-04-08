@@ -12,8 +12,11 @@ import lombok.*;
 @Entity
 @Table(name = "lecture")
 public class LectureEntity extends UuidEntity<String> {
+
     private String title;
+
     private Integer position;
+
     @Column(name = "course_id", nullable = false)
     private Long courseId;
 

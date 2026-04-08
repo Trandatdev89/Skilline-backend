@@ -19,5 +19,4 @@ public class OrderReq {
     private BigDecimal totalPrice;
     private OrderStatus status;
     private List<Long> courseId;
-    private Long quantity;
 }

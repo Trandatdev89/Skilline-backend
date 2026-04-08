@@ -37,12 +37,14 @@ public class CourseEntity extends BaseEntity<Long> {
     @Column(name = "publish_status", length = 20)
     private PublishStatus publishStatus = PublishStatus.DRAFT;
 
-    private BigDecimal price;
+    private BigDecimal priceOriginal;
+
+    private BigDecimal priceDiscount;
 
     private Double rate;
 
-    @Column(name = "discount_price", precision = 12, scale = 2)
-    private BigDecimal discountPrice;
+    @Column(name = "discount", precision = 12, scale = 2)
+    private BigDecimal discount;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "access_duration_unit", length = 20)

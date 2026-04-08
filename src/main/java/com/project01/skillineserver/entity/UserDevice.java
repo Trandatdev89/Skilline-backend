@@ -17,13 +17,16 @@ import java.time.Instant;
 public class UserDevice extends BaseEntity<Long> {
 
     private Long userId;
+
     @Column(unique = true)
     private String deviceId;
 
     private String ipAddress; // Lưu IP để tham khảo thôi
+
     private String userAgent;  // Lưu để hiển thị cho user biết
 
     private Instant firstLogin;
+
     private Instant lastLogin;
 
     private boolean isActive;

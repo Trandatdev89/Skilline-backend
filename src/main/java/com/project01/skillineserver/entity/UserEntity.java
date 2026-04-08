@@ -22,21 +22,36 @@ import java.time.Instant;
                 @UniqueConstraint(name = "uk_users_username", columnNames = "username")
         })
 public class UserEntity extends BaseEntity<Long> {
+
     private String username;
+
     private String password;
+
     private String email;
+
     private String phone;
+
     private String fullname;
+
     @Column(name = "avatar_asset_id")
     private String avatarAssetId;
+
     private String address;
+
     @Enumerated(EnumType.STRING)
     private Role role;
+
     private boolean isLocked = false;
+
     private boolean isDisable = false;
+
     private boolean isAccountNonExpired = true;
+
     private boolean isCredentialsNonExpired = true;
+
     private Integer failedLoginAttempts = 0;
+
     private Instant lockTime;
+
     private Instant lastTimeChangePassword;
 }

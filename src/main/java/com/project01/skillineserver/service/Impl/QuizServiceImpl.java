@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -35,18 +36,18 @@ public class QuizServiceImpl implements QuizService {
     @Override
     @Transactional
     public void save(QuizReq quizReq) {
-        boolean isUpdate = quizReq.id()!=null;
-        QuizEntity quizEntity = isUpdate
-                ? quizRepository
-                .findById(quizReq.id())
-                .orElseThrow(() -> new AppException(ErrorCode.QUIZ_NOT_EXITS)) :
-                new QuizEntity();
+
+        QuizEntity quizEntity = Optional
+                .ofNullable(quizReq.id())
+                .flatMap(quizRepository::findById)
+                .orElseGet(QuizEntity::new);
 
         quizEntity.setTitle(quizReq.title());
         quizEntity.setDescription(quizReq.desc());
         quizEntity.setLectureId(quizReq.lectureId());
         quizEntity.setTimeLimit(quizReq.timeLimit());
         quizEntity.setMaxAttempt(quizReq.maxAttempt());
+        quizEntity.setTimeUnit(quizReq.timeUnit());
 
         quizRepository.save(quizEntity);
     }
@@ -54,14 +55,14 @@ public class QuizServiceImpl implements QuizService {
     @Override
     public void delete(List<Long> quizIds) {
 
-        if(quizIds==null || quizIds.isEmpty()){
+        if (quizIds == null || quizIds.isEmpty()) {
             throw new AppException(ErrorCode.QUIZ_ID_REQUIRE);
         }
 
-        List<QuizAttemptEntity> listQuizAttemptNeedRemove  = new ArrayList<>();
-        List<QuestionEntity> listQuestionNeedRemove  = new ArrayList<>();
+        List<QuizAttemptEntity> listQuizAttemptNeedRemove = new ArrayList<>();
+        List<QuestionEntity> listQuestionNeedRemove = new ArrayList<>();
 
-        for (Long quizId : quizIds){
+        for (Long quizId : quizIds) {
             listQuizAttemptNeedRemove.add(quizAttemptRepository.findByQuizId(quizId));
             listQuestionNeedRemove.add(questionRepository.findByQuizId(quizId));
         }
@@ -72,10 +73,10 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
-    public PageResponse<QuizEntity> getQuizByLectureId(int page,int size,String sort,String keyword,Long courseId,String lectureId) {
+    public PageResponse<QuizEntity> getQuizByLectureId(int page, int size, String sort, String keyword, Long courseId, String lectureId) {
         Sort sortField = MapUtil.parseSort(sort);
         PageRequest pageRequest = PageRequest.of(page - 1, size, sortField);
-        Page<QuizEntity> pageQuiz = quizRepository.getQuizzes(keyword,courseId,lectureId,pageRequest);
+        Page<QuizEntity> pageQuiz = quizRepository.getQuizzes(keyword, courseId, lectureId, pageRequest);
         return PageResponse.<QuizEntity>builder()
                 .totalElements(pageQuiz.getTotalElements())
                 .totalPages(pageQuiz.getTotalPages())

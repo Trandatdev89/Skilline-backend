@@ -23,5 +23,6 @@ public class UserSubscription extends BaseEntity<Long> {
     private String endpoint;
 
     private String p256dh;
+
     private String auth;
 }

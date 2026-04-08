@@ -16,9 +16,17 @@ public class OrderDetailEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(name = "order_id")
     private String orderId;
+
     @Column(name = "course_id")
     private Long courseId;
-    private BigDecimal price;
+
+    private BigDecimal originalPrice;
+
+    private BigDecimal discountPrice;
+
+    private BigDecimal discount;
+
 }

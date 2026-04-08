@@ -10,16 +10,20 @@ import lombok.*;
 @Getter
 @Setter
 @Entity
-@Table(name = "history_score_user")  //tra loi tung cau
+@Table(name = "history_score_user")
 public class HistoryScoreUserEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "attempt_quiz_id")
     private Long attemptQuizId;
+
     @Column(name = "question_id")
     private Long questionId;
+
     private String answerText;
+
     private Double score;
 }

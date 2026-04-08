@@ -108,7 +108,9 @@ public class OrderServiceImpl implements OrderService {
             orderDetailEntities.add(OrderDetailEntity.builder()
                     .orderId(order.getId())
                     .courseId(item.getId())
-                    .price(item.getPrice())
+                    .discountPrice(item.getPriceDiscount())
+                    .discount(item.getDiscount())
+                    .originalPrice(item.getPriceOriginal())
                     .build());
         }
 

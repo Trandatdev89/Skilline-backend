@@ -16,6 +16,7 @@ import com.project01.skillineserver.repository.MediaAssetRepository;
 import com.project01.skillineserver.service.CourseService;
 import com.project01.skillineserver.specification.SearchCriteria;
 import com.project01.skillineserver.specification.SearchSpecification;
+import com.project01.skillineserver.utils.CalculatorUtil;
 import com.project01.skillineserver.utils.MapUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,15 +59,16 @@ public class CourseServiceImpl implements CourseService {
         courseEntityInDB.setCategoryId(courseReq.categoryId());
         courseEntityInDB.setDescription(courseReq.description());
         courseEntityInDB.setDelete(true);
-        courseEntityInDB.setPrice(courseReq.price());
+        courseEntityInDB.setPriceOriginal(courseReq.price());
         courseEntityInDB.setLevel(courseReq.level());
-        courseEntityInDB.setDiscountPrice(courseReq.discount());
+        courseEntityInDB.setDiscount(courseReq.discount());
         courseEntityInDB.setTitle(courseReq.title());
         courseEntityInDB.setRate(courseReq.rate());
         courseEntityInDB.setPublishStatus(courseReq.publishStatus());
         courseEntityInDB.setAccessDurationUnit(courseReq.accessDurationUnit());
         courseEntityInDB.setAccessDurationValue(courseReq.accessDurationValue());
         courseEntityInDB.setThumbnailAssetId(courseReq.assetId());
+        courseEntityInDB.setPriceDiscount(CalculatorUtil.computedPriceWhenDiscount(courseReq.price(), courseReq.discount()));
 
         return courseRepository.save(courseEntityInDB);
     }

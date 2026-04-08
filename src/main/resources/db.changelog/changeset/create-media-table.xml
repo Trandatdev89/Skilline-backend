@@ -5,7 +5,6 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
 
-    <!-- ===== media_asset ===== -->
     <changeSet id="create-media-asset-table" author="datmacay_v1">
         <createTable tableName="media_asset">
             <column name="id" type="VARCHAR(36)">
@@ -42,10 +41,6 @@
             <column name="is_private" type="BOOLEAN" defaultValueBoolean="true">
                 <constraints nullable="false"/>
             </column>
-            <column name="created_at" type="TIMESTAMP"/>
-            <column name="updated_at" type="TIMESTAMP"/>
-            <column name="created_by" type="BIGINT"/>
-            <column name="updated_by" type="BIGINT"/>
         </createTable>
 
         <createIndex indexName="idx_media_asset_asset_type" tableName="media_asset">
@@ -59,7 +54,6 @@
         </createIndex>
     </changeSet>
 
-    <!-- ===== media_asset_variant ===== -->
     <changeSet id="create-media-asset-variant-table" author="datmacay_v1">
         <createTable tableName="media_asset_variant">
             <column name="id" type="VARCHAR(36)">
@@ -82,10 +76,6 @@
             <column name="height_px" type="INT"/>
             <column name="bitrate" type="BIGINT"/>
             <column name="sort_order" type="INT"/>
-            <column name="created_at" type="TIMESTAMP"/>
-            <column name="updated_at" type="TIMESTAMP"/>
-            <column name="created_by" type="BIGINT"/>
-            <column name="updated_by" type="BIGINT"/>
         </createTable>
 
         <createIndex indexName="idx_media_asset_variant_asset_id" tableName="media_asset_variant">
@@ -101,7 +91,6 @@
                 onDelete="CASCADE"/>
     </changeSet>
 
-    <!-- ===== media_job ===== -->
     <changeSet id="create-media-job-table" author="datmacay_v1">
         <createTable tableName="media_job">
             <column name="id" type="VARCHAR(36)">
@@ -122,10 +111,6 @@
             <column name="error_message" type="TEXT"/>
             <column name="started_at" type="TIMESTAMP"/>
             <column name="finished_at" type="TIMESTAMP"/>
-            <column name="created_at" type="TIMESTAMP"/>
-            <column name="updated_at" type="TIMESTAMP"/>
-            <column name="created_by" type="BIGINT"/>
-            <column name="updated_by" type="BIGINT"/>
         </createTable>
 
         <createIndex indexName="idx_media_job_asset_id" tableName="media_job">

@@ -11,9 +11,9 @@
             </column>
             <column name="user_id" type="bigint"/>
             <column name="course_id" type="bigint"/>
-            <column name="progress" type="bigint"/>
             <column name="progress_percent" type="int"/>
             <column name="enrolled_at" type="timestamp"/>
+            <column name="time_expire" type="timestamp"/>
         </createTable>
 
         <addForeignKeyConstraint

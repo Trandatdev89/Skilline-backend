@@ -13,6 +13,7 @@
             <column name="title" type="varchar(225)"/>
             <column name="description" type="varchar(225)"/>
             <column name="time_limit" type="int"/>
+            <column name="time_unit" type="varchar(25)"/>
             <column name="max_attempt" type="int"/>
         </createTable>
 

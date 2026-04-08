@@ -10,7 +10,7 @@
                 <constraints primaryKey="true" />
             </column>
             <column name="question_id" type="bigint"/>
-            <column name="content" type="varchar(225)"/>
+            <column name="content" type="TEXT"/>
             <column name="is_correct" type="boolean"/>
         </createTable>
 
@@ -21,12 +21,5 @@
                 referencedColumnNames="id"
                 constraintName="fk_quiz_question_options_questions"/>
 
-    </changeSet>
-
-    <changeSet id="20260115-01-modify-answer-content" author="datmacay_v1">
-        <modifyDataType
-                tableName="answer"
-                columnName="content"
-                newDataType="TEXT"/>
     </changeSet>
 </databaseChangeLog>

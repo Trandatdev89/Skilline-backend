@@ -23,11 +23,12 @@ public class CourseResponse extends AuditCommonRes {
     private String thumbnail_url;
     private String description;
     private boolean isDelete;
-    private BigDecimal price;
+    private BigDecimal priceOriginal;
     private BigDecimal discount;
     private Double rate;
     private Long categoryId;
     private PublishStatus publishStatus;
     private ExpireUnit expireUnit;
     private Integer accessDurationValue;
+    private BigDecimal priceDiscount;
 }
