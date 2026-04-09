@@ -16,6 +16,9 @@ public interface OrderRepository extends JpaRepository<OrderEntity, String> {
     @Query("SELECT od.id AS id, " +
             "od.status AS status, " +
             "od.createdAt AS createdAt, " +
+            "od.updatedAt AS updatedAt, " +
+            "od.createdBy AS createdBy, " +
+            "od.updatedBy AS updatedBy, " +
             "od.totalPrice AS totalPrice, " +
             "us.username AS username, " +
             "us.address AS address, " +
@@ -23,9 +26,27 @@ public interface OrderRepository extends JpaRepository<OrderEntity, String> {
             "us.email AS email, " +
             "us.phone AS phone " +
             "FROM OrderEntity od " +
-            "INNER JOIN UserEntity us ON us.id = od.userId " +
+            "RIGHT JOIN UserEntity us ON us.id = od.userId " +
             "WHERE :keyword IS NULL OR LOWER(us.username) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     Page<OrderProjection> getOrders(String keyword, Pageable pageable);
+
+    @Query("SELECT od.id AS id, " +
+            "od.status AS status, " +
+            "od.createdAt AS createdAt, " +
+            "od.updatedAt AS updatedAt, " +
+            "od.createdBy AS createdBy, " +
+            "od.updatedBy AS updatedBy, " +
+            "od.totalPrice AS totalPrice, " +
+            "us.username AS username, " +
+            "us.address AS address, " +
+            "us.fullname AS fullname, " +
+            "us.email AS email, " +
+            "us.phone AS phone " +
+            "FROM OrderEntity od " +
+            "RIGHT JOIN UserEntity us ON us.id = od.userId " +
+            "WHERE us.id = :userId and " +
+            ":keyword IS NULL OR LOWER(us.username) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    Page<OrderProjection> getOrdersMySelf(String keyword, Pageable pageable, Long userId);
 
     @Query("""
             select co from OrderEntity ord

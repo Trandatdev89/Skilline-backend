@@ -31,7 +31,7 @@ public class MediaController {
      * "mimeType": "video/mp4", "sizeBytes": 104857600 }
      */
     @PostMapping("/upload/init")
-//    @PreAuthorize("@authorizationService.isAdmin()")
+    @PreAuthorize("@authorizationService.isCanAccessApi()")
     public ApiResponse<InitUploadResponse> initUpload(
             @RequestBody InitUploadRequest request) {
 
@@ -51,7 +51,7 @@ public class MediaController {
      * Body: { "assetId": "550e8400-e29b-41d4-a716-446655440000" }
      */
     @PostMapping("/upload/confirm")
-//    @PreAuthorize("@authorizationService.isAdmin()")
+    @PreAuthorize("@authorizationService.isCanAccessApi()")
     public ApiResponse<MediaAssetResponse> confirmUpload(
             @RequestBody ConfirmUploadRequest request) {
 

@@ -33,11 +33,14 @@ public class EnrollmentController {
 
     @GetMapping(value = "/check")
     @PreAuthorize("@authorizationService.isCanAccessApi()")
-    public ApiResponse<Boolean> checkUserEnrollment(@RequestParam List<Long> courseId) {
+    public ApiResponse<Boolean> checkUserEnrollment(@RequestParam List<Long> courseId, @AuthenticationPrincipal CustomUserDetail customUserDetail) {
+
+        Long userId = customUserDetail.getUser().getId();
+
         return ApiResponse.<Boolean>builder()
                 .code(200)
                 .message("success")
-                .data(enrollmentService.checkUserEnrollment(courseId))
+                .data(enrollmentService.checkUserEnrollment(courseId, userId))
                 .build();
     }
 }

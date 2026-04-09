@@ -2,7 +2,6 @@ package com.project01.skillineserver.service.Impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project01.skillineserver.entity.PaymentEntity;
-import com.project01.skillineserver.enums.PaymentStatus;
 import com.project01.skillineserver.kafka.event.TransactionPaymentEvent;
 import com.project01.skillineserver.repository.PaymentRepository;
 import com.project01.skillineserver.service.PaymentService;
@@ -46,15 +45,13 @@ public class PaymentServiceImpl implements PaymentService {
                 flatMap(paymentRepository::findById)
                 .orElseGet(PaymentEntity::new);
 
-        boolean isUpdate = paymentEntity.getId() != null;
-
         paymentEntity.setPaymentMethod(event.getPaymentMethod());
         paymentEntity.setTransactionId(event.getTransactionId());
         paymentEntity.setAmount(event.getAmount());
         paymentEntity.setStatus(event.getPaymentStatus());
         paymentEntity.setOrderId(event.getOrderId());
         paymentEntity.setGatewayResponse(event.getGatewayResponse());
-        paymentEntity.setPaidAt(isUpdate && event.getPaymentStatus().equals(PaymentStatus.SUCCESS) ? Instant.now() : null);
+        paymentEntity.setPaidAt(Instant.now());
 
         paymentRepository.save(paymentEntity);
     }

@@ -1,6 +1,5 @@
 package com.project01.skillineserver.service;
 
-import com.project01.skillineserver.entity.EnrollmentEntity;
 import com.project01.skillineserver.projection.CourseProjection;
 
 import java.util.List;
@@ -8,9 +7,5 @@ import java.util.List;
 public interface EnrollmentService {
     List<CourseProjection> getListCourseUserBought(Long userId);
 
-    Boolean checkUserEnrollment(List<Long> courseId);
-
-    void enrollmentCourses(List<EnrollmentEntity> enrollmentEntity);
-
-
+    Boolean checkUserEnrollment(List<Long> courseId, Long userId);
 }

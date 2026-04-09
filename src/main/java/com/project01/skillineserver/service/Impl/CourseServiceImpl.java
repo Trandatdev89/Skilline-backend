@@ -4,7 +4,6 @@ import com.project01.skillineserver.dto.reponse.CourseResponse;
 import com.project01.skillineserver.dto.reponse.PageResponse;
 import com.project01.skillineserver.dto.request.CourseReq;
 import com.project01.skillineserver.entity.CourseEntity;
-import com.project01.skillineserver.entity.EnrollmentEntity;
 import com.project01.skillineserver.entity.MediaAssetEntity;
 import com.project01.skillineserver.enums.ErrorCode;
 import com.project01.skillineserver.excepion.CustomException.AppException;
@@ -20,10 +19,7 @@ import com.project01.skillineserver.utils.CalculatorUtil;
 import com.project01.skillineserver.utils.MapUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -58,7 +54,7 @@ public class CourseServiceImpl implements CourseService {
 
         courseEntityInDB.setCategoryId(courseReq.categoryId());
         courseEntityInDB.setDescription(courseReq.description());
-        courseEntityInDB.setDelete(true);
+        courseEntityInDB.setDelete(false);
         courseEntityInDB.setPriceOriginal(courseReq.price());
         courseEntityInDB.setLevel(courseReq.level());
         courseEntityInDB.setDiscount(courseReq.discount());
@@ -92,32 +88,6 @@ public class CourseServiceImpl implements CourseService {
         List<CourseResponse> courseResponses = handleComputedThumbnailAssetOfCourses(List.of(course));
 
         return courseResponses.getFirst();
-    }
-
-    @Override
-    public void purchaseCourse(List<Long> idCourse, Long userId) {
-        List<Long> existingCourseIds = courseRepository.findAllIdsByIdIn(idCourse);
-
-        if (existingCourseIds.size() != idCourse.size()) {
-
-//            Set<Long> existingSet = new HashSet<>(existingCourseIds);
-//            List<Long> notFoundIds = idCourse.stream()
-//                    .filter(id -> !existingSet.contains(id))
-//                    .collect(Collectors.toList());
-
-            throw new AppException(ErrorCode.COURSE_NOT_FOUND);
-        }
-
-        List<EnrollmentEntity> enrollmentEntities = idCourse.stream()
-                .map(courseId -> EnrollmentEntity.builder()
-                        .userId(userId)
-                        .courseId(courseId)
-                        .enrolledAt(Instant.now())
-                        .progressPercent(0)
-                        .build())
-                .collect(Collectors.toList());
-
-        enrollmentRepository.saveAll(enrollmentEntities);
     }
 
     @Override
@@ -188,21 +158,14 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public PageResponse<CourseResponse> getCoursesWithCursor(Instant cursor, String sort, String keyword, int size, Long categoryId) {
 
-        Page<CourseEntity> pages = courseRepository.getCoursesWithCursor(keyword, categoryId, cursor, size);
+        Slice<CourseEntity> pages = courseRepository.getCoursesWithCursor(keyword, categoryId, cursor, size);
 
         List<CourseResponse> courseResponseList = handleComputedThumbnailAssetOfCourses(pages.getContent());
 
         int indexLast = pages.getContent().size();
         Instant nextCursor = pages.getContent().get(indexLast - 1).getCreatedAt();
 
-        return PageResponse.<CourseResponse>builder()
-                .list(courseResponseList)
-                .size(size)
-                .nextCursor(nextCursor)
-                .hasNextPage(size == indexLast)
-                .totalElements(pages.getTotalElements())
-                .totalPages(pages.getTotalPages())
-                .build();
+        return null;
     }
 
     @Override

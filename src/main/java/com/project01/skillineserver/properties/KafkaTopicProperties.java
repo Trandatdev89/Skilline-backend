@@ -10,4 +10,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class KafkaTopicProperties {
     private String mediaUploadedTopic;
     private String paymentTransaction;
+    private String enrollmentCourse;
 }

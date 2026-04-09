@@ -10,7 +10,6 @@ import java.util.List;
 
 public interface EnrollmentRepository extends JpaRepository<EnrollmentEntity, Long> {
 
-
     @Query(value = "SELECT co.id as id, " +
             "co.title as title, " +
             "co.description as description, " +
@@ -21,12 +20,15 @@ public interface EnrollmentRepository extends JpaRepository<EnrollmentEntity, Lo
             "FROM users us " +
             "INNER JOIN enrollment en ON us.id = en.user_id " +
             "INNER JOIN courses co ON co.id = en.course_id " +
-            "WHERE us.id = :userId", nativeQuery = true)
+            "WHERE us.id = :userId " +
+            "AND (en.time_expire IS NULL OR en.time_expire > NOW())", nativeQuery = true)
     List<CourseProjection> getListCourseUserBought(@Param("userId") Long userId);
 
     @Query(value = "SELECT COUNT(*) > 0 " +
             "FROM enrollment en " +
-            "WHERE en.user_id = :userId AND en.course_id in :courseId",
+            "WHERE en.user_id = :userId " +
+            "AND en.course_id in :courseId " +
+            "AND (en.time_expire IS NULL OR en.time_expire > NOW())",
             nativeQuery = true)
     int isUserEnrolledInCourse(@Param("userId") Long userId, @Param("courseId") List<Long> courseId);
 }

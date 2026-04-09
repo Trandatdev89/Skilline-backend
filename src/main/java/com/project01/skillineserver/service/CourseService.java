@@ -16,8 +16,6 @@ public interface CourseService {
 
     CourseResponse getCourseById(Long id);
 
-    void purchaseCourse(List<Long> idCourse, Long userId);
-
     PageResponse<CourseResponse> getCourses(int page, int size, String sort, String keyword, Long categoryId);
 
     PageResponse<CourseResponse> searchAdvanceCourse(String[] search, int page, int size, String sort);

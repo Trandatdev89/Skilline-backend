@@ -4,11 +4,11 @@ import com.project01.skillineserver.entity.CourseEntity;
 import com.project01.skillineserver.enums.PublishStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
 import java.util.List;
@@ -39,7 +39,7 @@ public interface CourseRepository extends JpaRepository<CourseEntity, Long>, Jpa
             "and (?2 is null or c.categoryId = ?2 ) " +
             "and c.createdAt <= ?3 " +
             "order by c.createdAt desc")
-    Page<CourseEntity> getCoursesWithCursor(String title, Long category_id, Instant cursorNext, int size);
+    Slice<CourseEntity> getCoursesWithCursor(String title, Long category_id, Instant cursorNext, int size);
 
 
     @Query("select c " +
@@ -48,13 +48,10 @@ public interface CourseRepository extends JpaRepository<CourseEntity, Long>, Jpa
             "and (?2 is null or c.categoryId = ?2 )")
     Page<CourseEntity> getCoursesByMySelf(String title, Long category_id, Long userId, Pageable pageable);
 
-    @Query("SELECT c.id FROM CourseEntity c WHERE c.id IN :ids")
-    List<Long> findAllIdsByIdIn(@Param("ids") List<Long> ids);
-
     @Query("select c from CourseEntity c " +
             "where " +
             "c.publishStatus = ?2 " +
-            "and c.isDelete = false and c.id in :id")
+            "and c.isDelete = false and c.id in ?1")
     Optional<List<CourseEntity>> findAllByCourseStatusPublishIdIn(List<Long> id, PublishStatus status);
 
 }

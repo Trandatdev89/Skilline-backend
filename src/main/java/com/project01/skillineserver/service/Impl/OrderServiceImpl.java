@@ -32,6 +32,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 @Service
@@ -66,15 +67,22 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderEntity getOrderById(String id) {
-        return orderRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.LECTURE_NOT_FOUND));
+    public OrderEntity getOrderById(String id, Long userId, Role role) {
+
+        OrderEntity orderInDB = orderRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+
+        if (role != Role.ADMIN && !Objects.equals(orderInDB.getUserId(), userId)) {
+            throw new AppException(ErrorCode.FOBIDEN);
+        }
+        return orderInDB;
     }
 
     @Override
     @Transactional
-    public OrderEntity saveOrder(OrderReq orderReq) {
+    public OrderEntity saveOrder(OrderReq orderReq, Long userId) {
 
-        if (orderReq.getUserId() == null) {
+        if (userId == null) {
             throw new AppException(ErrorCode.USER_NOT_FOUND);
         }
 
@@ -83,14 +91,14 @@ public class OrderServiceImpl implements OrderService {
         }
 
         UserEntity user = userRepository
-                .findById(orderReq.getUserId())
+                .findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         List<CourseEntity> courseEntityList = courseRepository
                 .findAllByCourseStatusPublishIdIn(orderReq.getCourseId(), PublishStatus.PUBLISHER)
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_PUBLISHER));
 
-        if (enrollmentService.checkUserEnrollment(orderReq.getCourseId())) {
+        if (enrollmentService.checkUserEnrollment(orderReq.getCourseId(), userId)) {
             throw new AppException(ErrorCode.COURSE_BOUGHT_ALREADY);
         }
 
@@ -114,6 +122,8 @@ public class OrderServiceImpl implements OrderService {
                     .build());
         }
 
+        orderDetailRepository.saveAll(orderDetailEntities);
+
         TransactionPaymentEvent event = TransactionPaymentEvent.builder()
                 .paymentMethod(PaymentMethod.VNPAY)
                 .amount(orderReq.getTotalPrice())
@@ -125,8 +135,6 @@ public class OrderServiceImpl implements OrderService {
         log.info("Published transaction payment event for order [{}]",
                 order.getId());
 
-        orderDetailRepository.saveAll(orderDetailEntities);
-
         return order;
     }
 
@@ -134,5 +142,22 @@ public class OrderServiceImpl implements OrderService {
     public List<CourseResponse> getOrderDetailByOrderId(Long orderId) {
         List<CourseEntity> courseInDB = orderRepository.getOrderDetailByOrderId(orderId);
         return courseService.handleComputedThumbnailAssetOfCourses(courseInDB);
+    }
+
+    @Override
+    public PageResponse<OrderProjection> getOrdersMySelf(int page, int size, String sort, String keyword, Long userId) {
+        Sort sortField = MapUtil.parseSort(sort);
+
+        PageRequest pageRequest = PageRequest.of(page - 1, size, sortField);
+
+        Page<OrderProjection> orders = orderRepository.getOrdersMySelf(keyword, pageRequest, userId);
+
+        return PageResponse.<OrderProjection>builder()
+                .list(orders.getContent())
+                .page(page)
+                .size(size)
+                .totalElements(orders.getTotalElements())
+                .totalPages(orders.getTotalPages())
+                .build();
     }
 }

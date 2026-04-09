@@ -7,7 +7,6 @@ public interface OrderProjection {
     Long getId();
     String getStatus();
     Instant getCreatedAt();
-    Long getQuantity();
     BigDecimal getTotalPrice();
     String getUsername();
     String getAddress();
