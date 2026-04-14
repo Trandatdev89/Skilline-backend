@@ -1,6 +1,5 @@
 package com.project01.skillineserver.controller;
 
-import com.project01.skillineserver.constants.AppConstants;
 import com.project01.skillineserver.dto.ApiResponse;
 import com.project01.skillineserver.dto.reponse.AuthResponse;
 import com.project01.skillineserver.dto.request.LoginRequest;
@@ -53,16 +52,6 @@ public class AuthController {
                 .code(200)
                 .message("Token Valid!")
                 .data(authService.introspect(token, tokenType))
-                .build();
-    }
-
-    @GetMapping(value = "/me")
-    public ApiResponse<AuthResponse> me(HttpServletRequest request) {
-        String token = CookieUtil.getTokenFromCookie(AppConstants.ACCESS_TOKEN,request);
-        return ApiResponse.<AuthResponse>builder()
-                .code(200)
-                .message("Token Valid!")
-                .data(authService.me(token))
                 .build();
     }
 

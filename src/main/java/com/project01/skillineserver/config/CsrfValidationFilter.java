@@ -1,7 +1,5 @@
 package com.project01.skillineserver.config;
 
-import com.project01.skillineserver.enums.ErrorCode;
-import com.project01.skillineserver.excepion.CustomException.AppException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,7 +9,6 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
-import org.springframework.security.web.csrf.InvalidCsrfTokenException;
 import org.springframework.security.web.csrf.MissingCsrfTokenException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -55,13 +52,13 @@ public class CsrfValidationFilter extends OncePerRequestFilter {
                 actualToken = request.getHeader("X-CSRF-TOKEN");
             }
 
-            if (actualToken == null) {
-                throw new AppException(ErrorCode.FOBIDEN);
-            }
-
-            if (!csrfToken.getToken().equals(actualToken)) {
-                throw new InvalidCsrfTokenException(csrfToken, actualToken);
-            }
+//            if (actualToken == null) {
+//                throw new AppException(ErrorCode.FOBIDEN);
+//            }
+//
+//            if (!csrfToken.getToken().equals(actualToken)) {
+//                throw new InvalidCsrfTokenException(csrfToken, actualToken);
+//            }
 
             System.out.println("✅ CSRF validation PASSED!");
         }

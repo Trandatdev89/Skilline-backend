@@ -19,5 +19,4 @@ public interface AuthService {
 
     void logout(String token, HttpServletResponse response) throws ParseException;
     void forgotPassword(String email);
-    AuthResponse me(String token);
 }

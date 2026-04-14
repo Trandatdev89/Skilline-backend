@@ -9,21 +9,24 @@ import com.project01.skillineserver.service.EmailService;
 import com.project01.skillineserver.utils.MailjetUtil;
 import com.project01.skillineserver.utils.MapUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.context.Context;
-import org.thymeleaf.spring6.SpringTemplateEngine;
+import org.thymeleaf.TemplateEngine;
 
 import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EmailServiceImpl implements EmailService {
 
     private final MailjetUtil mailjetUtil;
     private final TemplateMailRepository templateMailRepository;
-    private final SpringTemplateEngine templateEngine;
+    private final TemplateEngine templateEngine;
 
     @Override
+    @Async
     public void verifyAccount(VerifyAccountRequest verifyAccountRequest) throws IllegalAccessException {
 
         EmailTemplate emailTemplate = templateMailRepository
@@ -31,6 +34,9 @@ public class EmailServiceImpl implements EmailService {
                 .orElseThrow((() -> new AppException(ErrorCode.MAIL_CONFIG_NOT_FOUND)));
 
         String resultRender = renderTemplate(emailTemplate.getHtmlContent(), MapUtil.extractInfo(verifyAccountRequest));
+
+        log.info("Result template render :{}", resultRender);
+
         mailjetUtil.sendMailWithMailjet(verifyAccountRequest.getToEmail(),
                 verifyAccountRequest.getToName(),
                 emailTemplate.getSubject(),
@@ -39,8 +45,12 @@ public class EmailServiceImpl implements EmailService {
     }
 
     private String renderTemplate(String html, Map<String, Object> data) {
-        Context context = new Context();
-        context.setVariables(data);
-        return templateEngine.process(html, context);
+        String result = html;
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
+            String placeholder = "{{" + entry.getKey() + "}}";
+            String value = entry.getValue() != null ? entry.getValue().toString() : "";
+            result = result.replace(placeholder, value);
+        }
+        return result;
     }
 }

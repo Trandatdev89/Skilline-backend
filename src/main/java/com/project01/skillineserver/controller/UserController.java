@@ -3,6 +3,7 @@ package com.project01.skillineserver.controller;
 import com.project01.skillineserver.config.CustomUserDetail;
 import com.project01.skillineserver.constants.AppConstants;
 import com.project01.skillineserver.dto.ApiResponse;
+import com.project01.skillineserver.dto.reponse.AuthResponse;
 import com.project01.skillineserver.dto.request.ChangeEmailReq;
 import com.project01.skillineserver.dto.request.ChangePasswordReq;
 import com.project01.skillineserver.entity.UserEntity;
@@ -43,6 +44,16 @@ public class UserController {
                 .build();
     }
 
+    @GetMapping(value = "/me")
+    @PreAuthorize("@authorizationService.isCanAccessApi()")
+    public ApiResponse<AuthResponse> me(HttpServletRequest request) {
+        return ApiResponse.<AuthResponse>builder()
+                .code(200)
+                .message("Token Valid!")
+                .data(userService.me())
+                .build();
+    }
+
     @GetMapping(value = "/logout")
     @PreAuthorize("@authorizationService.isCanAccessApi()")
     public ApiResponse<?> logout(HttpServletRequest request, HttpServletResponse response) throws ParseException {
@@ -56,7 +67,8 @@ public class UserController {
 
     @PostMapping(value = "/change-password")
     @PreAuthorize("@authorizationService.isCanAccessApi()")
-    public ApiResponse<?> changePassword(@RequestBody ChangePasswordReq changePasswordReq,@AuthenticationPrincipal CustomUserDetail customUserDetail){
+    public ApiResponse<?> changePassword(@RequestBody ChangePasswordReq changePasswordReq
+            , @AuthenticationPrincipal CustomUserDetail customUserDetail) {
         userService.changePassword(changePasswordReq,customUserDetail.getUser().getId());
         return ApiResponse.builder()
                 .message("Change Password Success!")

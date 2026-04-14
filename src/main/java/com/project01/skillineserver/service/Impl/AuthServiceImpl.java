@@ -136,11 +136,15 @@ public class AuthServiceImpl implements AuthService {
 
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
-        CookieUtil.setAccessTokenCookieHttpOnly(securityUtil.generateToken(Objects
-                .requireNonNull(AuthenticationUtil.getUserDetail()), TokenType.ACCESS_TOKEN,currentDeviceId),response);
+        String accessToken = securityUtil.generateToken(Objects
+                .requireNonNull(AuthenticationUtil.getUserDetail()), TokenType.ACCESS_TOKEN, currentDeviceId);
 
-        CookieUtil.setRefreshTokenCookieHttpOnly(securityUtil.generateToken(Objects
-                .requireNonNull(AuthenticationUtil.getUserDetail()), TokenType.REFRESH_TOKEN, currentDeviceId), response);
+        CookieUtil.setAccessTokenCookieHttpOnly(accessToken, response);
+
+        String refreshToken = securityUtil.generateToken(Objects
+                .requireNonNull(AuthenticationUtil.getUserDetail()), TokenType.REFRESH_TOKEN, currentDeviceId);
+
+        CookieUtil.setRefreshTokenCookieHttpOnly(refreshToken, response);
 
         return AuthResponse.builder()
                 .authenticated(true)
@@ -150,6 +154,8 @@ public class AuthServiceImpl implements AuthService {
                 .deviceId(currentDeviceId)
                 .role(user.getUser().getRole())
                 .avatar(user.getUser().getAvatarAssetId())
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 
@@ -246,7 +252,7 @@ public class AuthServiceImpl implements AuthService {
             throw new AppException(ErrorCode.USER_EXITED);
         }
 
-        if (userRepository.existsByEmail(registerDTO.getUsername())) {
+        if (userRepository.existsByEmail(registerDTO.getEmail())) {
             throw new AppException(ErrorCode.EMAIL_EXITED);
         }
 
@@ -263,14 +269,7 @@ public class AuthServiceImpl implements AuthService {
 
         UserEntity userCreated = userRepository.save(user);
 
-        emailService.verifyAccount(VerifyAccountRequest.builder()
-                .token(UUID.randomUUID().toString())
-                .linkUrl(verifyAccountUrl)
-                .userId(userCreated.getId())
-                .toEmail(userCreated.getEmail())
-                .emailType(EmailType.VERIFY_ACCOUNT)
-                .toName(registerDTO.getFullname())
-                .build());
+        sendMailForVerifyAccount(userCreated);
     }
 
 
@@ -299,11 +298,6 @@ public class AuthServiceImpl implements AuthService {
        if(!userExist){
            throw new AppException(ErrorCode.USER_NOT_FOUND);
        }
-    }
-
-    @Override
-    public AuthResponse me(String token) {
-        return null;
     }
 
     private void increaseAttemptLogin(UserEntity user) {
@@ -362,6 +356,23 @@ public class AuthServiceImpl implements AuthService {
             return true;
         }
         return false;
+    }
+
+    private void sendMailForVerifyAccount(UserEntity user) throws IllegalAccessException {
+
+        String tokenVerify = UUID.randomUUID().toString();
+
+        String verifyUrl = verifyAccountUrl + "/verify" + "?userId=" + user.getId()
+                + "&token=" + tokenVerify;
+
+        emailService.verifyAccount(VerifyAccountRequest.builder()
+                .token(tokenVerify)
+                .linkUrl(verifyUrl)
+                .userId(user.getId())
+                .toEmail(user.getEmail())
+                .emailType(EmailType.VERIFY_ACCOUNT)
+                .toName(user.getFullname())
+                .build());
     }
 
 }

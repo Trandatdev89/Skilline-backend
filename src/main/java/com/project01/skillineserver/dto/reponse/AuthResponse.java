@@ -15,4 +15,6 @@ public class AuthResponse {
     private Role role;
     private String deviceId;
     private String avatar;
+    private String accessToken;
+    private String refreshToken;
 }

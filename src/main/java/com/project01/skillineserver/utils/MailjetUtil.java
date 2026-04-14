@@ -49,7 +49,7 @@ public class MailjetUtil {
 
         SendEmailsRequest request = SendEmailsRequest
                 .builder()
-                .message(message) // you can add up to 50 messages per request
+                .message(message)
                 .build();
 
         SendEmailsResponse response = null;
