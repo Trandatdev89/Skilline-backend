@@ -1,7 +1,7 @@
 package com.project01.skillineserver.mapper;
 
+import com.project01.skillineserver.dto.projection.CategoryProjection;
 import com.project01.skillineserver.dto.reponse.CategoryResponse;
-import com.project01.skillineserver.projection.CategoryProjection;
 import com.project01.skillineserver.utils.DateUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

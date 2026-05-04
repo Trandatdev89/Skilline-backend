@@ -8,9 +8,12 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface LectureRepository extends JpaRepository<LectureEntity, String> {
 
+
+    Optional<LectureEntity> findByIdAndCourseId(String id, Long courseId);
 
     @Modifying
     @Query("update LectureEntity le set le.delete = true where le.id in :lectureIds")

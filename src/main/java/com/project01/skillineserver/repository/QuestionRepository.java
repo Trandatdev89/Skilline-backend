@@ -1,7 +1,7 @@
 package com.project01.skillineserver.repository;
 
+import com.project01.skillineserver.dto.projection.QuestionExamProjection;
 import com.project01.skillineserver.entity.QuestionEntity;
-import com.project01.skillineserver.projection.QuestionExamProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -25,7 +25,7 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Long> 
             an.content as answerContent
             from questions qu
             inner join answer an on qu.id=an.question_id
-            where qu.quiz_id=?1;
+            where qu.quiz_id=?1
                         """, nativeQuery = true)
     List<QuestionExamProjection> findQuestionByQuizId(Long quizId);
 

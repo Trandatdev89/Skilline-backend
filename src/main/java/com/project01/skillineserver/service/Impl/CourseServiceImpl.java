@@ -24,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,9 +40,11 @@ public class CourseServiceImpl implements CourseService {
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = {AppException.class})
     public void save(CourseReq courseReq) throws IOException {
 
-        CourseEntity courseEntityInDB = Optional.ofNullable(courseReq.id())
-                .flatMap(courseRepository::findById)
-                .orElse(new CourseEntity());
+        boolean isUpdate = courseReq.id() != null;
+
+        CourseEntity courseEntityInDB = isUpdate ? courseRepository.findById(courseReq.id())
+                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND))
+                : new CourseEntity();
 
         courseEntityInDB.setCategoryId(courseReq.categoryId());
         courseEntityInDB.setDescription(courseReq.description());
@@ -59,6 +60,8 @@ public class CourseServiceImpl implements CourseService {
         courseEntityInDB.setThumbnailAssetId(courseReq.assetId());
         courseEntityInDB.setPriceDiscount(CalculatorUtil
                 .computedPriceWhenDiscount(courseReq.price(), courseReq.discount()));
+
+        courseRepository.save(courseEntityInDB);
     }
 
     @Override

@@ -63,10 +63,10 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
-    public PageResponse<QuizEntity> getQuizByLectureId(int page, int size, String sort, String keyword, Long courseId, String lectureId) {
+    public PageResponse<QuizEntity> getQuizByLectureId(int page, int size, String sort, String keyword, Long courseId) {
         Sort sortField = MapUtil.parseSort(sort);
         PageRequest pageRequest = PageRequest.of(page - 1, size, sortField);
-        Page<QuizEntity> pageQuiz = quizRepository.getQuizzes(keyword, courseId, lectureId, pageRequest);
+        Page<QuizEntity> pageQuiz = quizRepository.getQuizzes(keyword, courseId, pageRequest);
         return PageResponse.<QuizEntity>builder()
                 .totalElements(pageQuiz.getTotalElements())
                 .totalPages(pageQuiz.getTotalPages())

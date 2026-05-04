@@ -2,12 +2,12 @@ package com.project01.skillineserver.controller;
 
 import com.project01.skillineserver.config.CustomUserDetail;
 import com.project01.skillineserver.dto.ApiResponse;
+import com.project01.skillineserver.dto.projection.OrderProjection;
 import com.project01.skillineserver.dto.reponse.CourseResponse;
 import com.project01.skillineserver.dto.reponse.PageResponse;
 import com.project01.skillineserver.dto.request.OrderReq;
 import com.project01.skillineserver.entity.OrderEntity;
 import com.project01.skillineserver.enums.Role;
-import com.project01.skillineserver.projection.OrderProjection;
 import com.project01.skillineserver.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;

@@ -35,17 +35,16 @@ public class QuizController {
                 .build();
     }
 
-    @GetMapping(value = "/lecture")
+    @GetMapping(value = "/get-by-course")
     public ApiResponse<PageResponse<QuizEntity>> getQuizByLectureId(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String sort,
             @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) Long courseId,
-            @RequestParam(required = false) String lectureId) {
+            @RequestParam(required = false) Long courseId) {
         return ApiResponse.<PageResponse<QuizEntity>>builder()
                 .code(200)
-                .data(quizService.getQuizByLectureId(page,size,sort,keyword,courseId,lectureId))
+                .data(quizService.getQuizByLectureId(page, size, sort, keyword, courseId))
                 .message("Get quiz success!")
                 .build();
     }

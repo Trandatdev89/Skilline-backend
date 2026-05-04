@@ -1,5 +1,6 @@
 package com.project01.skillineserver.service.Impl;
 
+import com.project01.skillineserver.dto.projection.CategoryProjection;
 import com.project01.skillineserver.dto.reponse.CategoryResponse;
 import com.project01.skillineserver.dto.reponse.PageResponse;
 import com.project01.skillineserver.dto.request.CategoryReq;
@@ -7,7 +8,6 @@ import com.project01.skillineserver.entity.CategoryEntity;
 import com.project01.skillineserver.enums.ErrorCode;
 import com.project01.skillineserver.excepion.CustomException.AppException;
 import com.project01.skillineserver.mapper.CategoryMapper;
-import com.project01.skillineserver.projection.CategoryProjection;
 import com.project01.skillineserver.repository.CategoryRepository;
 import com.project01.skillineserver.service.CategoryService;
 import com.project01.skillineserver.utils.MapUtil;

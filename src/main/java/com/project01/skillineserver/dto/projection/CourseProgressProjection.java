@@ -1,4 +1,4 @@
-package com.project01.skillineserver.projection;
+package com.project01.skillineserver.dto.projection;
 
 public interface CourseProgressProjection {
     Long progressPercent();

@@ -11,7 +11,7 @@ import lombok.*;
 @Setter
 @Entity
 @Table(name = "history_score_user")
-public class HistoryScoreUserEntity {
+public class AttemptAnswerEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,6 +22,9 @@ public class HistoryScoreUserEntity {
 
     @Column(name = "question_id")
     private Long questionId;
+
+    @Column(name = "answerId")
+    private Long answerId;    // FK -> answer_option
 
     private String answerText;
 

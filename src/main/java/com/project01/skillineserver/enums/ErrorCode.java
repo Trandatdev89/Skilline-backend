@@ -45,6 +45,9 @@ public enum ErrorCode {
     COURSE_BOUGHT_ALREADY(1032, "You have bought course already!", HttpStatus.BAD_REQUEST),
     PAYMENT_FAILED(1033, "", HttpStatus.INTERNAL_SERVER_ERROR),
     MAIL_CONFIG_NOT_FOUND(1034, "You not yet config mail", HttpStatus.NOT_FOUND),
+    ANSWER_NOT_EXISTS(1035, "This is answer not exits, maybe that is delete!", HttpStatus.BAD_REQUEST),
+    ANSWER_NOT_BELONG_TO_QUESTION(1036, "ANSWER_NOT_BELONG_TO_QUESTION!", HttpStatus.BAD_REQUEST),
+    QUESTION_NOT_BELONG_TO_QUIZ(1037, "QUESTION_NOT_BELONG_TO_QUIZ", HttpStatus.BAD_REQUEST),
 
     INTERNAL_SERVER(9999,"Server error",HttpStatus.INTERNAL_SERVER_ERROR);
 

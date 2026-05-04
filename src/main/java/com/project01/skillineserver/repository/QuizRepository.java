@@ -18,7 +18,6 @@ public interface QuizRepository extends JpaRepository<QuizEntity, Long> {
     @Query(value = "select qe from QuizEntity qe " +
             "left join LectureEntity le on le.id=qe.lectureId " +
             "where (?2 is null or le.courseId = ?2) and " +
-            "(?3 is null or qe.lectureId = ?3) and " +
             "(?1 is null or lower(qe.title) like lower(concat('%',?1,'%')) ) ",
             countQuery = """
                       select count(qe)
@@ -29,5 +28,5 @@ public interface QuizRepository extends JpaRepository<QuizEntity, Long> {
                         and (?1 is null 
                              or lower(qe.title) like lower(concat('%',?1,'%')))
                     """)
-    Page<QuizEntity> getQuizzes(String keyword, Long courseId, String lectureId, Pageable pageable);
+    Page<QuizEntity> getQuizzes(String keyword, Long courseId, Pageable pageable);
 }

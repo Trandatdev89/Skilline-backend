@@ -14,5 +14,6 @@ public class HistoryExamUser {
     private Long quizAttemptId;
     private Instant submittedAt;
     private Double totalScore;
+    private Integer attemptNo;
     private List<QuestionExamUser> questions;
 }

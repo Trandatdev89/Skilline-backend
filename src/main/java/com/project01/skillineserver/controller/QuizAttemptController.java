@@ -3,10 +3,9 @@ package com.project01.skillineserver.controller;
 
 import com.project01.skillineserver.config.CustomUserDetail;
 import com.project01.skillineserver.dto.ApiResponse;
+import com.project01.skillineserver.dto.projection.QuizAttemptProjection;
 import com.project01.skillineserver.dto.reponse.PageResponse;
-import com.project01.skillineserver.dto.reponse.ResultExamResponse;
 import com.project01.skillineserver.dto.request.AttemptQuizReq;
-import com.project01.skillineserver.projection.QuizAttemptProjection;
 import com.project01.skillineserver.service.QuizAttemptService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,10 +19,10 @@ public class QuizAttemptController {
     private final QuizAttemptService quizAttemptService;
 
     @PostMapping
-    public ApiResponse<ResultExamResponse> save(@RequestBody AttemptQuizReq attemptQuizReq,
-                                                @AuthenticationPrincipal CustomUserDetail customUserDetail) {
-        return ApiResponse.<ResultExamResponse>builder()
-                .data(quizAttemptService.save(attemptQuizReq, customUserDetail.getUser().getId()))
+    public ApiResponse<?> save(@RequestBody AttemptQuizReq attemptQuizReq,
+                               @AuthenticationPrincipal CustomUserDetail customUserDetail) {
+        quizAttemptService.save(attemptQuizReq, customUserDetail.getUser().getId());
+        return ApiResponse.builder()
                 .code(200)
                 .message("Save exam quiz success!")
                 .build();

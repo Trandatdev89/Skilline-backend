@@ -36,7 +36,7 @@ public class LectureServiceImpl implements LectureService {
         boolean isUpdate = lectureReq.id() != null;
 
         LectureEntity lectureEntity = isUpdate
-                ? lectureRepository.findById(lectureReq.id())
+                ? lectureRepository.findByIdAndCourseId(lectureReq.id(), lectureReq.courseId())
                 .orElseThrow(() -> new AppException(ErrorCode.LECTURE_NOT_FOUND))
                 : new LectureEntity();
 

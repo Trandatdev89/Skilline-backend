@@ -16,5 +16,5 @@ public class QuestionExamUser {
     private QuestionType type;
     private Double maxScore;
     private Double scoreAchieved;
-    private List<AnswerUserRes> answers;
+    private List<AnswerRes> answers;
 }

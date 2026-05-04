@@ -1,5 +1,6 @@
 package com.project01.skillineserver.service.Impl;
 
+import com.project01.skillineserver.dto.projection.OrderProjection;
 import com.project01.skillineserver.dto.reponse.CourseResponse;
 import com.project01.skillineserver.dto.reponse.PageResponse;
 import com.project01.skillineserver.dto.request.OrderReq;
@@ -11,7 +12,6 @@ import com.project01.skillineserver.enums.*;
 import com.project01.skillineserver.excepion.CustomException.AppException;
 import com.project01.skillineserver.kafka.event.TransactionPaymentEvent;
 import com.project01.skillineserver.mapper.CourseMapper;
-import com.project01.skillineserver.projection.OrderProjection;
 import com.project01.skillineserver.properties.KafkaTopicProperties;
 import com.project01.skillineserver.repository.CourseRepository;
 import com.project01.skillineserver.repository.OrderDetailRepository;

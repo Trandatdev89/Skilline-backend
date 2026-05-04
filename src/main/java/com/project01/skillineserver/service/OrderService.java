@@ -1,11 +1,11 @@
 package com.project01.skillineserver.service;
 
+import com.project01.skillineserver.dto.projection.OrderProjection;
 import com.project01.skillineserver.dto.reponse.CourseResponse;
 import com.project01.skillineserver.dto.reponse.PageResponse;
 import com.project01.skillineserver.dto.request.OrderReq;
 import com.project01.skillineserver.entity.OrderEntity;
 import com.project01.skillineserver.enums.Role;
-import com.project01.skillineserver.projection.OrderProjection;
 
 import java.util.List;
 

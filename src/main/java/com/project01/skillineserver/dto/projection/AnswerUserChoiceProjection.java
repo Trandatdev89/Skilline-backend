@@ -1,9 +1,10 @@
-package com.project01.skillineserver.projection;
+package com.project01.skillineserver.dto.projection;
 
 
 
 public interface AnswerUserChoiceProjection {
      Long getQuestionId();
-     Long getAnswerUserChoice();
+
+    Long getAnswerId();
      Double getScore();
 }

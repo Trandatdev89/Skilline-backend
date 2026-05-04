@@ -1,7 +1,7 @@
 package com.project01.skillineserver.repository;
 
+import com.project01.skillineserver.dto.projection.CategoryProjection;
 import com.project01.skillineserver.entity.CategoryEntity;
-import com.project01.skillineserver.projection.CategoryProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
