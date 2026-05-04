@@ -85,7 +85,8 @@ public class AuthController {
     @PostMapping(value = "/refresh-token")
     public ApiResponse<?> refreshToken(HttpServletRequest request, HttpServletResponse response) throws ParseException {
         String refreshToken = CookieUtil.getTokenFromCookie(refreshTokenName,request);
-        authService.refreshToken(refreshToken, response);
+        String accessToken = CookieUtil.getTokenFromCookie(accessTokenName, request);
+        authService.refreshToken(refreshToken, accessToken, response);
         return ApiResponse.<String>builder()
                 .code(200)
                 .message("Refresh Token Success!")

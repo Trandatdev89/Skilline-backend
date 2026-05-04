@@ -2,8 +2,6 @@ package com.project01.skillineserver.mapper;
 
 import com.project01.skillineserver.dto.reponse.LectureResponse;
 import com.project01.skillineserver.entity.LectureEntity;
-import com.project01.skillineserver.projection.CourseProjection;
-import com.project01.skillineserver.repository.LectureRepository;
 import com.project01.skillineserver.utils.DateUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -13,21 +11,19 @@ import org.springframework.stereotype.Component;
 public class LectureMapper {
 
     private final DateUtil dateUtil;
-    private final LectureRepository lectureRepository;
 
-    public LectureResponse toLectureResponse(LectureEntity lectureEntity) {
-
-        CourseProjection courseProjection = lectureRepository.getCourseWithCategory(lectureEntity.getCourseId());
+    public LectureResponse toLectureResponse(LectureEntity lectureEntity, String urlThumbnail) {
 
         return LectureResponse.builder()
                 .id(lectureEntity.getId())
                 .title(lectureEntity.getTitle())
-                .urlThumbnail(lectureEntity.getThumbnailAssetId())
+                .urlThumbnail(urlThumbnail)
                 .urlVideo(lectureEntity.getContentAssetId())
                 .position(lectureEntity.getPosition())
                 .publishStatus(lectureEntity.getPublishStatus())
                 .previewable(lectureEntity.isPreviewable())
                 .durationSeconds(lectureEntity.getDurationSeconds())
+                .isDeleted(lectureEntity.isDelete())
                 .createAt(dateUtil.format(lectureEntity.getCreatedAt()))
                 .updateAt(dateUtil.format(lectureEntity.getUpdatedAt()))
                 .build();

@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 
 public interface OrderProjection {
-    Long getId();
+    String getId();
     String getStatus();
     Instant getCreatedAt();
     BigDecimal getTotalPrice();

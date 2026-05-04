@@ -9,15 +9,11 @@ public interface CategoryProjection {
 
     String getSlug();
 
-    Boolean isActive();
+    Boolean getIsActive();
 
-    String getObjectKey();
+    String getThumbnailAssetId();
 
     Instant getCreatedAt();
 
     Instant getUpdatedAt();
-
-    Long getCreatedBy();
-
-    Long getUpdateBy();
 }

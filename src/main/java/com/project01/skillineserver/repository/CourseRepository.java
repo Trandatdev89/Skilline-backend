@@ -10,7 +10,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,7 +23,7 @@ public interface CourseRepository extends JpaRepository<CourseEntity, Long>, Jpa
     Optional<CourseEntity> findByCourseId(Long id);
 
     @Modifying
-    @Query("update CourseEntity c set c.isDelete = true where c.categoryId in :courseIds")
+    @Query("update CourseEntity c set c.isDelete = true where c.id in :courseIds")
     void deleteAllByCourseIdIn(List<Long> courseIds);
 
     @Query("select c " +
@@ -35,11 +34,12 @@ public interface CourseRepository extends JpaRepository<CourseEntity, Long>, Jpa
 
     @Query("select c " +
             "from CourseEntity c " +
-            "where c.isDelete = false and (?1 is null or c.title like lower(concat('%',?1,'%'))) " +
+            "where c.isDelete = false " +
+            "and (?1 is null or c.title like lower(concat('%',?1,'%'))) " +
             "and (?2 is null or c.categoryId = ?2 ) " +
-            "and c.createdAt <= ?3 " +
-            "order by c.createdAt desc")
-    Slice<CourseEntity> getCoursesWithCursor(String title, Long category_id, Instant cursorNext, int size);
+            "and (?3 is null or c.id < ?3 ) " +
+            "order by c.id desc")
+    Slice<CourseEntity> getCoursesWithCursor(String title, Long category_id, Long id, Pageable pageable);
 
 
     @Query("select c " +

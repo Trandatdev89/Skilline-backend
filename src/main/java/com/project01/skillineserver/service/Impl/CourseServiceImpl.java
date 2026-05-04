@@ -4,14 +4,10 @@ import com.project01.skillineserver.dto.reponse.CourseResponse;
 import com.project01.skillineserver.dto.reponse.PageResponse;
 import com.project01.skillineserver.dto.request.CourseReq;
 import com.project01.skillineserver.entity.CourseEntity;
-import com.project01.skillineserver.entity.MediaAssetEntity;
 import com.project01.skillineserver.enums.ErrorCode;
 import com.project01.skillineserver.excepion.CustomException.AppException;
 import com.project01.skillineserver.mapper.CourseMapper;
-import com.project01.skillineserver.properties.CdnProperties;
 import com.project01.skillineserver.repository.CourseRepository;
-import com.project01.skillineserver.repository.EnrollmentRepository;
-import com.project01.skillineserver.repository.MediaAssetRepository;
 import com.project01.skillineserver.service.CourseService;
 import com.project01.skillineserver.specification.SearchCriteria;
 import com.project01.skillineserver.specification.SearchSpecification;
@@ -26,11 +22,11 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,19 +34,16 @@ import java.util.stream.Collectors;
 public class CourseServiceImpl implements CourseService {
 
     private final CourseRepository courseRepository;
-    private final EnrollmentRepository enrollmentRepository;
     private final CourseMapper courseMapper;
-    private final MediaAssetRepository mediaAssetRepository;
-    private final CdnProperties cdnProperties;
+    private final MapUtil mapUtil;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = {AppException.class})
-    public CourseEntity save(CourseReq courseReq) throws IOException {
+    public void save(CourseReq courseReq) throws IOException {
 
         CourseEntity courseEntityInDB = Optional.ofNullable(courseReq.id())
                 .flatMap(courseRepository::findById)
                 .orElse(new CourseEntity());
-
 
         courseEntityInDB.setCategoryId(courseReq.categoryId());
         courseEntityInDB.setDescription(courseReq.description());
@@ -64,12 +57,12 @@ public class CourseServiceImpl implements CourseService {
         courseEntityInDB.setAccessDurationUnit(courseReq.accessDurationUnit());
         courseEntityInDB.setAccessDurationValue(courseReq.accessDurationValue());
         courseEntityInDB.setThumbnailAssetId(courseReq.assetId());
-        courseEntityInDB.setPriceDiscount(CalculatorUtil.computedPriceWhenDiscount(courseReq.price(), courseReq.discount()));
-
-        return courseRepository.save(courseEntityInDB);
+        courseEntityInDB.setPriceDiscount(CalculatorUtil
+                .computedPriceWhenDiscount(courseReq.price(), courseReq.discount()));
     }
 
     @Override
+    @Transactional
     public void delete(List<Long> courseId) {
 
         if (courseId == null || courseId.isEmpty()) {
@@ -85,7 +78,9 @@ public class CourseServiceImpl implements CourseService {
         CourseEntity course = courseRepository.findByCourseId(id)
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
 
-        List<CourseResponse> courseResponses = handleComputedThumbnailAssetOfCourses(List.of(course));
+        List<CourseResponse> courseResponses = mapUtil.handleComputedThumbnail(List.of(course)
+                , CourseEntity::getThumbnailAssetId
+                , courseMapper::toCourseResponse);
 
         return courseResponses.getFirst();
     }
@@ -98,7 +93,10 @@ public class CourseServiceImpl implements CourseService {
 
         Page<CourseEntity> pageCourses = courseRepository.getCourses(keyword, categoryId, pageRequest);
 
-        List<CourseResponse> courseResponseList = handleComputedThumbnailAssetOfCourses(pageCourses.getContent());
+        List<CourseResponse> courseResponseList = mapUtil
+                .handleComputedThumbnail(pageCourses.getContent()
+                        , CourseEntity::getThumbnailAssetId
+                        , courseMapper::toCourseResponse);
 
         return PageResponse.<CourseResponse>builder()
                 .list(courseResponseList)
@@ -143,7 +141,9 @@ public class CourseServiceImpl implements CourseService {
         }
 
 
-        List<CourseResponse> courseResponseList = handleComputedThumbnailAssetOfCourses(listCourseResponses.getContent());
+        List<CourseResponse> courseResponseList = mapUtil.handleComputedThumbnail(listCourseResponses.getContent()
+                , CourseEntity::getThumbnailAssetId
+                , courseMapper::toCourseResponse);
 
         return PageResponse.<CourseResponse>builder()
                 .list(courseResponseList)
@@ -156,16 +156,30 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public PageResponse<CourseResponse> getCoursesWithCursor(Instant cursor, String sort, String keyword, int size, Long categoryId) {
+    public PageResponse<CourseResponse> getCoursesWithCursor(Long cursor, String sort, String keyword, int size, Long categoryId) {
 
-        Slice<CourseEntity> pages = courseRepository.getCoursesWithCursor(keyword, categoryId, cursor, size);
+        log.info("cursor: {}, keyword: {}, size: {}, categoryId: {}", cursor, keyword, size, categoryId);
 
-        List<CourseResponse> courseResponseList = handleComputedThumbnailAssetOfCourses(pages.getContent());
+        Sort sortField = MapUtil.parseSort(sort);
 
-        int indexLast = pages.getContent().size();
-        Instant nextCursor = pages.getContent().get(indexLast - 1).getCreatedAt();
+        PageRequest pageRequest = PageRequest.of(0, size, sortField);
 
-        return null;
+        Slice<CourseEntity> pages = courseRepository.getCoursesWithCursor(keyword, categoryId, cursor, pageRequest);
+
+        List<CourseEntity> content = pages.getContent();
+
+        List<CourseResponse> courseResponseList = mapUtil.handleComputedThumbnail(content
+                , CourseEntity::getThumbnailAssetId
+                , courseMapper::toCourseResponse);
+
+        Long nextCursorId = pages.hasNext() ? content.getLast().getId() : null;
+
+        return PageResponse.<CourseResponse>builder()
+                .list(courseResponseList)
+                .hasNextPage(pages.hasNext())
+                .nextCursor(nextCursorId)
+                .size(size)
+                .build();
     }
 
     @Override
@@ -176,7 +190,9 @@ public class CourseServiceImpl implements CourseService {
 
         Page<CourseEntity> pageCourses = courseRepository.getCoursesByMySelf(keyword, categoryId, userId, pageRequest);
 
-        List<CourseResponse> courseResponseList = handleComputedThumbnailAssetOfCourses(pageCourses.getContent());
+        List<CourseResponse> courseResponseList = mapUtil.handleComputedThumbnail(pageCourses.getContent()
+                , CourseEntity::getThumbnailAssetId
+                , courseMapper::toCourseResponse);
 
         return PageResponse.<CourseResponse>builder()
                 .list(courseResponseList)
@@ -186,24 +202,4 @@ public class CourseServiceImpl implements CourseService {
                 .totalPages(pageCourses.getTotalPages())
                 .build();
     }
-
-    public List<CourseResponse> handleComputedThumbnailAssetOfCourses(List<CourseEntity> pageCourseEntityInDB) {
-        Set<String> listAssetIdOfCourses = pageCourseEntityInDB.stream()
-                .map(CourseEntity::getThumbnailAssetId).collect(Collectors.toSet());
-
-
-        Map<String, String> thumbnailUrlByAssetId = mediaAssetRepository
-                .findAllByIdIn(listAssetIdOfCourses)
-                .stream()
-                .collect(Collectors.toMap(MediaAssetEntity::getId
-                        , asset -> cdnProperties.getDomain() + "/" + asset.getObjectKey()));
-
-        return pageCourseEntityInDB
-                .stream()
-                .map(courseEntity ->
-                        courseMapper
-                                .toCourseResponse(courseEntity, thumbnailUrlByAssetId.get(courseEntity.getThumbnailAssetId())))
-                .toList();
-    }
-
 }

@@ -29,6 +29,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
+    private final MapUtil mapUtil;
 
     @Override
     @Transactional
@@ -53,7 +54,9 @@ public class CategoryServiceImpl implements CategoryService {
 
         Page<CategoryProjection> pageCategories = categoryRepository.getCategories(keyword, pageRequest);
 
-        List<CategoryResponse> list = pageCategories.getContent().stream().map(categoryMapper::toCategoriesResponse).toList();
+        List<CategoryResponse> list = mapUtil.handleComputedThumbnail(pageCategories.getContent()
+                , CategoryProjection::getThumbnailAssetId,
+                categoryMapper::toCategoriesResponse);
 
         return PageResponse.<CategoryResponse>builder()
                 .list(list)
@@ -71,7 +74,9 @@ public class CategoryServiceImpl implements CategoryService {
 
         Page<CategoryProjection> pageCategories = categoryRepository.getCategoriesMySelf(keyword, userId, pageRequest);
 
-        List<CategoryResponse> list = pageCategories.getContent().stream().map(categoryMapper::toCategoriesResponse).toList();
+        List<CategoryResponse> list = mapUtil.handleComputedThumbnail(pageCategories.getContent()
+                , CategoryProjection::getThumbnailAssetId,
+                categoryMapper::toCategoriesResponse);
 
         return PageResponse.<CategoryResponse>builder()
                 .list(list)

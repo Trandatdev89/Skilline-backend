@@ -10,6 +10,7 @@ import com.project01.skillineserver.entity.UserEntity;
 import com.project01.skillineserver.enums.*;
 import com.project01.skillineserver.excepion.CustomException.AppException;
 import com.project01.skillineserver.kafka.event.TransactionPaymentEvent;
+import com.project01.skillineserver.mapper.CourseMapper;
 import com.project01.skillineserver.projection.OrderProjection;
 import com.project01.skillineserver.properties.KafkaTopicProperties;
 import com.project01.skillineserver.repository.CourseRepository;
@@ -45,9 +46,10 @@ public class OrderServiceImpl implements OrderService {
     private final CourseRepository courseRepository;
     private final OrderDetailRepository orderDetailRepository;
     private final EnrollmentService enrollmentService;
-    private final CourseServiceImpl courseService;
+    private final MapUtil mapUtil;
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final KafkaTopicProperties kafkaTopicProperties;
+    private final CourseMapper courseMapper;
 
     @Override
     public PageResponse<OrderProjection> getOrders(int page, int size, String sort, String keyword) {
@@ -139,9 +141,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<CourseResponse> getOrderDetailByOrderId(Long orderId) {
+    public List<CourseResponse> getOrderDetailByOrderId(String orderId) {
         List<CourseEntity> courseInDB = orderRepository.getOrderDetailByOrderId(orderId);
-        return courseService.handleComputedThumbnailAssetOfCourses(courseInDB);
+        return mapUtil.handleComputedThumbnail(courseInDB, CourseEntity::getThumbnailAssetId, courseMapper::toCourseResponse);
     }
 
     @Override

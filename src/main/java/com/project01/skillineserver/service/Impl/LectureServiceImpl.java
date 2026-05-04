@@ -9,7 +9,6 @@ import com.project01.skillineserver.excepion.CustomException.AppException;
 import com.project01.skillineserver.mapper.LectureMapper;
 import com.project01.skillineserver.repository.LectureRepository;
 import com.project01.skillineserver.service.LectureService;
-import com.project01.skillineserver.service.MediaService;
 import com.project01.skillineserver.utils.MapUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,9 +16,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -28,13 +27,13 @@ import java.util.List;
 public class LectureServiceImpl implements LectureService {
 
     private final LectureRepository lectureRepository;
-    private final MediaService mediaService;
     private final LectureMapper lectureMapper;
+    private final MapUtil mapUtil;
 
     @Override
-    public LectureEntity save(LectureReq lectureReq) throws IOException, InterruptedException {
+    public void save(LectureReq lectureReq) throws IOException, InterruptedException {
 
-        boolean isUpdate = lectureReq.id()!=null;
+        boolean isUpdate = lectureReq.id() != null;
 
         LectureEntity lectureEntity = isUpdate
                 ? lectureRepository.findById(lectureReq.id())
@@ -44,17 +43,16 @@ public class LectureServiceImpl implements LectureService {
         Integer maxPositionLectureOfCourse = lectureRepository.findMaxPosition(lectureReq.courseId());
 
         lectureEntity.setTitle(lectureReq.title());
-        lectureEntity.setPosition(maxPositionLectureOfCourse!=null ? maxPositionLectureOfCourse+1 : 0);
+        lectureEntity.setPosition(maxPositionLectureOfCourse != null ? maxPositionLectureOfCourse + 1 : 0);
         lectureEntity.setCourseId(lectureReq.courseId());
-        lectureEntity.setUpdatedAt(Instant.now());
+        lectureEntity.setContentAssetId(lectureReq.contentAssetId());
+        lectureEntity.setThumbnailAssetId(lectureReq.thumbnailAssetId());
+        lectureEntity.setDurationSeconds(lectureReq.durationSeconds());
+        lectureEntity.setPublishStatus(lectureReq.publishStatus());
+        lectureEntity.setPreviewable(lectureReq.previewable());
 
-        if(!isUpdate){
-            lectureEntity.setCreatedAt(Instant.now());
-        }
+        lectureRepository.save(lectureEntity);
 
-        LectureEntity lectureNeedSave = lectureRepository.save(lectureEntity);
-
-        return lectureNeedSave;
     }
 
     @Override
@@ -62,28 +60,30 @@ public class LectureServiceImpl implements LectureService {
         Sort sortField = MapUtil.parseSort(sort);
         PageRequest pageRequest = PageRequest.of(page - 1, size, sortField);
 
-        Page<LectureEntity> orders = lectureRepository.getLectures(keyword,courseId,pageRequest);
+        Page<LectureEntity> lecturePages = lectureRepository.getLectures(keyword, courseId, pageRequest);
 
-        List<LectureResponse> listLectureResponse = orders.getContent().stream().map(lectureMapper::toLectureResponse).toList();
+        List<LectureResponse> listLectureResponse = mapUtil.handleComputedThumbnail(lecturePages.getContent()
+                , LectureEntity::getThumbnailAssetId
+                , lectureMapper::toLectureResponse);
 
         return PageResponse.<LectureResponse>builder()
                 .list(listLectureResponse)
                 .page(page)
                 .size(size)
-                .totalElements(orders.getTotalElements())
-                .totalPages(orders.getTotalPages())
+                .totalElements(lecturePages.getTotalElements())
+                .totalPages(lecturePages.getTotalPages())
                 .build();
     }
 
     @Override
-    public List<LectureResponse> getListLectureNotPagi(Long courseId) {
-        List<LectureEntity> lectureEntityList = lectureRepository.findAllByCourseId(courseId);
-        return lectureEntityList.stream().map(lectureMapper::toLectureResponse).toList();
-    }
+    @Transactional
+    public void delete(List<String> lectureIds) {
 
-    @Override
-    public Long countLectureInCourse(Long courseId) {
-        return lectureRepository.countLectureByCourseId(courseId);
-    }
+        if (lectureIds == null || lectureIds.isEmpty()) {
+            log.info("List Lecture id is empty");
+            throw new AppException(ErrorCode.LIST_ID_EMPTY);
+        }
 
+        lectureRepository.deleteAllByLectureIdIn(lectureIds);
+    }
 }

@@ -5,6 +5,8 @@ import com.project01.skillineserver.enums.ExpireUnit;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 
 public class CalculatorUtil {
@@ -22,13 +24,19 @@ public class CalculatorUtil {
                 return now.plus(durationExpireValue, ChronoUnit.DAYS);
             }
             case MONTH -> {
-                return now.plus(durationExpireValue, ChronoUnit.MONTHS);
+                return LocalDateTime.now().plusMonths(durationExpireValue).toInstant(ZoneOffset.UTC);
             }
             case YEAR -> {
-                return now.plus(durationExpireValue, ChronoUnit.YEARS);
+                return LocalDateTime.now().plusYears(durationExpireValue).toInstant(ZoneOffset.UTC);
             }
             case WEEK -> {
                 return now.plus(durationExpireValue, ChronoUnit.WEEKS);
+            }
+            case HOURS -> {
+                return now.plus(durationExpireValue, ChronoUnit.HOURS);
+            }
+            case MINUTE -> {
+                return now.plus(durationExpireValue, ChronoUnit.MINUTES);
             }
             default -> {
                 return null;

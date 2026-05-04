@@ -2,8 +2,6 @@ package com.project01.skillineserver.service.Impl;
 
 import com.project01.skillineserver.dto.reponse.PageResponse;
 import com.project01.skillineserver.dto.request.QuizReq;
-import com.project01.skillineserver.entity.QuestionEntity;
-import com.project01.skillineserver.entity.QuizAttemptEntity;
 import com.project01.skillineserver.entity.QuizEntity;
 import com.project01.skillineserver.enums.ErrorCode;
 import com.project01.skillineserver.excepion.CustomException.AppException;
@@ -20,7 +18,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,22 +50,15 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
+    @Transactional
     public void delete(List<Long> quizIds) {
 
         if (quizIds == null || quizIds.isEmpty()) {
             throw new AppException(ErrorCode.QUIZ_ID_REQUIRE);
         }
 
-        List<QuizAttemptEntity> listQuizAttemptNeedRemove = new ArrayList<>();
-        List<QuestionEntity> listQuestionNeedRemove = new ArrayList<>();
-
-        for (Long quizId : quizIds) {
-            listQuizAttemptNeedRemove.add(quizAttemptRepository.findByQuizId(quizId));
-            listQuestionNeedRemove.add(questionRepository.findByQuizId(quizId));
-        }
-
-        quizAttemptRepository.deleteAll(listQuizAttemptNeedRemove);
-        questionRepository.deleteAll(listQuestionNeedRemove);
+        quizAttemptRepository.deleteAllByQuizIdIn(quizIds);
+        questionRepository.deleteAllByQuizIdIn(quizIds);
         quizRepository.deleteByIdIn(quizIds);
     }
 

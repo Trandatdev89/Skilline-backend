@@ -13,7 +13,7 @@ public interface AuthService {
     AuthResponse login(LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response);
     boolean introspect(String token, TokenType tokenType);
 
-    void refreshToken(String refreshToken, HttpServletResponse response) throws ParseException;
+    void refreshToken(String refreshToken, String accessToken, HttpServletResponse response) throws ParseException;
     void createAccount(RegisterRequest registerRequest) throws IllegalAccessException;
     void verifyAccount(String token,Long userId);
 

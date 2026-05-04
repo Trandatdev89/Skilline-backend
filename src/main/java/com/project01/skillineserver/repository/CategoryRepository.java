@@ -17,29 +17,25 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> 
     @Query("update CategoryEntity c set c.isActive = false where c.id in :ids")
     void deleteCategoryByIds(@Param("ids") List<Long> ids);
 
-    @Query("select c.id," +
-            "c.name," +
-            "c.createdAt," +
-            "c.updatedAt," +
-            "c.createdBy," +
-            "c.updatedBy," +
-            "c.slug, " +
-            "media.objectKey " +
+    @Query("select c.id as id," +
+            "c.name as name," +
+            "c.createdAt as createdAt," +
+            "c.updatedAt as updatedAt," +
+            "c.isActive as isActive," +
+            "c.slug as slug, " +
+            "c.thumbnailAssetId as thumbnailAssetId " +
             "from CategoryEntity c " +
-            "left join MediaAssetEntity media on c.thumbnailAssetId = media.id " +
             "where c.isActive = true and (?1 is null or lower(c.name) like lower(concat('%',?1,'%')))")
     Page<CategoryProjection> getCategories(String keyword, Pageable pageable);
 
-    @Query("select c.id," +
-            "c.name," +
-            "c.createdAt," +
-            "c.updatedAt," +
-            "c.createdBy," +
-            "c.updatedBy," +
-            "c.slug, " +
-            "media.objectKey " +
+    @Query("select c.id as id," +
+            "c.name as name," +
+            "c.createdAt as createdAt," +
+            "c.updatedAt as updatedAt," +
+            "c.isActive as isActive," +
+            "c.slug as slug, " +
+            "c.thumbnailAssetId as thumbnailAssetId " +
             "from CategoryEntity c " +
-            "left join MediaAssetEntity media on c.thumbnailAssetId = media.id " +
             "where c.isActive = true and c.createdBy = ?2 and (?1 is null or lower(c.name) like lower(concat('%',?1,'%')))")
     Page<CategoryProjection> getCategoriesMySelf(String keyword, Long userId, Pageable pageable);
 }

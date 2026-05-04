@@ -15,7 +15,8 @@ public interface OrderService {
     OrderEntity getOrderById(String id, Long userId, Role role);
 
     OrderEntity saveOrder(OrderReq orderReq, Long userId);
-    List<CourseResponse> getOrderDetailByOrderId(Long orderId);
+
+    List<CourseResponse> getOrderDetailByOrderId(String orderId);
 
     PageResponse<OrderProjection> getOrdersMySelf(int page, int size, String sort, String keyword, Long userId);
 }

@@ -5,7 +5,6 @@ import com.project01.skillineserver.dto.ApiResponse;
 import com.project01.skillineserver.dto.reponse.CourseResponse;
 import com.project01.skillineserver.dto.reponse.PageResponse;
 import com.project01.skillineserver.dto.request.CourseReq;
-import com.project01.skillineserver.entity.CourseEntity;
 import com.project01.skillineserver.service.CourseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,7 +12,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.List;
 
 @RestController
@@ -25,11 +23,11 @@ public class CourseController {
 
     @PostMapping(value = "/save")
     @PreAuthorize("@authorizationService.isAdmin()")
-    public ApiResponse<CourseEntity> saveCourse(@ModelAttribute CourseReq courseReq) throws IOException {
-        return ApiResponse.<CourseEntity>builder()
+    public ApiResponse<?> saveCourse(@ModelAttribute CourseReq courseReq) throws IOException {
+        courseService.save(courseReq);
+        return ApiResponse.builder()
                 .code(200)
                 .message("Success")
-                .data(courseService.save(courseReq))
                 .build();
     }
 
@@ -62,7 +60,7 @@ public class CourseController {
     }
 
     @GetMapping(value = "/get-with-cursor")
-    public ApiResponse<PageResponse<CourseResponse>> getCoursesWithCursor(@RequestParam Instant cursor,
+    public ApiResponse<PageResponse<CourseResponse>> getCoursesWithCursor(@RequestParam(required = false) Long cursor,
                                                                           @RequestParam(required = false) String sort,
                                                                           @RequestParam(required = false) Long categoryId,
                                                                           @RequestParam(required = false) String keyword,

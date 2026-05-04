@@ -21,4 +21,5 @@ public class LectureResponse {
     private Long durationSeconds;
     private boolean previewable;
     private PublishStatus publishStatus;
+    private boolean isDeleted;
 }

@@ -1,16 +1,28 @@
 package com.project01.skillineserver.utils;
 
+import com.project01.skillineserver.entity.MediaAssetEntity;
 import com.project01.skillineserver.enums.ErrorCode;
 import com.project01.skillineserver.excepion.CustomException.AppException;
+import com.project01.skillineserver.properties.CdnProperties;
+import com.project01.skillineserver.repository.MediaAssetRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+@Component
+@RequiredArgsConstructor
 public class MapUtil {
+
+    private final MediaAssetRepository mediaAssetRepository;
+    private final CdnProperties cdnProperties;
+
     public static <X,Y> Map<X,Y> extractInfo(Object dataNeedExtract) throws IllegalAccessException {
 
         if(Objects.isNull(dataNeedExtract)){
@@ -31,6 +43,28 @@ public class MapUtil {
         }
         return infoExtract;
     }
+
+    public <T, R> List<R> handleComputedThumbnail(List<T> data, Function<T, String> assetIdExtractor,
+                                                  BiFunction<T, String, R> mapper) {
+
+        Set<String> assetIds = data.stream()
+                .map(assetIdExtractor)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        Map<String, String> thumbnailUrlByAssetId = mediaAssetRepository
+                .findAllByIdIn(assetIds)
+                .stream()
+                .collect(Collectors.toMap(
+                        MediaAssetEntity::getId,
+                        asset -> cdnProperties.getDomain() + "/" + asset.getObjectKey()
+                ));
+
+        return data.stream()
+                .map(entity -> mapper.apply(entity, thumbnailUrlByAssetId.get(assetIdExtractor.apply(entity))))
+                .toList();
+    }
+
     public static Sort parseSort(String sort){
         if(!StringUtils.hasText(sort)){
             return Sort.by(Sort.Direction.DESC,"createdAt");

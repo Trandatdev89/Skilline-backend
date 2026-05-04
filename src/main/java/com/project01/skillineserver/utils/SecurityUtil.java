@@ -100,6 +100,7 @@ public class SecurityUtil {
 
     public SignedJWT verifyToken(String token, TokenType tokenType) throws ParseException, JOSEException {
         if (!StringUtils.hasText(token)) {
+            log.info("Token {} with type {} is empty", token, tokenType);
             throw new AppException(ErrorCode.INVALID_TOKEN);
         }
 
@@ -127,11 +128,13 @@ public class SecurityUtil {
         }
 
         if (redisService.existsKey(tokenId)) {
+            log.info("Token {} with type {} is revoke", token, tokenType);
             throw new AppException(ErrorCode.ACCOUNT_IS_LOGOUT);
         }
 
         Optional<UserDevice> device = userDeviceRepository.findByDeviceId(deviceIdFromToken);
         if (device.isEmpty() || !device.get().isActive()) {
+            log.info("Your account with deviceId {} is located in a remote location.", deviceIdFromToken);
             throw new AppException(ErrorCode.ACCOUNT_LOGINED);
         }
 

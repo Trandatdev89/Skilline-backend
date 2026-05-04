@@ -11,10 +11,11 @@ import com.project01.skillineserver.enums.OrderStatus;
 import com.project01.skillineserver.enums.PaymentMethod;
 import com.project01.skillineserver.enums.PaymentStatus;
 import com.project01.skillineserver.excepion.CustomException.AppException;
-import com.project01.skillineserver.kafka.event.EnrollmentEvent;
 import com.project01.skillineserver.kafka.event.TransactionPaymentEvent;
 import com.project01.skillineserver.properties.KafkaTopicProperties;
 import com.project01.skillineserver.repository.OrderRepository;
+import com.project01.skillineserver.service.EnrollmentService;
+import com.project01.skillineserver.service.PaymentService;
 import com.project01.skillineserver.vnpay.VNPayService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +49,8 @@ public class PaymentController {
     private final OrderRepository orderRepository;
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final KafkaTopicProperties kafkaTopicProperties;
+    private final PaymentService paymentService;
+    private final EnrollmentService enrollmentService;
 
     @Value("${domain.client}")
     @NonFinal
@@ -110,6 +113,17 @@ public class PaymentController {
 
         BigDecimal amount = BigDecimal.valueOf(Double.valueOf(params.get("vnp_Amount")) / 100);
 
+        handleProcessTransaction(amount, orderId);
+
+        handleProcessEnrollment(courses, userId);
+
+        String targetUrl = DOMAIN_CLIENT + "/success";
+        org.springframework.http.HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create(targetUrl));
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
+    }
+
+    private void handleProcessTransaction(BigDecimal amount, String orderId) {
         TransactionPaymentEvent paymentEvent = TransactionPaymentEvent.builder()
                 .paymentStatus(PaymentStatus.SUCCESS)
                 .amount(amount)
@@ -120,20 +134,11 @@ public class PaymentController {
                 .paymentMethod(PaymentMethod.VNPAY)
                 .build();
 
-        kafkaTemplate.send(kafkaTopicProperties.getPaymentTransaction(), orderId, paymentEvent);
-        log.info("Push event payment transaction course with coursesId : {} and orderId : {}", courses.toString(), orderId);
+        paymentService.savePayment(paymentEvent);
+    }
 
-        EnrollmentEvent enrollmentEvent = EnrollmentEvent.builder()
-                .userId(userId)
-                .coursesId(courses)
-                .build();
-        kafkaTemplate.send(kafkaTopicProperties.getEnrollmentCourse(), orderId, enrollmentEvent);
-        log.info("Push event enrollment transaction course with coursesId : {} and userId : {}", courses.toString(), userId);
-
-        String targetUrl = DOMAIN_CLIENT + "/success";
-        org.springframework.http.HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(URI.create(targetUrl));
-        return new ResponseEntity<>(headers, HttpStatus.FOUND);
+    private void handleProcessEnrollment(List<Long> courseIds, Long userId) {
+        enrollmentService.saveEnrollment(courseIds, userId);
     }
 
 }

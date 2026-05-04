@@ -3,17 +3,13 @@ package com.project01.skillineserver.service;
 import com.project01.skillineserver.dto.reponse.LectureResponse;
 import com.project01.skillineserver.dto.reponse.PageResponse;
 import com.project01.skillineserver.dto.request.LectureReq;
-import com.project01.skillineserver.entity.LectureEntity;
-import org.springframework.core.io.Resource;
-import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
 import java.util.List;
 
 public interface LectureService {
-    LectureEntity save(LectureReq lectureReq) throws IOException, InterruptedException;
+    void save(LectureReq lectureReq) throws IOException, InterruptedException;
     PageResponse<LectureResponse> getListLecture(int page, int size, String sort, String keyword, Long courseId);
-    List<LectureResponse> getListLectureNotPagi(Long courseId);
 
-    Long countLectureInCourse(Long courseId);
+    void delete(List<String> ids);
 }

@@ -4,5 +4,7 @@ public enum ExpireUnit {
     DAY,
     WEEK,
     MONTH,
-    YEAR
+    YEAR,
+    HOURS,
+    MINUTE
 }

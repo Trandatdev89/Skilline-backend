@@ -63,6 +63,7 @@ public class AuthServiceImpl implements AuthService {
     public AuthResponse login(LoginRequest loginRequest,HttpServletRequest request, HttpServletResponse response) {
 
         CustomUserDetail user = (CustomUserDetail) userDetailsService.loadUserByUsername(loginRequest.getUsername());
+
         UserEntity userInDB = user.getUser();
 
 
@@ -223,26 +224,20 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void refreshToken(String refreshToken, HttpServletResponse response) throws ParseException {
+    public void refreshToken(String refreshToken, String accessToken, HttpServletResponse response) throws ParseException {
 
-        boolean check = introspect(refreshToken,TokenType.REFRESH_TOKEN);
-
-        if (!check) {
-            log.info("Refresh token in cookie is expire!");
-            throw new AppException(ErrorCode.REFRESH_TOKEN_EXPIRE);
-        }
+        introspect(refreshToken, TokenType.REFRESH_TOKEN);
 
         String username = SecurityUtil.extractUsernameByToken(refreshToken);
         String deviceId = SecurityUtil.extractDeviceIdByToken(refreshToken);
+        String tokenId = SignedJWT.parse(accessToken).getJWTClaimsSet().getJWTID();
 
         CustomUserDetail user = (CustomUserDetail)userDetailsService.loadUserByUsername(username);
 
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities());
-
         CookieUtil.setAccessTokenCookieHttpOnly(securityUtil.generateToken(Objects
                 .requireNonNull(user), TokenType.ACCESS_TOKEN, deviceId), response);
-        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+        redisService.saveData(tokenId, accessToken);
     }
 
 

@@ -35,5 +35,9 @@ public class LectureEntity extends UuidEntity<String> {
     @Enumerated(EnumType.STRING)
     @Column(name = "publish_status", nullable = false, length = 20)
     private PublishStatus publishStatus = PublishStatus.DRAFT;
+
+    @Column(name = "is_deleted", nullable = false)
+    private boolean delete = false;
+
 }
 

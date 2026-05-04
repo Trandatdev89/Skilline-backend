@@ -31,6 +31,8 @@ public class CourseMapper {
                 .updatedAt(dateUtil.format(courseEntity.getUpdatedAt()))
                 .createdBy(courseEntity.getCreatedBy())
                 .updatedBy(courseEntity.getUpdatedBy())
+                .accessDurationValue(courseEntity.getAccessDurationValue())
+                .expireUnit(courseEntity.getAccessDurationUnit())
                 .build();
     }
 }

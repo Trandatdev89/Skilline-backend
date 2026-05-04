@@ -23,7 +23,6 @@ public class KafkaConfig {
     @Value("${spring.kafka.bootstrap-servers:localhost:9092}")
     private String bootstrapServers;
 
-    // ==================== PRODUCER ====================
 
     @Bean
     public ProducerFactory<String, Object> producerFactory() {
@@ -43,7 +42,6 @@ public class KafkaConfig {
         return new KafkaTemplate<>(producerFactory());
     }
 
-    // ==================== CONSUMER ====================
 
     @Bean
     public ConsumerFactory<String, Object> consumerFactory() {
@@ -53,8 +51,8 @@ public class KafkaConfig {
         config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         config.put(JsonDeserializer.TRUSTED_PACKAGES, "com.project01.skillineserver.*");
-        config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-        // Tắt auto commit - tự commit sau khi xử lý xong để không mất message
+        config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+
         config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
         return new DefaultKafkaConsumerFactory<>(config);
     }
@@ -64,14 +62,12 @@ public class KafkaConfig {
         ConcurrentKafkaListenerContainerFactory<String, Object> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
-        // Manual ack - chỉ commit sau khi xử lý thành công
+
         factory.getContainerProperties().setAckMode(
                 org.springframework.kafka.listener.ContainerProperties.AckMode.MANUAL_IMMEDIATE
         );
         return factory;
     }
-
-    // ==================== TOPICS ====================
 
     @Bean
     public NewTopic mediaUploadedTopic() {

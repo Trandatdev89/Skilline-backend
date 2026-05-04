@@ -35,14 +35,18 @@ public class PaymentServiceImpl implements PaymentService {
         TransactionPaymentEvent event;
         try {
             event = objectMapper.convertValue(record.value(), TransactionPaymentEvent.class);
+            savePayment(event);
+            ack.acknowledge();
         } catch (Exception e) {
             log.error("Cannot deserialize event key={}: {}", record.key(), e.getMessage());
             ack.acknowledge();
-            return;
         }
 
-        PaymentEntity paymentEntity = Optional.ofNullable(event.getPaymentId()).
-                flatMap(paymentRepository::findById)
+    }
+
+    public void savePayment(TransactionPaymentEvent event) {
+        PaymentEntity paymentEntity = Optional.ofNullable(event.getOrderId()).
+                flatMap(paymentRepository::findByOrderId)
                 .orElseGet(PaymentEntity::new);
 
         paymentEntity.setPaymentMethod(event.getPaymentMethod());

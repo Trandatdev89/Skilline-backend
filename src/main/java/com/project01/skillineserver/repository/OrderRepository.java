@@ -26,7 +26,7 @@ public interface OrderRepository extends JpaRepository<OrderEntity, String> {
             "us.email AS email, " +
             "us.phone AS phone " +
             "FROM OrderEntity od " +
-            "RIGHT JOIN UserEntity us ON us.id = od.userId " +
+            "LEFT JOIN UserEntity us ON us.id = od.userId " +
             "WHERE :keyword IS NULL OR LOWER(us.username) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     Page<OrderProjection> getOrders(String keyword, Pageable pageable);
 
@@ -43,7 +43,7 @@ public interface OrderRepository extends JpaRepository<OrderEntity, String> {
             "us.email AS email, " +
             "us.phone AS phone " +
             "FROM OrderEntity od " +
-            "RIGHT JOIN UserEntity us ON us.id = od.userId " +
+            "LEFT JOIN UserEntity us ON us.id = od.userId " +
             "WHERE us.id = :userId and " +
             ":keyword IS NULL OR LOWER(us.username) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     Page<OrderProjection> getOrdersMySelf(String keyword, Pageable pageable, Long userId);
@@ -54,5 +54,5 @@ public interface OrderRepository extends JpaRepository<OrderEntity, String> {
             inner join CourseEntity co on co.id = od.courseId
             where od.orderId = :orderId
             """)
-    List<CourseEntity> getOrderDetailByOrderId(Long orderId);
+    List<CourseEntity> getOrderDetailByOrderId(String orderId);
 }

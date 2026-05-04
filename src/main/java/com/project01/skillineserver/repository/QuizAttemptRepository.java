@@ -13,6 +13,9 @@ import java.time.Instant;
 import java.util.List;
 
 public interface QuizAttemptRepository extends JpaRepository<QuizAttemptEntity, Long> {
+
+    void deleteAllByQuizIdIn(List<Long> quizIds);
+
     QuizAttemptEntity findByQuizId(Long quizId);
 
     @Query("select qa.attemptNo as attemptNo " +

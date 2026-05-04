@@ -38,7 +38,7 @@ public class OrderController {
     }
 
     @GetMapping(value = "/my-self")
-    @PreAuthorize("@authorizationService.canAccessApi()")
+    @PreAuthorize("@authorizationService.isCanAccessApi()")
     public ApiResponse<PageResponse<OrderProjection>> getOrdersMySelf(@RequestParam(defaultValue = "0") int page,
                                                                       @RequestParam(defaultValue = "10") int size,
                                                                       @RequestParam(required = false) String sort,
@@ -71,7 +71,7 @@ public class OrderController {
 
     @GetMapping(value = "/order-detail/{orderId}")
     @PreAuthorize("@authorizationService.isAdmin()")
-    public ApiResponse<List<CourseResponse>> getOrderDetailByOrderId(@PathVariable Long orderId) {
+    public ApiResponse<List<CourseResponse>> getOrderDetailByOrderId(@PathVariable String orderId) {
         return ApiResponse.<List<CourseResponse>>builder()
                 .code(200)
                 .message("Success")
