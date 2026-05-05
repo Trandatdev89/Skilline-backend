@@ -21,7 +21,7 @@ public class LectureController {
 
     @PostMapping(value = "/save")
     @PreAuthorize("@authorizationService.isAdmin()")
-    public ApiResponse<?> save(@ModelAttribute LectureReq lectureReq) throws IOException, InterruptedException {
+    public ApiResponse<?> save(@RequestBody LectureReq lectureReq) throws IOException, InterruptedException {
         lectureService.save(lectureReq);
         return ApiResponse.builder()
                 .code(200)

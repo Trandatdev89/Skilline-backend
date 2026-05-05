@@ -25,7 +25,7 @@ public class CategoryController {
 
     @PostMapping
     @PreAuthorize("@authorizationService.isAdmin()")
-    public ApiResponse<?> save(@ModelAttribute CategoryReq categoryReq) throws IOException {
+    public ApiResponse<?> save(@RequestBody CategoryReq categoryReq) throws IOException {
         categoryService.save(categoryReq);
         return ApiResponse.builder()
                 .message("Save Category success!")

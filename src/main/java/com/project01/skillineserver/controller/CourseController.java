@@ -23,7 +23,7 @@ public class CourseController {
 
     @PostMapping(value = "/save")
     @PreAuthorize("@authorizationService.isAdmin()")
-    public ApiResponse<?> saveCourse(@ModelAttribute CourseReq courseReq) throws IOException {
+    public ApiResponse<?> saveCourse(@RequestBody CourseReq courseReq) throws IOException {
         courseService.save(courseReq);
         return ApiResponse.builder()
                 .code(200)
