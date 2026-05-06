@@ -45,14 +45,17 @@ public class LectureServiceImpl implements LectureService {
         lectureEntity.setTitle(lectureReq.title());
         lectureEntity.setPosition(maxPositionLectureOfCourse != null ? maxPositionLectureOfCourse + 1 : 0);
         lectureEntity.setCourseId(lectureReq.courseId());
-        lectureEntity.setContentAssetId(lectureReq.contentAssetId());
-        lectureEntity.setThumbnailAssetId(lectureReq.thumbnailAssetId());
         lectureEntity.setDurationSeconds(lectureReq.durationSeconds());
         lectureEntity.setPublishStatus(lectureReq.publishStatus());
         lectureEntity.setPreviewable(lectureReq.previewable());
+        if (lectureReq.contentAssetId() != null) {
+            lectureEntity.setContentAssetId(lectureReq.contentAssetId());
+        }
+        if (lectureReq.thumbnailAssetId() != null) {
+            lectureEntity.setThumbnailAssetId(lectureReq.thumbnailAssetId());
+        }
 
         lectureRepository.save(lectureEntity);
-
     }
 
     @Override

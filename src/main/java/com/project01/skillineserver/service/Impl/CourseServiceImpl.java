@@ -57,9 +57,13 @@ public class CourseServiceImpl implements CourseService {
         courseEntityInDB.setPublishStatus(courseReq.publishStatus());
         courseEntityInDB.setAccessDurationUnit(courseReq.accessDurationUnit());
         courseEntityInDB.setAccessDurationValue(courseReq.accessDurationValue());
-        courseEntityInDB.setThumbnailAssetId(courseReq.assetId());
         courseEntityInDB.setPriceDiscount(CalculatorUtil
                 .computedPriceWhenDiscount(courseReq.price(), courseReq.discount()));
+        if (courseReq.assetId() != null) {
+            courseEntityInDB.setThumbnailAssetId(courseReq.assetId());
+        } else {
+            courseEntityInDB.setThumbnailAssetId(null);
+        }
 
         courseRepository.save(courseEntityInDB);
     }

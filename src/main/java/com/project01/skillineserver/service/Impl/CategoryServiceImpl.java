@@ -42,7 +42,9 @@ public class CategoryServiceImpl implements CategoryService {
         categoryInDB.setName(category.name());
         categoryInDB.setActive(true);
         categoryInDB.setSlug(category.slug());
-        categoryInDB.setThumbnailAssetId(category.assetId());
+        if (category.assetId() != null) {
+            categoryInDB.setThumbnailAssetId(category.assetId());
+        }
 
         categoryRepository.save(categoryInDB);
     }
