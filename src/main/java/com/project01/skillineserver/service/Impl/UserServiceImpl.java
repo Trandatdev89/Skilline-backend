@@ -1,6 +1,7 @@
 package com.project01.skillineserver.service.Impl;
 
-import com.project01.skillineserver.dto.request.ChangeEmailReq;
+import com.project01.skillineserver.config.CustomUserDetail;
+import com.project01.skillineserver.dto.reponse.AuthResponse;
 import com.project01.skillineserver.dto.request.ChangePasswordReq;
 import com.project01.skillineserver.entity.UserEntity;
 import com.project01.skillineserver.enums.ErrorCode;
@@ -53,6 +54,22 @@ public class UserServiceImpl implements UserService {
 
         user.setEmail(newEmail);
         userRepository.save(user);
+    }
+
+    @Override
+    public AuthResponse me() {
+
+        CustomUserDetail customUserDetail = (CustomUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        UserEntity userEntityInUserDetail = customUserDetail.getUser();
+
+        return AuthResponse.builder()
+                .role(userEntityInUserDetail.getRole())
+                .userId(userEntityInUserDetail.getId())
+                .authenticated(true)
+                .avatar(userEntityInUserDetail.getAvatar())
+                .username(userEntityInUserDetail.getUsername())
+                .build();
     }
 
 }

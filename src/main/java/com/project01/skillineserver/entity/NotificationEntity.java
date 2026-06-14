@@ -1,10 +1,9 @@
 package com.project01.skillineserver.entity;
 
 import com.project01.skillineserver.enums.NotificationType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.*;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.FieldType;
-import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.time.Instant;
 
@@ -13,19 +12,19 @@ import java.time.Instant;
 @Setter
 @NoArgsConstructor
 @Builder
-@Document(collection = "notification")
-public class NotificationEntity {
+@Entity
+@Table(name = "notification")
+public class NotificationEntity extends UuidEntity<String> {
 
-    @MongoId(FieldType.STRING)
-    private String id;
     private NotificationType notificationType;
     private String content;
-    private String userId;
+    private Long userId;
     private String nameUser;
     private String title;
     private String linkAttachment;
-    private boolean isActive;
     private Instant timePush;
-    private Instant createdAt;
+    private boolean isRead = false;        // đã đọc chưa
+    private Instant readAt;                // đọc lúc nào
+    private boolean isDeleted = false;     // soft delete
 
 }

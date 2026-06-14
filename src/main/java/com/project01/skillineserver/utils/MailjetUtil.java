@@ -7,7 +7,6 @@ import com.mailjet.client.transactional.SendContact;
 import com.mailjet.client.transactional.SendEmailsRequest;
 import com.mailjet.client.transactional.TransactionalEmail;
 import com.mailjet.client.transactional.response.SendEmailsResponse;
-import com.project01.skillineserver.repository.TemplateMailRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
@@ -27,8 +26,6 @@ public class MailjetUtil {
     @NonFinal
     private String apiSecretKey;
 
-    private final TemplateMailRepository templateMailRepository;
-
     public void sendMailWithMailjet(String toEmail,
                                     String toName,
                                     String subject,
@@ -43,7 +40,7 @@ public class MailjetUtil {
         TransactionalEmail message = TransactionalEmail
                 .builder()
                 .from(new SendContact("tranquocdat30122004@gmail.com", "Tran Quoc Dat"))
-                .to(new SendContact(toEmail,toName))
+                .to(new SendContact(toEmail, toName))
                 .htmlPart(body)
                 .subject(subject)
                 .header("test-header-key", "test-value")
@@ -52,7 +49,7 @@ public class MailjetUtil {
 
         SendEmailsRequest request = SendEmailsRequest
                 .builder()
-                .message(message) // you can add up to 50 messages per request
+                .message(message)
                 .build();
 
         SendEmailsResponse response = null;
@@ -61,7 +58,7 @@ public class MailjetUtil {
         } catch (MailjetException e) {
             throw new RuntimeException(e);
         }
-        log.info("Info : {}",response);
+        log.info("Info : {}", response);
     }
 
 }

@@ -10,7 +10,13 @@
                 <constraints primaryKey="true" />
             </column>
             <column name="name" type="varchar(255)"/>
+            <column name="slug" type="varchar(255)"/>
+            <column name="is_active" type="TINYINT"/>
             <column name="path" type="varchar(255)"/>
+            <column name="created_at" type="timestamp"/>
+            <column name="updated_at" type="timestamp"/>
+            <column name="created_by" type="bigint"/>
+            <column name="updated_by" type="bigint"/>
         </createTable>
     </changeSet>
 </databaseChangeLog>

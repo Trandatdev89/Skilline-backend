@@ -15,9 +15,13 @@ public class EmailTemplate extends BaseEntity<Long> {
 
     @Enumerated(EnumType.STRING)
     private EmailType type;
+
     private String subject;
-    @Column(columnDefinition = "TEXT")
+
+    @Column(name = "html_content", columnDefinition = "TEXT")
     private String htmlContent;
+
     private String language;
+
     private boolean active;
 }

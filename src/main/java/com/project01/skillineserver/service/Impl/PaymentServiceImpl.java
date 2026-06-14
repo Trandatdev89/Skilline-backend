@@ -19,12 +19,17 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public void createPayment(PaymentReq paymentReq) {
-        PaymentEntity paymentEntity = PaymentEntity.builder()
-                .paymentMethod(paymentReq.paymentMethod())
-                .status(paymentReq.paymentStatus())
-                .orderId(paymentReq.orderId())
-                .paidAt(Instant.now())
-                .build();
+
+        PaymentEntity paymentEntity = paymentRepository.findByOrderId(paymentReq.orderId())
+                .orElseGet(PaymentEntity::new);
+
+        paymentEntity.setPaymentMethod(paymentReq.paymentMethod());
+        paymentEntity.setAmount(paymentReq.amount());
+        paymentEntity.setStatus(paymentReq.paymentStatus());
+        paymentEntity.setOrderId(paymentReq.orderId());
+        paymentEntity.setPaidAt(Instant.now());
+        paymentEntity.setGatewayResponse(paymentReq.gatewayResponse());
+        paymentEntity.setTransactionId(paymentReq.transactionId());
 
         paymentRepository.save(paymentEntity);
 

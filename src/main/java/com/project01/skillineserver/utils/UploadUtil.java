@@ -1,7 +1,8 @@
 package com.project01.skillineserver.utils;
 
-import com.project01.skillineserver.entity.LectureEntity;
+import com.project01.skillineserver.enums.ErrorCode;
 import com.project01.skillineserver.enums.FileType;
+import com.project01.skillineserver.excepion.CustomException.AppException;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,10 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Component
 public class UploadUtil {
@@ -49,29 +47,14 @@ public class UploadUtil {
         }
     }
 
-    public LectureEntity generateVideoUrl(MultipartFile lectureFile, LectureEntity lectureEntity) throws IOException, InterruptedException {
-
-        Path pathVideo = createPathFile(lectureFile, FileType.VIDEO);
-
-        String durationVideo = getVideoDuration(pathVideo.toString());
-        String imageVideo = extractThumbnail(pathVideo.toString());
-
-        lectureEntity.setContentType(lectureFile.getContentType());
-        lectureEntity.setDuration(durationVideo);
-        lectureEntity.setImage(Paths.get(imagePath,imageVideo).toString());
-        lectureEntity.setFilePath(Paths.get(videoPath,pathVideo.getFileName().toString()).toString());
-
-        return lectureEntity;
-    }
-
     public Map<String,Object> generateVideoUrl(MultipartFile lectureFile) throws IOException, InterruptedException {
         Map<String,Object> claimVideo = new HashMap<>();
-        Path pathVideo = createPathFile(lectureFile, FileType.VIDEO);
+        String pathVideo = createPathFile(lectureFile, FileType.VIDEO);
 
-        String durationVideo = getVideoDuration(pathVideo.toString());
-        String imageVideo = extractThumbnail(pathVideo.toString());
+        String durationVideo = getVideoDuration(pathVideo);
+        String imageVideo = extractThumbnail(pathVideo);
 
-        claimVideo.put("filePath",pathVideo.toString());
+        claimVideo.put("filePath",pathVideo);
         claimVideo.put("contentType",lectureFile.getContentType());
         claimVideo.put("duration",durationVideo);
         claimVideo.put("image",imageVideo);
@@ -132,24 +115,29 @@ public class UploadUtil {
 
     }
 
-    public Path createPathFile(MultipartFile lectureFile, FileType fileType) throws IOException {
+    public String createPathFile(MultipartFile lectureFile, FileType fileType) throws IOException {
+
 
         String originFileName = lectureFile.getOriginalFilename();
-        Path folderUpload = null;
+        Path folderUpload;
 
-        switch (fileType){
-            case VIDEO:
-                folderUpload = Paths.get(videoPath);
-                break;
-            case PDF:
-                folderUpload = Paths.get(pdfPath);
-                break;
-            default:
-                folderUpload = Paths.get(imagePath);
-                break;
+        switch (fileType) {
+            case VIDEO -> folderUpload = Paths.get(videoPath);
+            case PDF -> folderUpload = Paths.get(pdfPath);
+            default -> folderUpload = Paths.get(imagePath);
         }
 
         String fileExtension = StringUtils.getFilenameExtension(originFileName);
+
+        List<String> allowedExtensions = switch (fileType) {
+            case IMAGE -> List.of("jpg", "jpeg", "png", "webp");
+            case VIDEO -> List.of("mp4", "mkv", "avi", "mov", "webm");
+            case PDF -> List.of("pdf");
+            case EXCEL -> null;
+        };
+        if (fileExtension != null && !allowedExtensions.contains(fileExtension.toLowerCase())) {
+            throw new AppException(ErrorCode.INVALID_FILE_TYPE);
+        }
 
         String fileName = Objects.isNull(fileExtension)
                 ? UUID.randomUUID().toString()
@@ -157,10 +145,13 @@ public class UploadUtil {
 
         Path filePath = folderUpload.resolve(fileName).normalize().toAbsolutePath();
 
+        if (!filePath.startsWith(folderUpload.toAbsolutePath())) {
+            throw new SecurityException("Invalid file path detected");
+        }
 
         Files.copy(lectureFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-        return Paths.get(String.valueOf(folderUpload),fileName);
+        return folderUpload.toString().replace("\\", "/") + "/" + fileName;
     }
 
 }

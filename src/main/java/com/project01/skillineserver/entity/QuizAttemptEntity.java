@@ -20,9 +20,13 @@ public class QuizAttemptEntity {
 
     @Column(name = "quiz_id")
     private Long quizId;
+
     @Column(name = "user_id")
     private Long userId;
+
     private Integer attemptNo;
+
     private Instant submittedAt;
+
     private Double totalScore;
 }

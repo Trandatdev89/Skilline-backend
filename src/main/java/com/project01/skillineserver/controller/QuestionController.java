@@ -4,7 +4,6 @@ package com.project01.skillineserver.controller;
 import com.project01.skillineserver.dto.ApiResponse;
 import com.project01.skillineserver.dto.reponse.QuestionExamUser;
 import com.project01.skillineserver.dto.request.SaveQuestionListReq;
-import com.project01.skillineserver.projection.QuestionExamProjection;
 import com.project01.skillineserver.service.QuestionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -36,5 +35,12 @@ public class QuestionController {
                 .build();
     }
 
-
+    @DeleteMapping(value = "/{ids}")
+    public ApiResponse<?> delete(@PathVariable List<Long> ids) {
+        questionService.delete(ids);
+        return ApiResponse.builder()
+                .code(200)
+                .message("Delete question success!")
+                .build();
+    }
 }

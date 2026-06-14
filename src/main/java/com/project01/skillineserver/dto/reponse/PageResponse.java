@@ -17,4 +17,6 @@ public class PageResponse <T>{
     private List<T> list;
     private int totalPages;
     private long totalElements;
+    private Long nextCursor;
+    private boolean hasNextPage;
 }

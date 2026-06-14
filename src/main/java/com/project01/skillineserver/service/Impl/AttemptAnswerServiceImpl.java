@@ -1,29 +1,31 @@
 package com.project01.skillineserver.service.Impl;
 
-import com.project01.skillineserver.dto.reponse.AnswerUserRes;
+import com.project01.skillineserver.dto.projection.AnswerUserChoiceProjection;
+import com.project01.skillineserver.dto.reponse.AnswerRes;
 import com.project01.skillineserver.dto.reponse.HistoryExamUser;
 import com.project01.skillineserver.dto.reponse.QuestionExamUser;
 import com.project01.skillineserver.entity.AnswerEntity;
 import com.project01.skillineserver.entity.QuestionEntity;
 import com.project01.skillineserver.entity.QuizAttemptEntity;
-import com.project01.skillineserver.projection.AnswerUserChoiceProjection;
-import com.project01.skillineserver.projection.HistoryExamFlatProjection;
 import com.project01.skillineserver.repository.AnswerRepository;
 import com.project01.skillineserver.repository.HistoryScoreUserRepository;
 import com.project01.skillineserver.repository.QuestionRepository;
 import com.project01.skillineserver.repository.QuizAttemptRepository;
-import com.project01.skillineserver.service.HistoryScoreUserService;
+import com.project01.skillineserver.service.AttemptAnswerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class HistoryScoreUserServiceImpl implements HistoryScoreUserService {
+public class AttemptAnswerServiceImpl implements AttemptAnswerService {
 
     private final HistoryScoreUserRepository historyScoreUserRepository;
     private final QuizAttemptRepository quizAttemptRepository;
@@ -46,7 +48,7 @@ public class HistoryScoreUserServiceImpl implements HistoryScoreUserService {
 
         //List HistoryUserChoice:
         Map<Long,List<AnswerUserChoiceProjection>> answerUserChoiceGroupByQuestionId  = historyScoreUserRepository
-                .findByAttemptQuizIdAndQuestionIdIn(attemptQuizId,questionIds)
+                .findByAttemptQuizIdAndQuestionIdIn(attemptQuizId)
                 .stream()
                 .collect(Collectors.groupingBy(AnswerUserChoiceProjection::getQuestionId));
 
@@ -63,6 +65,7 @@ public class HistoryScoreUserServiceImpl implements HistoryScoreUserService {
                 .submittedAt(quizAttemptOfUser.getSubmittedAt())
                 .totalScore(quizAttemptOfUser.getTotalScore())
                 .quizAttemptId(quizAttemptOfUser.getId())
+                .attemptNo(quizAttemptOfUser.getAttemptNo())
                 .questions(questionExamUsers)
                 .build();
     }
@@ -70,20 +73,20 @@ public class HistoryScoreUserServiceImpl implements HistoryScoreUserService {
     private QuestionExamUser buildQuestionExamUser(
             QuestionEntity question,
             List<AnswerEntity> answers,
-            List<AnswerUserChoiceProjection> userChoices) {
+            List<AnswerUserChoiceProjection> selectedAnswerOfUser) {
 
-        double scoreAchieved = userChoices.stream()
+        double scoreAchieved = selectedAnswerOfUser.stream()
                 .mapToDouble(choice -> choice.getScore() == null ? 0.0 : choice.getScore())
                 .sum();
 
         // Set các answer user đã chọn
-        Set<Long> selectedAnswerIds = userChoices.stream()
-                .map(AnswerUserChoiceProjection::getAnswerUserChoice)
+        Set<Long> selectedAnswerIds = selectedAnswerOfUser.stream()
+                .map(AnswerUserChoiceProjection::getAnswerId)
                 .collect(Collectors.toSet());
 
         // Build answer responses
-        List<AnswerUserRes> answerUserRes = answers.stream()
-                .map(answer -> AnswerUserRes.builder()
+        List<AnswerRes> answerUserRes = answers.stream()
+                .map(answer -> AnswerRes.builder()
                         .answerId(answer.getId())
                         .isCorrect(answer.isCorrect())
                         .isUserSelected(selectedAnswerIds.contains(answer.getId()))
@@ -100,59 +103,5 @@ public class HistoryScoreUserServiceImpl implements HistoryScoreUserService {
                 .answers(answerUserRes)
                 .build();
     }
-
-//    @Override
-//    public HistoryExamUser getHistoryScoreExamOfUser(Long attemptQuizId) {
-//
-//        List<HistoryExamFlatProjection> rows =
-//                quizAttemptRepository.getA(attemptQuizId);
-//
-//        if (rows.isEmpty()) {
-//            return null; // hoặc throw exception
-//        }
-//
-//        Map<Long, QuestionExamUser> questionMap = new LinkedHashMap<>();
-//
-//        for (HistoryExamFlatProjection row : rows) {
-//
-//            QuestionExamUser question = questionMap.computeIfAbsent(
-//                    row.getQuestionId(),
-//                    id -> QuestionExamUser.builder()
-//                            .questionId(id)
-//                            .content(row.getQuestionContent())
-//                            .type(row.getQuestionType())
-//                            .maxScore(row.getMaxScore())
-//                            .scoreAchieved(row.getScoreAchieved())
-//                            .answers(new ArrayList<>())
-//                            .build()
-//            );
-//
-//            // tránh duplicate answer (phòng hờ)
-//            boolean exists = question.getAnswers().stream()
-//                    .anyMatch(a -> a.getAnswerId().equals(row.getAnswerId()));
-//
-//            if (!exists) {
-//                question.getAnswers().add(
-//                        AnswerUserRes.builder()
-//                                .answerId(row.getAnswerId())
-//                                .content(row.getAnswerContent())
-//                                .isCorrect(row.getIsCorrect())
-//                                .isUserSelected(row.getIsUserSelected() != null && row.getIsUserSelected() == 1L)
-//                                .build()
-//                );
-//            }
-//        }
-//
-//        HistoryExamFlatProjection first = rows.get(0);
-//
-//        log.info("Data first {}",first.getTotalScore(),first.getSubmittedAt());
-//
-//        return HistoryExamUser.builder()
-//                .quizAttemptId(first.getAttemptId())
-//                .submittedAt(first.getSubmittedAt())
-//                .totalScore(first.getTotalScore())
-//                .questions(new ArrayList<>(questionMap.values()))
-//                .build();
-//    }
 
 }

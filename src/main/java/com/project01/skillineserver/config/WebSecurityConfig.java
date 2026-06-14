@@ -3,6 +3,7 @@ package com.project01.skillineserver.config;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.project01.skillineserver.entity.UserEntity;
 import com.project01.skillineserver.enums.ErrorCode;
+import com.project01.skillineserver.enums.TokenType;
 import com.project01.skillineserver.excepion.CustomException.AppException;
 import com.project01.skillineserver.repository.UserRepository;
 import com.project01.skillineserver.service.AuthService;
@@ -41,7 +42,8 @@ import org.springframework.web.filter.CorsFilter;
 public class WebSecurityConfig {
 
     private static final String[] PUBLIC_ENTRYPOINT = {"/auth/**", "/api/file/**", "/chat/**",
-            "/vnpay-payment/**", "/api/lecture/**", "/api/course/**","/api/push/**","/api/test/**"};
+            "/vnpay-payment/**", "/api/lecture/**", "/api/course/**", "/api/push/**", "/api/test", "/ws/**",
+            "/api/media/**"};
 
     @Lazy
     @Autowired
@@ -100,11 +102,15 @@ public class WebSecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .oauth2ResourceServer(oauth -> oauth
                         .bearerTokenResolver(cookieBearerTokenResolver)
-                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
                         .accessDeniedHandler(new JwtAccessDeniedEntryPoint())
+                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
                         .jwt(config -> config
                                 .jwtAuthenticationConverter(customJwtAuthConverter)
                                 .decoder(accessTokenDecoder())))
+                .exceptionHandling(ex -> ex
+                        .accessDeniedHandler(new JwtAccessDeniedEntryPoint())
+                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
+                )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
     }
@@ -135,10 +141,13 @@ public class WebSecurityConfig {
                 .withSecretKey(securityUtil.secretKey()).macAlgorithm(MacAlgorithm.HS256).build();
         return token -> {
             try {
-//               authService.introspect(token, TokenType.ACCESS_TOKEN);
+                var responseToken = authService.introspect(token, TokenType.ACCESS_TOKEN);
+                if (!responseToken) {
+                    throw new AppException(ErrorCode.INVALID_TOKEN);
+                }
                 return nimbusJwtDecoder.decode(token);
             } catch (Exception e) {
-                System.out.println("Access token " + e.getMessage());
+                System.out.println(e.getMessage());
                 throw e;
             }
         };

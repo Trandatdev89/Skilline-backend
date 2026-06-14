@@ -14,18 +14,16 @@ import java.time.Instant;
 @Setter
 @Entity
 @Table(name = "orders")
-public class OrderEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class OrderEntity extends UuidEntity<String> {
 
     private Long userId;
+
     @Column(name = "total_price")
     private BigDecimal totalPrice;
+
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
-    private Long quantity;
-    @Column(name = "created_at")
-    private Instant createdAt;
+
+    @Column(name = "expires_at")
+    private Instant expiresAt;
 }

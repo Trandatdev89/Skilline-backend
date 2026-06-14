@@ -8,4 +8,6 @@ import java.util.Optional;
 
 public interface TemplateMailRepository extends JpaRepository<EmailTemplate,Long> {
     Optional<EmailTemplate> findByType(EmailType type);
+
+    Optional<EmailTemplate> findEmailTemplateByTypeAndActive(EmailType type, boolean isActive);
 }

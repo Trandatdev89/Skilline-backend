@@ -3,20 +3,21 @@ package com.project01.skillineserver.controller;
 import com.project01.skillineserver.config.CustomUserDetail;
 import com.project01.skillineserver.constants.AppConstants;
 import com.project01.skillineserver.dto.ApiResponse;
+import com.project01.skillineserver.dto.reponse.AuthResponse;
 import com.project01.skillineserver.dto.request.ChangeEmailReq;
 import com.project01.skillineserver.dto.request.ChangePasswordReq;
-import com.project01.skillineserver.dto.request.TokenRequest;
 import com.project01.skillineserver.entity.UserEntity;
 import com.project01.skillineserver.service.AuthService;
-import com.project01.skillineserver.service.Impl.AuthorizationService;
 import com.project01.skillineserver.service.UserService;
 import com.project01.skillineserver.utils.CookieUtil;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -26,6 +27,7 @@ import java.text.ParseException;
 @RequestMapping(value = "/api/user")
 public class UserController {
 
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private final UserService userService;
     private final AuthService authService;
 
@@ -42,11 +44,21 @@ public class UserController {
                 .build();
     }
 
+    @GetMapping(value = "/me")
+    @PreAuthorize("@authorizationService.isCanAccessApi()")
+    public ApiResponse<AuthResponse> me(HttpServletRequest request) {
+        return ApiResponse.<AuthResponse>builder()
+                .code(200)
+                .message("Token Valid!")
+                .data(userService.me())
+                .build();
+    }
+
     @GetMapping(value = "/logout")
     @PreAuthorize("@authorizationService.isCanAccessApi()")
-    public ApiResponse<?> logout(HttpServletRequest request) throws ParseException {
+    public ApiResponse<?> logout(HttpServletRequest request, HttpServletResponse response) throws ParseException {
         String token = CookieUtil.getTokenFromCookie(AppConstants.ACCESS_TOKEN,request);
-        authService.logout(token);
+        authService.logout(token, response);
         return ApiResponse.builder()
                 .message("Logout Success!")
                 .code(200)
@@ -55,7 +67,8 @@ public class UserController {
 
     @PostMapping(value = "/change-password")
     @PreAuthorize("@authorizationService.isCanAccessApi()")
-    public ApiResponse<?> changePassword(@RequestBody ChangePasswordReq changePasswordReq,@AuthenticationPrincipal CustomUserDetail customUserDetail){
+    public ApiResponse<?> changePassword(@RequestBody ChangePasswordReq changePasswordReq
+            , @AuthenticationPrincipal CustomUserDetail customUserDetail) {
         userService.changePassword(changePasswordReq,customUserDetail.getUser().getId());
         return ApiResponse.builder()
                 .message("Change Password Success!")
@@ -65,8 +78,17 @@ public class UserController {
 
     @PostMapping(value = "/change-email")
     @PreAuthorize("@authorizationService.isCanAccessApi()")
-    public ApiResponse<?> changeEmail(@RequestBody ChangeEmailReq changeEmailReq,@AuthenticationPrincipal CustomUserDetail customUserDetail){
+    public ApiResponse<?> changeEmail(@RequestBody ChangeEmailReq changeEmailReq, @AuthenticationPrincipal CustomUserDetail customUserDetail, HttpServletRequest request) {
         System.out.println("🚨 CSRF ATTACK via FORM: Email changed to " + changeEmailReq.newEmail());
+
+        String csrfTokenGetHeader = request.getHeader("X-XSRF-TOKEN");
+        log.info("Token csrf from header of browser: {}", csrfTokenGetHeader);
+
+        CsrfToken csrfTokenInRepo = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
+        String expected = csrfTokenInRepo != null ? csrfTokenInRepo.getToken() : null;
+
+        log.info("Token csrf from repo of browser: {}", expected);
+
         userService.changeEmail(changeEmailReq.newEmail(),customUserDetail.getUser().getId());
         return ApiResponse.builder()
                 .message("Change Mail Success!")

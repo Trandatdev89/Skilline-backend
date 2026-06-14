@@ -1,7 +1,6 @@
 package com.project01.skillineserver.repository;
 
 import com.project01.skillineserver.entity.CourseProgressEntity;
-import com.project01.skillineserver.projection.CourseProgressProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

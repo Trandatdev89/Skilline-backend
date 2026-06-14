@@ -2,8 +2,6 @@ package com.project01.skillineserver.service.Impl;
 
 import com.project01.skillineserver.dto.reponse.PageResponse;
 import com.project01.skillineserver.dto.request.QuizReq;
-import com.project01.skillineserver.entity.QuestionEntity;
-import com.project01.skillineserver.entity.QuizAttemptEntity;
 import com.project01.skillineserver.entity.QuizEntity;
 import com.project01.skillineserver.enums.ErrorCode;
 import com.project01.skillineserver.excepion.CustomException.AppException;
@@ -20,8 +18,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -35,47 +33,40 @@ public class QuizServiceImpl implements QuizService {
     @Override
     @Transactional
     public void save(QuizReq quizReq) {
-        boolean isUpdate = quizReq.id()!=null;
-        QuizEntity quizEntity = isUpdate
-                ? quizRepository
-                .findById(quizReq.id())
-                .orElseThrow(() -> new AppException(ErrorCode.QUIZ_NOT_EXITS)) :
-                new QuizEntity();
+
+        QuizEntity quizEntity = Optional
+                .ofNullable(quizReq.id())
+                .flatMap(quizRepository::findById)
+                .orElseGet(QuizEntity::new);
 
         quizEntity.setTitle(quizReq.title());
         quizEntity.setDescription(quizReq.desc());
         quizEntity.setLectureId(quizReq.lectureId());
         quizEntity.setTimeLimit(quizReq.timeLimit());
         quizEntity.setMaxAttempt(quizReq.maxAttempt());
+        quizEntity.setTimeUnit(quizReq.timeUnit());
 
         quizRepository.save(quizEntity);
     }
 
     @Override
+    @Transactional
     public void delete(List<Long> quizIds) {
 
-        if(quizIds==null || quizIds.isEmpty()){
+        if (quizIds == null || quizIds.isEmpty()) {
             throw new AppException(ErrorCode.QUIZ_ID_REQUIRE);
         }
 
-        List<QuizAttemptEntity> listQuizAttemptNeedRemove  = new ArrayList<>();
-        List<QuestionEntity> listQuestionNeedRemove  = new ArrayList<>();
-
-        for (Long quizId : quizIds){
-            listQuizAttemptNeedRemove.add(quizAttemptRepository.findByQuizId(quizId));
-            listQuestionNeedRemove.add(questionRepository.findByQuizId(quizId));
-        }
-
-        quizAttemptRepository.deleteAll(listQuizAttemptNeedRemove);
-        questionRepository.deleteAll(listQuestionNeedRemove);
+        quizAttemptRepository.deleteAllByQuizIdIn(quizIds);
+        questionRepository.deleteAllByQuizIdIn(quizIds);
         quizRepository.deleteByIdIn(quizIds);
     }
 
     @Override
-    public PageResponse<QuizEntity> getQuizByLectureId(int page,int size,String sort,String keyword,Long courseId,String lectureId) {
+    public PageResponse<QuizEntity> getQuizByLectureId(int page, int size, String sort, String keyword, Long courseId) {
         Sort sortField = MapUtil.parseSort(sort);
         PageRequest pageRequest = PageRequest.of(page - 1, size, sortField);
-        Page<QuizEntity> pageQuiz = quizRepository.getQuizzes(keyword,courseId,lectureId,pageRequest);
+        Page<QuizEntity> pageQuiz = quizRepository.getQuizzes(keyword, courseId, pageRequest);
         return PageResponse.<QuizEntity>builder()
                 .totalElements(pageQuiz.getTotalElements())
                 .totalPages(pageQuiz.getTotalPages())

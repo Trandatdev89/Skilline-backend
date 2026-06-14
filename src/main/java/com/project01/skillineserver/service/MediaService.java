@@ -12,6 +12,6 @@ public interface MediaService {
     ResponseEntity<Resource> streamMasterPlaylist(String videoId);
     ResponseEntity<Resource> streamSegment(String videoId,String segmentName);
 
-    ResponseEntity<Resource> streamBasicVideo(String id);
-    ResponseEntity<Resource> streamRangeLecture(String id,String range);
+    ResponseEntity<Resource> streamBasicVideo(String id) throws IOException;
+    ResponseEntity<Resource> streamRangeLecture(String id,String range) throws IOException;
 }

@@ -1,9 +1,8 @@
 package com.project01.skillineserver.repository;
 
+import com.project01.skillineserver.dto.projection.QuizAttemptProjection;
 import com.project01.skillineserver.entity.AnswerEntity;
 import com.project01.skillineserver.entity.QuizAttemptEntity;
-import com.project01.skillineserver.projection.HistoryExamFlatProjection;
-import com.project01.skillineserver.projection.QuizAttemptProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,6 +12,9 @@ import java.time.Instant;
 import java.util.List;
 
 public interface QuizAttemptRepository extends JpaRepository<QuizAttemptEntity, Long> {
+
+    void deleteAllByQuizIdIn(List<Long> quizIds);
+
     QuizAttemptEntity findByQuizId(Long quizId);
 
     @Query("select qa.attemptNo as attemptNo " +
@@ -51,34 +53,4 @@ public interface QuizAttemptRepository extends JpaRepository<QuizAttemptEntity, 
     @Query("select qa from QuizAttemptEntity qa " +
             "where qa.id = ?1")
     QuizAttemptEntity findQuizAttemptOfUserById(Long id);
-
-    @Query(value = """
-            SELECT
-                qa.id                    AS attemptId,
-                qa.submitted_at          AS submittedAt,
-                qa.total_score           AS totalScore,
-
-                qs.id                    AS questionId,
-                qs.content               AS questionContent,
-                qs.type                  AS questionType,
-                qs.score                 AS maxScore,
-
-                a.id                     AS answerId,
-                a.content                AS answerContent,
-                a.is_correct             AS isCorrect,
-
-                IF(hauc.answer_id IS NOT NULL, 1, 0) AS isUserSelected,
-                hsu.score                AS scoreAchieved
-            FROM quiz_attempt qa
-            JOIN questions qs ON qs.quiz_id = qa.quiz_id
-            JOIN answer a ON a.question_id = qs.id
-            LEFT JOIN history_score_user hsu
-                   ON hsu.attempt_quiz_id = qa.id
-                  AND hsu.question_id = qs.id
-            LEFT JOIN history_answer_user_choice hauc
-                   ON hauc.history_answer_user_id = hsu.id
-                  AND hauc.answer_id = a.id
-            WHERE qa.id = ?1
-            """,nativeQuery = true)
-    List<HistoryExamFlatProjection> getA(Long attemptQuizId);
 }

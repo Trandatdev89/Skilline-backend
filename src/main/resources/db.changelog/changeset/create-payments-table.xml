@@ -9,10 +9,13 @@
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" />
             </column>
-            <column name="order_id" type="bigint"/>
+            <column name="order_id" type="varchar(225)"/>
+            <column name="amount" type="decimal"/>
             <column name="payment_method" type="varchar(225)"/>
             <column name="status" type="varchar(225)"/>
             <column name="paid_at" type="timestamp"/>
+            <column name="transaction_id" type="varchar(225)"/>
+            <column name="gateway_response" type="text"/>
         </createTable>
 
         <addForeignKeyConstraint

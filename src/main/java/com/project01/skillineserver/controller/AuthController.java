@@ -1,6 +1,5 @@
 package com.project01.skillineserver.controller;
 
-import com.project01.skillineserver.constants.AppConstants;
 import com.project01.skillineserver.dto.ApiResponse;
 import com.project01.skillineserver.dto.reponse.AuthResponse;
 import com.project01.skillineserver.dto.request.LoginRequest;
@@ -56,16 +55,6 @@ public class AuthController {
                 .build();
     }
 
-    @GetMapping(value = "/me")
-    public ApiResponse<AuthResponse> me(HttpServletRequest request) {
-        String token = CookieUtil.getTokenFromCookie(AppConstants.ACCESS_TOKEN,request);
-        return ApiResponse.<AuthResponse>builder()
-                .code(200)
-                .message("Token Valid!")
-                .data(authService.me(token))
-                .build();
-    }
-
     @PostMapping("/register")
     public ApiResponse<?> register(@RequestBody RegisterRequest registerDTO) throws IllegalAccessException {
         authService.createAccount(registerDTO);
@@ -94,19 +83,20 @@ public class AuthController {
     }
 
     @PostMapping(value = "/refresh-token")
-    public ApiResponse<String> refreshToken(HttpServletRequest request, HttpServletResponse response) throws ParseException {
+    public ApiResponse<?> refreshToken(HttpServletRequest request, HttpServletResponse response) throws ParseException {
         String refreshToken = CookieUtil.getTokenFromCookie(refreshTokenName,request);
+        String accessToken = CookieUtil.getTokenFromCookie(accessTokenName, request);
+        authService.refreshToken(refreshToken, accessToken, response);
         return ApiResponse.<String>builder()
                 .code(200)
                 .message("Refresh Token Success!")
-                .data(authService.refreshToken(refreshToken,response))
                 .build();
     }
 
     @GetMapping(value = "/csrf-token")
     public Map<String,String> getCsrfToken(CsrfToken csrfToken){
         Map<String,String> response = new HashMap<>();
-        response.put("csrf-token",csrfToken.getToken());
+        response.put("csrfToken", csrfToken.getToken());
         response.put("headerName", csrfToken.getHeaderName());
         response.put("parameterName", csrfToken.getParameterName());
         return response;

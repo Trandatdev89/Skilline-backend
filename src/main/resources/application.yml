@@ -11,12 +11,10 @@ spring:
       port: 6379
       ssl:
         enabled: false
-#    mongodb:
-#      uri: mongodb://root:root@localhost:27017/Chat-service?auth=admin
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
@@ -33,8 +31,8 @@ spring:
     enabled: true
   servlet:
     multipart:
-      max-file-size: 50MB
-      max-request-size: 50MB
+      max-file-size: 100MB
+      max-request-size: 100MB
 
 
 jwt:

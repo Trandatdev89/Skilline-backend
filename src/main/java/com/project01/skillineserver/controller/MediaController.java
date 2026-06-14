@@ -22,7 +22,7 @@ public class MediaController {
 
     @GetMapping(value = "/range/{id}")
     public ResponseEntity<Resource> streamRangeLecture(@PathVariable String id,
-                                                       @RequestHeader(value = "Range", required = false) String range) {
+                                                       @RequestHeader(value = "Range", required = false) String range) throws IOException {
         return mediaService.streamRangeLecture(id, range);
     }
 

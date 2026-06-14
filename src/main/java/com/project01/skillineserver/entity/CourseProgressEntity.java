@@ -13,15 +13,26 @@ import java.time.Instant;
 @Entity
 @Table(name = "course_progress")
 public class CourseProgressEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(name = "enrollment_id")
     private Long enrollmentId;
+
     @Column(name = "lecture_id")
     private String lectureId;
+
     @Column(name = "is_completed")
     private boolean isCompleted;
+
     @Column(name = "completed_at")
     private Instant completedAt;
+
+    @Column(name = "watch_duration_seconds")
+    private Long watchDurationSeconds;
+
+    @Column(name = "last_watched_at")
+    private Instant lastWatchedAt;
 }

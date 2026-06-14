@@ -11,7 +11,8 @@
             </column>
             <column name="attempt_quiz_id" type="bigint"/>
             <column name="question_id" type="bigint"/>
-            <column name="answer_text" type="varchar(225)"/>
+            <column name="answer_text" type="TEXT"/>
+            <column name="answer_id" type="bigint"/>
             <column name="score" type="double"/>
         </createTable>
 
@@ -30,13 +31,13 @@
                 referencedColumnNames="id"
                 constraintName="fk_history_score_user_questions"/>
 
+        <addForeignKeyConstraint
+                baseTableName="history_score_user"
+                baseColumnNames="answer_id"
+                referencedTableName="answer"
+                referencedColumnNames="id"
+                constraintName="fk_history_score_user_answers"/>
 
-    </changeSet>
 
-    <changeSet id="20260115-01-modify-history_score_user-content" author="datmacay_v1">
-        <modifyDataType
-                tableName="history_score_user"
-                columnName="answer_text"
-                newDataType="TEXT"/>
     </changeSet>
 </databaseChangeLog>

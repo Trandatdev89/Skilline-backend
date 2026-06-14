@@ -21,7 +21,8 @@
     <include file="db.changelog/changeset/create-answer-table.xml"/>
     <include file="db.changelog/changeset/create-quiz-attempt-table.xml"/>
     <include file="db.changelog/changeset/create-history-score-user-table.xml"/>
-    <include file="db.changelog/changeset/create-history-answer-user-choice.xml"/>
     <include file="db.changelog/changeset/create-user-sub-webpush.xml"/>
+    <include file="db.changelog/changeset/create-notification-table.xml"/>
+    <include file="db.changelog/changeset/create-email-template-table.xml"/>
 
 </databaseChangeLog>

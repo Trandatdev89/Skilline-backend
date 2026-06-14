@@ -37,12 +37,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -65,6 +63,7 @@ public class AuthServiceImpl implements AuthService {
     public AuthResponse login(LoginRequest loginRequest,HttpServletRequest request, HttpServletResponse response) {
 
         CustomUserDetail user = (CustomUserDetail) userDetailsService.loadUserByUsername(loginRequest.getUsername());
+
         UserEntity userInDB = user.getUser();
 
 
@@ -111,7 +110,7 @@ public class AuthServiceImpl implements AuthService {
                 log.info("Kicked old device for user: {}", userInDB.getId());
             } else {
                 // Cùng thiết bị → Cập nhật thời gian
-                device.setLastLogin(LocalDateTime.now());
+                device.setLastLogin(Instant.now());
                 device.setIpAddress(getClientIP(request));
                 userDeviceRepository.save(device);
             }
@@ -124,11 +123,11 @@ public class AuthServiceImpl implements AuthService {
         newDevice.setDeviceId(currentDeviceId);
         newDevice.setIpAddress(getClientIP(request));
         newDevice.setUserAgent(request.getHeader("User-Agent"));
-        newDevice.setLastLogin(LocalDateTime.now());
+        newDevice.setLastLogin(Instant.now());
         newDevice.setActive(true);
 
         if (newDevice.getFirstLogin() == null) {
-            newDevice.setFirstLogin(LocalDateTime.now());
+            newDevice.setFirstLogin(Instant.now());
         }
 
         userDeviceRepository.save(newDevice);
@@ -138,11 +137,15 @@ public class AuthServiceImpl implements AuthService {
 
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
-        CookieUtil.setAccessTokenCookieHttpOnly(securityUtil.generateToken(Objects
-                .requireNonNull(AuthenticationUtil.getUserDetail()), TokenType.ACCESS_TOKEN,currentDeviceId),response);
+        String accessToken = securityUtil.generateToken(Objects
+                .requireNonNull(AuthenticationUtil.getUserDetail()), TokenType.ACCESS_TOKEN, currentDeviceId);
 
-        CookieUtil.setRefreshTokenCookieHttpOnly(securityUtil.generateToken(Objects
-                .requireNonNull(AuthenticationUtil.getUserDetail()), TokenType.REFRESH_TOKEN,null),response);
+        CookieUtil.setAccessTokenCookieHttpOnly(accessToken, response);
+
+        String refreshToken = securityUtil.generateToken(Objects
+                .requireNonNull(AuthenticationUtil.getUserDetail()), TokenType.REFRESH_TOKEN, currentDeviceId);
+
+        CookieUtil.setRefreshTokenCookieHttpOnly(refreshToken, response);
 
         return AuthResponse.builder()
                 .authenticated(true)
@@ -152,6 +155,8 @@ public class AuthServiceImpl implements AuthService {
                 .deviceId(currentDeviceId)
                 .role(user.getUser().getRole())
                 .avatar(user.getUser().getAvatar())
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 
@@ -200,6 +205,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public boolean introspect(String token, TokenType tokenType) {
+
         boolean check = false;
         try {
             securityUtil.verifyToken(token,
@@ -213,25 +219,20 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String refreshToken(String refreshToken, HttpServletResponse response) throws ParseException {
+    public void refreshToken(String refreshToken, String accessToken, HttpServletResponse response) throws ParseException {
 
-        boolean check = introspect(refreshToken,TokenType.REFRESH_TOKEN);
-        if (!check) {
-            log.info("refreshToken is not valid :{}", refreshToken);
-        }
+        introspect(refreshToken, TokenType.REFRESH_TOKEN);
 
         String username = SecurityUtil.extractUsernameByToken(refreshToken);
+        String deviceId = SecurityUtil.extractDeviceIdByToken(refreshToken);
+        String tokenId = SignedJWT.parse(accessToken).getJWTClaimsSet().getJWTID();
 
         CustomUserDetail user = (CustomUserDetail)userDetailsService.loadUserByUsername(username);
 
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities());
-
         CookieUtil.setAccessTokenCookieHttpOnly(securityUtil.generateToken(Objects
-                .requireNonNull(AuthenticationUtil.getUserDetail()), TokenType.ACCESS_TOKEN,null),response);
-        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                .requireNonNull(user), TokenType.ACCESS_TOKEN, deviceId), response);
 
-        return securityUtil.generateToken(Objects.requireNonNull(AuthenticationUtil.getUserDetail()), TokenType.ACCESS_TOKEN,null);
+        redisService.saveData(tokenId, accessToken);
     }
 
 
@@ -241,7 +242,7 @@ public class AuthServiceImpl implements AuthService {
             throw new AppException(ErrorCode.USER_EXITED);
         }
 
-        if (userRepository.existsByEmail(registerDTO.getUsername())) {
+        if (userRepository.existsByEmail(registerDTO.getEmail())) {
             throw new AppException(ErrorCode.EMAIL_EXITED);
         }
 
@@ -253,19 +254,11 @@ public class AuthServiceImpl implements AuthService {
         user.setFullname(registerDTO.getFullname());
         user.setPhone(registerDTO.getPhone());
         user.setLastTimeChangePassword(Instant.now());
-        user.setLockTime(Instant.now());
         user.setRole(registerDTO.getRole());
 
         UserEntity userCreated = userRepository.save(user);
 
-        emailService.verifyAccount(VerifyAccountRequest.builder()
-                .token(UUID.randomUUID().toString())
-                .linkUrl(verifyAccountUrl)
-                .userId(userCreated.getId())
-                .toEmail(userCreated.getEmail())
-                .emailType(EmailType.VERIFY_ACCOUNT)
-                .toName(registerDTO.getFullname())
-                .build());
+        sendMailForVerifyAccount(userCreated);
     }
 
 
@@ -276,15 +269,16 @@ public class AuthServiceImpl implements AuthService {
             userRepository.deleteById(userId);
             throw new AppException(ErrorCode.INVALID_TOKEN);
         }
-        user.setDisable(true);
+        user.setEnabled(true);
         userRepository.save(user);
     }
 
     @Override
-    public void logout(String token) throws ParseException {
+    public void logout(String token, HttpServletResponse response) throws ParseException {
         SignedJWT signedJWT = SignedJWT.parse(token);
         String tokenId = signedJWT.getJWTClaimsSet().getJWTID();
-        redisService.saveDataOnTime(tokenId, token, 5, TimeUnit.MILLISECONDS);
+        redisService.saveData(tokenId, token);
+        CookieUtil.clearAllAuthCookies(response);
     }
 
     @Override
@@ -293,11 +287,6 @@ public class AuthServiceImpl implements AuthService {
        if(!userExist){
            throw new AppException(ErrorCode.USER_NOT_FOUND);
        }
-    }
-
-    @Override
-    public AuthResponse me(String token) {
-        return null;
     }
 
     private void increaseAttemptLogin(UserEntity user) {
@@ -311,7 +300,7 @@ public class AuthServiceImpl implements AuthService {
 
         if (countLoginFail >= AppConstants.MAX_FAILED_ATTEMPTS) {
             user.setLockTime(Instant.now());
-            user.setLocked(false);
+            user.setAccountNonLocked(false);
         } else {
             user.setFailedLoginAttempts(countLoginFail);
         }
@@ -328,34 +317,48 @@ public class AuthServiceImpl implements AuthService {
     private boolean isAccountStillLocked(UserEntity user) {
         boolean isCheck = true;
 
-        if(user.getLockTime() == null){
-            return isCheck;
-        }
-
         Instant now = Instant.now();
-        Instant unlockTime = user.getLockTime().plus(120, ChronoUnit.SECONDS);
+        Instant unlockTime = user.getLockTime().plus(AppConstants.LOCK_TIME_DURATION, ChronoUnit.SECONDS);
 
         if (now.isAfter(unlockTime)) {
-            user.setLocked(true);
+            user.setAccountNonLocked(true);
             user.setLockTime(null);
             user.setFailedLoginAttempts(0);
             isCheck = false;
+            userRepository.save(user);
         }
         return isCheck;
     }
 
     private boolean isPasswordExpire(UserEntity user){
+        if (user.getLastTimeChangePassword() == null) return false;
         Instant now = Instant.now();
-        Instant lastTimeChangePassword = null;
-        if ( user.getLastTimeChangePassword()!=null){
-            lastTimeChangePassword = Instant.now();
-        }
-        if(now.isAfter(lastTimeChangePassword.plus(AppConstants.CHANGE_PASSWORD_PERIODIC,ChronoUnit.SECONDS))){
+        Instant expireTime = user.getLastTimeChangePassword()
+                .plus(AppConstants.CHANGE_PASSWORD_PERIODIC, ChronoUnit.DAYS);
+
+        if (now.isAfter(expireTime)) {
             user.setCredentialsNonExpired(false);
             userRepository.save(user);
             return true;
         }
         return false;
+    }
+
+    private void sendMailForVerifyAccount(UserEntity user) throws IllegalAccessException {
+
+        String tokenVerify = UUID.randomUUID().toString();
+
+        String verifyUrl = verifyAccountUrl + "/verify" + "?userId=" + user.getId()
+                + "&token=" + tokenVerify;
+
+        emailService.verifyAccount(VerifyAccountRequest.builder()
+                .token(tokenVerify)
+                .linkUrl(verifyUrl)
+                .userId(user.getId())
+                .toEmail(user.getEmail())
+                .emailType(EmailType.VERIFY_ACCOUNT)
+                .toName(user.getFullname())
+                .build());
     }
 
 }

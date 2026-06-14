@@ -61,14 +61,17 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
-    public ResponseEntity<Resource> streamBasicVideo(String id) {
+    public ResponseEntity<Resource> streamBasicVideo(String id) throws IOException {
         LectureEntity lectureEntity = lectureRepository
                 .findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.LECTURE_NOT_FOUND));
 
-        String contentType = lectureEntity.getContentType();
+
         String filePath = lectureEntity.getFilePath();
+
         Path path = Paths.get(filePath);
+
+        String contentType = Files.probeContentType(path);
 
         Resource resource = new FileSystemResource(path);
 
@@ -81,14 +84,14 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
-    public ResponseEntity<Resource> streamRangeLecture(String id, String range) {
+    public ResponseEntity<Resource> streamRangeLecture(String id, String range) throws IOException {
         System.out.println(range);
         LectureEntity video = lectureRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.LECTURE_NOT_FOUND));
         Path path = Paths.get(video.getFilePath());
 
         Resource resource = new FileSystemResource(path);
 
-        String contentType = video.getContentType();
+        String contentType = Files.probeContentType(path);
 
         if (contentType == null) {
             contentType = "application/octet-stream";
@@ -200,10 +203,6 @@ public class MediaServiceImpl implements MediaService {
         LectureEntity lectureEntityInDB = lectureRepository.findById(videoId)
                 .orElseThrow(() -> new AppException(ErrorCode.LECTURE_NOT_FOUND));
 
-        //update status Processing:
-        lectureEntityInDB.setProcessStatus(ProcessStatus.PROCESSING);
-        lectureRepository.save(lectureEntityInDB);
-
         String filePathOfLecture = lectureEntityInDB.getFilePath();
         Path pathLectureInDB = Paths.get(filePathOfLecture);
         Path streamVideoHls = Paths.get(HLS_DIR, videoId);
@@ -214,7 +213,7 @@ public class MediaServiceImpl implements MediaService {
                 pathLectureInDB, outputPath, outputPath
         );
 
-        ProcessBuilder processBuilder = new ProcessBuilder("/bin/bash", "-c", ffmpegCmd);
+        ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", ffmpegCmd);
 
         processBuilder.inheritIO();
 

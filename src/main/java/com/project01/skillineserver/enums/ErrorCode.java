@@ -38,7 +38,18 @@ public enum ErrorCode {
     QUESTION_NOT_EXITS(1025,"question is not exits",HttpStatus.NOT_FOUND),
     QUESTION_EMPTY(1026,"question is not exits",HttpStatus.BAD_REQUEST),
     QUIZ_MAX_FIVE(1027,"That is max 5 Quiz",HttpStatus.CONFLICT),
-    TOKEN_IS_BLANK(1028, "Token is blank", HttpStatus.BAD_REQUEST),
+    REFRESH_TOKEN_EXPIRE(1028, "Session of you is exprire", HttpStatus.UNAUTHORIZED),
+    MEDIA_ASSET_NOT_FOUND(1029, "Assest not found!", HttpStatus.NOT_FOUND),
+    MEDIA_ASSET_ALREADY_PROCESSED(1030, "Assest not found!", HttpStatus.BAD_REQUEST),
+    COURSE_NOT_PUBLISHER(1031, "Course dont public!", HttpStatus.BAD_REQUEST),
+    COURSE_BOUGHT_ALREADY(1032, "You have bought course already!", HttpStatus.BAD_REQUEST),
+    PAYMENT_FAILED(1033, "", HttpStatus.INTERNAL_SERVER_ERROR),
+    MAIL_CONFIG_NOT_FOUND(1034, "You not yet config mail", HttpStatus.NOT_FOUND),
+    ANSWER_NOT_EXISTS(1035, "This is answer not exits, maybe that is delete!", HttpStatus.BAD_REQUEST),
+    ANSWER_NOT_BELONG_TO_QUESTION(1036, "ANSWER_NOT_BELONG_TO_QUESTION!", HttpStatus.BAD_REQUEST),
+    QUESTION_NOT_BELONG_TO_QUIZ(1037, "QUESTION_NOT_BELONG_TO_QUIZ", HttpStatus.BAD_REQUEST),
+    INVALID_FILE_TYPE(1038, "INVALID FILE TYPE", HttpStatus.BAD_REQUEST),
+
 
     INTERNAL_SERVER(9999,"Server error",HttpStatus.INTERNAL_SERVER_ERROR);
 

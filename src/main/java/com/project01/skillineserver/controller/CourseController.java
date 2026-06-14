@@ -5,23 +5,14 @@ import com.project01.skillineserver.dto.ApiResponse;
 import com.project01.skillineserver.dto.reponse.CourseResponse;
 import com.project01.skillineserver.dto.reponse.PageResponse;
 import com.project01.skillineserver.dto.request.CourseReq;
-import com.project01.skillineserver.entity.CourseEntity;
-import com.project01.skillineserver.enums.LevelEnum;
-import com.project01.skillineserver.repository.CourseRepository;
 import com.project01.skillineserver.service.CourseService;
-import com.project01.skillineserver.specification.CourseSpecifications;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,20 +20,18 @@ import java.util.Map;
 public class CourseController {
 
     private final CourseService courseService;
-    private final CourseSpecifications courseSpecifications;
-    private final CourseRepository courseRepository;
 
     @PostMapping(value = "/save")
     @PreAuthorize("@authorizationService.isAdmin()")
-    public ApiResponse<CourseEntity> saveCourse(@ModelAttribute CourseReq courseReq) throws IOException {
-        return ApiResponse.<CourseEntity>builder()
+    public ApiResponse<?> saveCourse(@ModelAttribute CourseReq courseReq) throws IOException {
+        courseService.save(courseReq);
+        return ApiResponse.builder()
                 .code(200)
                 .message("Success")
-                .data(courseService.save(courseReq))
                 .build();
     }
 
-    @GetMapping(value = "/all")
+    @GetMapping
     public ApiResponse<PageResponse<CourseResponse>> getCourses(@RequestParam(defaultValue = "0") int page,
                                                                 @RequestParam(defaultValue = "10") int size,
                                                                 @RequestParam(required = false) String sort,
@@ -51,7 +40,7 @@ public class CourseController {
         return ApiResponse.<PageResponse<CourseResponse>>builder()
                 .code(200)
                 .message("Success")
-                .data(courseService.getCourses(page, size, sort, keyword,categoryId))
+                .data(courseService.getCourses(page, size, sort, keyword, categoryId))
                 .build();
     }
 
@@ -66,18 +55,21 @@ public class CourseController {
         return ApiResponse.<PageResponse<CourseResponse>>builder()
                 .code(200)
                 .message("Success")
-                .data(courseService.getCoursesByMySelf(page, size, sort, keyword,categoryId,userId))
+                .data(courseService.getCoursesByMySelf(page, size, sort, keyword, categoryId, userId))
                 .build();
     }
 
-    @GetMapping(value = "/cursor")
-    public ApiResponse<PageResponse<CourseResponse>> getCoursesWithCursor(@RequestParam LocalDateTime cursor, @RequestParam(required = false) String sort,
-                                                                          @RequestParam(required = false) String keyword, @RequestParam(defaultValue = "20") int size
-                                                                          ){
+    @GetMapping(value = "/get-with-cursor")
+    public ApiResponse<PageResponse<CourseResponse>> getCoursesWithCursor(@RequestParam(required = false) Long cursor,
+                                                                          @RequestParam(required = false) String sort,
+                                                                          @RequestParam(required = false) Long categoryId,
+                                                                          @RequestParam(required = false) String keyword,
+                                                                          @RequestParam(defaultValue = "20") int size
+    ) {
         return ApiResponse.<PageResponse<CourseResponse>>builder()
                 .code(200)
                 .message("Success")
-                .data(courseService.getCoursesWithCursor(cursor, sort, keyword,size))
+                .data(courseService.getCoursesWithCursor(cursor, sort, keyword, size, categoryId))
                 .build();
     }
 
@@ -87,15 +79,6 @@ public class CourseController {
         courseService.delete(ids);
         return ApiResponse.builder()
                 .code(200)
-                .message("Success")
-                .build();
-    }
-
-    @GetMapping(value = "/list/{ids}")
-    public ApiResponse<?> getListCourseById(@PathVariable List<Long> ids) {
-        return ApiResponse.builder()
-                .code(200)
-                .data(courseService.getListCourseById(ids))
                 .message("Success")
                 .build();
     }
@@ -117,31 +100,6 @@ public class CourseController {
 
         return ApiResponse.<PageResponse<?>>builder()
                 .data(courseService.searchAdvanceCourse(search, page, size, sort))
-                .code(200)
-                .message("Search course success!")
-                .build();
-    }
-
-    @GetMapping(value = "/search-with-specification")
-    public ApiResponse<?> searchWithSpecification(@RequestParam Map<String, Object> params) {
-        Specification<CourseEntity> spec = Specification.where(null);
-
-        for (Map.Entry<String, Object> item : params.entrySet()) {
-            String key = item.getKey();
-            Object value = item.getValue();
-            if (key.equals("categoryId")) {
-                spec = spec.and(courseSpecifications.hasCategoryId(Long.parseLong(value.toString())));
-            } else if (key.contains("Start") || key.contains("End")) {
-                spec = spec.and(courseSpecifications.hasFieldRange(key, value));
-            } else {
-                spec = spec.and(courseSpecifications.hasField(key, value));
-            }
-        }
-
-        List<CourseEntity> list = courseRepository.findAll(spec);
-
-        return ApiResponse.builder()
-                .data(list)
                 .code(200)
                 .message("Search course success!")
                 .build();

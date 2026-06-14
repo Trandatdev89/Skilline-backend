@@ -23,14 +23,10 @@ public class MapUtil {
             field.setAccessible(true);
             String key = field.getName();
             Object value = field.get(dataNeedExtract);
-            if(value!=null){
-                if(value instanceof String){
-                    if(StringUtils.hasText((CharSequence) value)){
-                        infoExtract.put((X)key,(Y)value);
-                    }
-                }else{
-                    infoExtract.put((X)key,(Y)value);
-                }
+            if (value == null) continue;
+
+            if (!(value instanceof String) || StringUtils.hasText((String) value)) {
+                infoExtract.put((X) key, (Y) value);
             }
         }
         return infoExtract;

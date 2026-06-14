@@ -17,7 +17,7 @@ public class ThymeleafConfig {
         resolver.setTemplateMode(TemplateMode.HTML);
         resolver.setCacheable(false);
 
-        engine.addTemplateResolver(resolver);
+        engine.setTemplateResolver(resolver);
         return engine;
     }
 }

@@ -18,9 +18,11 @@
             <column name="avatar" type="varchar(255)"/>
             <column name="created_at" type="timestamp"/>
             <column name="updated_at" type="timestamp"/>
-            <column name="is_locked" type="TINYINT(1)"/>
-            <column name="is_disable" type="TINYINT(1)"/>
-            <column name="role" type="varchar(255)"/>
+            <column name="created_by" type="bigint"/>
+            <column name="updated_by" type="bigint"/>
+            <column name="account_non_locked" type="TINYINT(1)"/>
+            <column name="enabled" type="TINYINT(1)"/>
+            <column name="role" type="VARCHAR(20)"/>
             <column name="is_account_non_expired" type="TINYINT(1)"/>
             <column name="is_credentials_non_expired" type="TINYINT(1)"/>
             <column name="failed_login_attempts" type="int"/>
@@ -28,13 +30,5 @@
             <column name="lock_time" type="timestamp"/>
         </createTable>
     </changeSet>
-
-    <changeSet id="55" author="datmacay_v1">
-        <modifyDataType
-                tableName="users"
-                columnName="role"
-                newDataType="VARCHAR(20)"/>
-    </changeSet>
-
 
 </databaseChangeLog>

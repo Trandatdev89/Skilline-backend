@@ -1,5 +1,6 @@
 package com.project01.skillineserver.service.Impl;
 
+import com.project01.skillineserver.dto.projection.OrderProjection;
 import com.project01.skillineserver.dto.reponse.CourseResponse;
 import com.project01.skillineserver.dto.reponse.PageResponse;
 import com.project01.skillineserver.dto.request.OrderReq;
@@ -11,12 +12,11 @@ import com.project01.skillineserver.entity.UserEntity;
 import com.project01.skillineserver.enums.*;
 import com.project01.skillineserver.excepion.CustomException.AppException;
 import com.project01.skillineserver.mapper.CourseMapper;
-import com.project01.skillineserver.projection.OrderProjection;
 import com.project01.skillineserver.repository.CourseRepository;
 import com.project01.skillineserver.repository.OrderDetailRepository;
 import com.project01.skillineserver.repository.OrderRepository;
 import com.project01.skillineserver.repository.UserRepository;
-import com.project01.skillineserver.service.CourseService;
+import com.project01.skillineserver.service.EnrollmentService;
 import com.project01.skillineserver.service.OrderService;
 import com.project01.skillineserver.service.PaymentService;
 import com.project01.skillineserver.utils.MapUtil;
@@ -29,8 +29,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 @Service
@@ -43,6 +45,8 @@ public class OrderServiceImpl implements OrderService {
     private final CourseRepository courseRepository;
     private final OrderDetailRepository orderDetailRepository;
     private final CourseMapper courseMapper;
+    private final EnrollmentService enrollmentService;
+    private final PaymentService paymentService;
 
     @Override
     public PageResponse<OrderProjection> getOrders(int page, int size, String sort, String keyword) {
@@ -50,7 +54,7 @@ public class OrderServiceImpl implements OrderService {
 
         PageRequest pageRequest = PageRequest.of(page - 1, size, sortField);
 
-        Page<OrderProjection> orders = orderRepository.getOrders(keyword,pageRequest);
+        Page<OrderProjection> orders = orderRepository.getOrders(keyword, pageRequest);
 
         return PageResponse.<OrderProjection>builder()
                 .list(orders.getContent())
@@ -62,44 +66,93 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderEntity getOrderById(Long id) {
-        return orderRepository.findById(id).orElseThrow(()->new AppException(ErrorCode.LECTURE_NOT_FOUND));
+    public OrderEntity getOrderById(String id, Long userId, Role role) {
+
+        OrderEntity orderInDB = orderRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+
+        if (role != Role.ADMIN && !Objects.equals(orderInDB.getUserId(), userId)) {
+            throw new AppException(ErrorCode.FOBIDEN);
+        }
+        return orderInDB;
     }
 
     @Override
-    @Transactional(rollbackFor = {AppException.class})
-    public OrderEntity saveOrder(OrderReq orderReq) {
+    @Transactional
+    public OrderEntity saveOrder(OrderReq orderReq, Long userId) {
 
-        UserEntity user = userRepository.findById(orderReq.getUserId()).orElseThrow(()->new AppException(ErrorCode.LECTURE_NOT_FOUND));
+        if (userId == null) {
+            throw new AppException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        if (orderReq.getCourseId().isEmpty()) {
+            throw new AppException(ErrorCode.COURSE_EMPTY);
+        }
+
+        UserEntity user = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        List<CourseEntity> courseEntityList = courseRepository
+                .findAllByCourseStatusPublishIdIn(orderReq.getCourseId(), PublishStatus.PUBLISHER)
+                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_PUBLISHER));
+
+        if (enrollmentService.checkUserEnrollment(orderReq.getCourseId(), userId)) {
+            throw new AppException(ErrorCode.COURSE_BOUGHT_ALREADY);
+        }
 
         OrderEntity orderEntity = OrderEntity.builder()
                 .userId(user.getId())
-                .status(orderReq.getStatus())
+                .status(OrderStatus.PENDING)
                 .totalPrice(orderReq.getTotalPrice())
-                .createdAt(Instant.now())
-                .quantity(orderReq.getQuantity())
+                .expiresAt(Instant.now().plus(7, ChronoUnit.DAYS))
                 .build();
 
         OrderEntity order = orderRepository.save(orderEntity);
 
-        List<CourseEntity> courseEntityList = courseRepository.findAllByCourseIdIn(orderReq.getCourseId());
-
         List<OrderDetailEntity> orderDetailEntities = new ArrayList<>();
-        for (CourseEntity item : courseEntityList){
+        for (CourseEntity item : courseEntityList) {
             orderDetailEntities.add(OrderDetailEntity.builder()
-                            .orderId(order.getId())
-                            .courseId(item.getId())
-                            .price(item.getPrice())
+                    .orderId(order.getId())
+                    .courseId(item.getId())
+                    .discountPrice(item.getPriceDiscount())
+                    .discount(item.getDiscount())
+                    .originalPrice(item.getPriceOriginal())
                     .build());
         }
+
         orderDetailRepository.saveAll(orderDetailEntities);
+
+        paymentService.createPayment( new PaymentReq( PaymentMethod.VNPAY,
+                order.getId(), PaymentStatus.SUCCESS,
+                orderReq.getTotalPrice(), null, null));
+
+        log.info("Published transaction payment event for order [{}]",
+                order.getId());
 
         return order;
     }
 
     @Override
-    public List<CourseResponse> getOrderDetailByOrderId(Long orderId) {
-        List<CourseEntity> courseInDB =  orderRepository.getOrderDetailByOrderId(orderId);
-        return courseInDB.stream().map(courseMapper::toLectureResponse).toList();
+    public List<CourseResponse> getOrderDetailByOrderId(String orderId) {
+        List<CourseEntity> courseInDB = orderRepository.getOrderDetailByOrderId(orderId);
+        return courseInDB.stream().map(courseMapper::toCourseResponse).toList();
+    }
+
+    @Override
+    public PageResponse<OrderProjection> getOrdersMySelf(int page, int size, String sort, String keyword, Long userId) {
+        Sort sortField = MapUtil.parseSort(sort);
+
+        PageRequest pageRequest = PageRequest.of(page - 1, size, sortField);
+
+        Page<OrderProjection> orders = orderRepository.getOrdersMySelf(keyword, pageRequest, userId);
+
+        return PageResponse.<OrderProjection>builder()
+                .list(orders.getContent())
+                .page(page)
+                .size(size)
+                .totalElements(orders.getTotalElements())
+                .totalPages(orders.getTotalPages())
+                .build();
     }
 }

@@ -1,17 +1,11 @@
 package com.project01.skillineserver.mapper;
 
-import com.project01.skillineserver.dto.reponse.CategoryResponse;
 import com.project01.skillineserver.dto.reponse.CourseResponse;
-import com.project01.skillineserver.entity.CategoryEntity;
 import com.project01.skillineserver.entity.CourseEntity;
-import com.project01.skillineserver.repository.CategoryRepository;
 import com.project01.skillineserver.utils.DateUtil;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import java.io.File;
 
 @Component
 public class CourseMapper {
@@ -20,29 +14,29 @@ public class CourseMapper {
     private String DOMAIN_SERVER;
 
     @Autowired
-    private CategoryRepository category;
-
-    @Autowired
     private DateUtil dateUtil;
 
-    public CourseResponse toLectureResponse(CourseEntity courseEntity) {
-
-        String path = courseEntity.getThumbnail_url().replace(File.separator, "/");
+    public CourseResponse toCourseResponse(CourseEntity courseEntity) {
 
         return CourseResponse.builder()
                 .id(courseEntity.getId())
                 .title(courseEntity.getTitle())
-                .thumbnail_url(DOMAIN_SERVER+path)
-                .categoryName(courseEntity.getCategoryId()!=null? category.findById(courseEntity.getCategoryId()).get().getName() : null )
+                .thumbnail_url(DOMAIN_SERVER+courseEntity.getThumbnail_url())
                 .level(courseEntity.getLevel())
-                .price(courseEntity.getPrice())
+                .priceOriginal(courseEntity.getPriceOriginal())
                 .description(courseEntity.getDescription())
                 .rate(courseEntity.getRate())
-                .discount(courseEntity.getDiscountPrice())
-                .status(courseEntity.isStatus())
+                .discount(courseEntity.getDiscount())
+                .priceDiscount(courseEntity.getPriceDiscount())
+                .isDelete(courseEntity.isDelete())
                 .categoryId(courseEntity.getCategoryId())
-                .createAt(dateUtil.format(courseEntity.getCreatedAt()))
-                .updateAt(dateUtil.format(courseEntity.getUpdatedAt()))
+                .publishStatus(courseEntity.getPublishStatus())
+                .createdAt(dateUtil.format(courseEntity.getCreatedAt()))
+                .updatedAt(dateUtil.format(courseEntity.getUpdatedAt()))
+                .createdBy(courseEntity.getCreatedBy())
+                .updatedBy(courseEntity.getUpdatedBy())
+                .accessDurationValue(courseEntity.getAccessDurationValue())
+                .expireUnit(courseEntity.getAccessDurationUnit())
                 .build();
     }
 }

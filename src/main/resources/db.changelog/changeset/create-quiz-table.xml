@@ -12,10 +12,13 @@
             <column name="lecture_id" type="varchar(225)"/>
             <column name="title" type="varchar(225)"/>
             <column name="description" type="varchar(225)"/>
+            <column name="time_limit" type="int"/>
+            <column name="time_unit" type="varchar(25)"/>
+            <column name="max_attempt" type="int"/>
             <column name="created_at" type="timestamp"/>
             <column name="updated_at" type="timestamp"/>
-            <column name="time_limit" type="timestamp"/>
-            <column name="max_attempt" type="int"/>
+            <column name="created_by" type="bigint"/>
+            <column name="updated_by" type="bigint"/>
         </createTable>
 
         <addForeignKeyConstraint

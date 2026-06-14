@@ -12,14 +12,20 @@
             <column name="title" type="varchar(255)"/>
             <column name="description" type="varchar(255)"/>
             <column name="level" type="varchar(255)"/>
-            <column name="price" type="DECIMAL(10,0)"/>
-            <column name="discount_price" type="varchar(255)"/>
+            <column name="price_original" type="DECIMAL(10,0)"/>
+            <column name="discount" type="decimal"/>
+            <column name="price_discount" type="DECIMAL(10,0)"/>
             <column name="thumbnail_url" type="varchar(255)"/>
-            <column name="status" type="TINYINT(1)"/>
+            <column name="publish_status" type="varchar(255)"/>
+            <column name="access_duration_unit" type="varchar(255)"/>
+            <column name="access_duration_value" type="int"/>
+            <column name="is_delete" type="TINYINT(1)"/>
             <column name="rate" type="double"/>
             <column name="category_id" type="bigint"/>
             <column name="created_at" type="timestamp"/>
             <column name="updated_at" type="timestamp"/>
+            <column name="created_by" type="bigint"/>
+            <column name="updated_by" type="bigint"/>
         </createTable>
 
         <addForeignKeyConstraint

@@ -9,5 +9,6 @@ import java.util.List;
 public interface QuizService {
     void save(QuizReq quizReq);
     void delete(List<Long> quizIds);
-    PageResponse<QuizEntity> getQuizByLectureId(int page,int size,String sort,String keyword,Long courseId,String lectureId);
+
+    PageResponse<QuizEntity> getQuizByLectureId(int page, int size, String sort, String keyword, Long courseId);
 }

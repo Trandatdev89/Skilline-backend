@@ -4,7 +4,6 @@ import com.project01.skillineserver.dto.ApiResponse;
 import com.project01.skillineserver.dto.reponse.LectureResponse;
 import com.project01.skillineserver.dto.reponse.PageResponse;
 import com.project01.skillineserver.dto.request.LectureReq;
-import com.project01.skillineserver.entity.LectureEntity;
 import com.project01.skillineserver.service.LectureService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,11 +21,11 @@ public class LectureController {
 
     @PostMapping(value = "/save")
     @PreAuthorize("@authorizationService.isAdmin()")
-    public ApiResponse<LectureEntity> save(@ModelAttribute LectureReq lectureReq) throws IOException, InterruptedException {
-        return ApiResponse.<LectureEntity>builder()
+    public ApiResponse<?> save(@ModelAttribute LectureReq lectureReq) throws IOException, InterruptedException {
+        lectureService.save(lectureReq);
+        return ApiResponse.builder()
                 .code(200)
                 .message("Success")
-                .data(lectureService.save(lectureReq))
                 .build();
     }
 
@@ -43,12 +42,13 @@ public class LectureController {
                 .build();
     }
 
-    @GetMapping(value = "/not-pagi")
-    public ApiResponse<List<LectureResponse>> listLecture(@RequestParam Long courseId) {
-        return ApiResponse.<List<LectureResponse>>builder()
-                .data(lectureService.getListLectureNotPagi(courseId))
-                .message("success!")
+    @DeleteMapping(value = "/{ids}")
+    @PreAuthorize("@authorizationService.isAdmin()")
+    public ApiResponse<?> delete(@PathVariable List<String> ids) {
+        lectureService.delete(ids);
+        return ApiResponse.builder()
                 .code(200)
+                .message("Success")
                 .build();
     }
 }

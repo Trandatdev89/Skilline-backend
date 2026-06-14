@@ -12,6 +12,7 @@ import com.project01.skillineserver.service.LectureService;
 import com.project01.skillineserver.service.MediaService;
 import com.project01.skillineserver.utils.MapUtil;
 import com.project01.skillineserver.utils.UploadUtil;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -21,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -36,34 +36,29 @@ public class LectureServiceImpl implements LectureService {
     private final LectureMapper lectureMapper;
 
     @Override
-    public LectureEntity save(LectureReq lectureReq) throws IOException, InterruptedException {
+    public void save(LectureReq lectureReq) throws IOException, InterruptedException {
 
-        boolean isUpdate = lectureReq.id()!=null;
+        boolean isUpdate = lectureReq.id() != null;
 
         LectureEntity lectureEntity = isUpdate
-                ? lectureRepository.findById(lectureReq.id())
+                ? lectureRepository.findByIdAndCourseId(lectureReq.id(), lectureReq.courseId())
                 .orElseThrow(() -> new AppException(ErrorCode.LECTURE_NOT_FOUND))
                 : new LectureEntity();
 
         Integer maxPositionLectureOfCourse = lectureRepository.findMaxPosition(lectureReq.courseId());
 
         lectureEntity.setTitle(lectureReq.title());
-        lectureEntity.setPosition(maxPositionLectureOfCourse!=null ? maxPositionLectureOfCourse+1 : 0);
+        lectureEntity.setPosition(maxPositionLectureOfCourse != null ? maxPositionLectureOfCourse + 1 : 0);
         lectureEntity.setCourseId(lectureReq.courseId());
-        lectureEntity.setUpdatedAt(Instant.now());
-
-        if(!isUpdate){
-            lectureEntity.setCreatedAt(Instant.now());
-        }
+        lectureEntity.setDurationSeconds(lectureReq.durationSeconds());
+        lectureEntity.setPublishStatus(lectureReq.publishStatus());
+        lectureEntity.setPreviewable(lectureReq.previewable());
 
         //handle Video upload only if new file
-        if(lectureReq.videoFile()!=null && !lectureReq.videoFile().isEmpty()){
+        if(lectureReq.videoFile()!=null){
             Map<String,Object> videoInfo = resolveVideoPath(lectureReq.videoFile());
-
             if (videoInfo != null) {
                 lectureEntity.setFilePath((String) videoInfo.get("filePath"));
-                lectureEntity.setContentType((String) videoInfo.get("contentType"));
-                lectureEntity.setDuration((String) videoInfo.get("duration"));
                 lectureEntity.setImage((String) videoInfo.get("image"));
             }
         }
@@ -72,8 +67,6 @@ public class LectureServiceImpl implements LectureService {
         if (lectureReq.videoFile() != null && !lectureReq.videoFile().isEmpty()) {
             mediaService.processVideoAsync(lectureNeedSave.getId());
         }
-
-        return lectureNeedSave;
     }
 
     @Override
@@ -81,28 +74,32 @@ public class LectureServiceImpl implements LectureService {
         Sort sortField = MapUtil.parseSort(sort);
         PageRequest pageRequest = PageRequest.of(page - 1, size, sortField);
 
-        Page<LectureEntity> orders = lectureRepository.getLectures(keyword,courseId,pageRequest);
+        Page<LectureEntity> lecturePages = lectureRepository.getLectures(keyword, courseId, pageRequest);
 
-        List<LectureResponse> listLectureResponse = orders.getContent().stream().map(lectureMapper::toLectureResponse).toList();
+        List<LectureResponse> listLectureResponse = lecturePages
+                .stream()
+                .map(lectureMapper::toLectureResponse)
+                .toList();
 
         return PageResponse.<LectureResponse>builder()
                 .list(listLectureResponse)
                 .page(page)
                 .size(size)
-                .totalElements(orders.getTotalElements())
-                .totalPages(orders.getTotalPages())
+                .totalElements(lecturePages.getTotalElements())
+                .totalPages(lecturePages.getTotalPages())
                 .build();
     }
 
     @Override
-    public List<LectureResponse> getListLectureNotPagi(Long courseId) {
-        List<LectureEntity> lectureEntityList = lectureRepository.findAllByCourseId(courseId);
-        return lectureEntityList.stream().map(lectureMapper::toLectureResponse).toList();
-    }
+    @Transactional
+    public void delete(List<String> lectureIds) {
 
-    @Override
-    public Long countLectureInCourse(Long courseId) {
-        return lectureRepository.countLectureByCourseId(courseId);
+        if (lectureIds == null || lectureIds.isEmpty()) {
+            log.info("List Lecture id is empty");
+            throw new AppException(ErrorCode.LIST_ID_EMPTY);
+        }
+
+        lectureRepository.deleteAllByLectureIdIn(lectureIds);
     }
 
     private Map<String,Object> resolveVideoPath(MultipartFile inputFile){
@@ -110,7 +107,7 @@ public class LectureServiceImpl implements LectureService {
             return null;
         }
         try{
-           return uploadUtil.generateVideoUrl(inputFile);
+            return uploadUtil.generateVideoUrl(inputFile);
         }catch (InterruptedException e){
             Thread.currentThread().interrupt();
             throw new AppException(ErrorCode.VIDEO_PROCESSING_FAILED);
@@ -118,5 +115,4 @@ public class LectureServiceImpl implements LectureService {
             throw new RuntimeException(e);
         }
     }
-
 }

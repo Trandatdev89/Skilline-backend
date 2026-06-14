@@ -11,6 +11,7 @@ import com.project01.skillineserver.enums.TokenType;
 import com.project01.skillineserver.excepion.CustomException.AppException;
 import com.project01.skillineserver.repository.UserDeviceRepository;
 import com.project01.skillineserver.service.Impl.RedisService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,6 +25,8 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -41,7 +44,6 @@ import java.util.stream.Collectors;
 @Component
 @Slf4j
 public class SecurityUtil {
-
 
     @Autowired
     @Qualifier("accessTokenEncoder")
@@ -71,7 +73,7 @@ public class SecurityUtil {
     @Autowired
     private UserDeviceRepository userDeviceRepository;
 
-    public String generateToken(CustomUserDetail customUserDetail, TokenType tokenType,String deviceId) {
+    public String generateToken(CustomUserDetail customUserDetail, TokenType tokenType, String deviceId) {
         JwsHeader jwsHeader = JwsHeader.with(MacAlgorithm.HS256).build();
 
 
@@ -79,7 +81,7 @@ public class SecurityUtil {
                 .subject(customUserDetail.getUser().getId().toString())
                 .issuedAt(Instant.now())
                 .expiresAt(Instant.now().plus(tokenType.equals(TokenType.ACCESS_TOKEN) ? expirationAccess : expirationRefresh, ChronoUnit.SECONDS))
-                .claims(setClaims(customUserDetail,tokenType,deviceId))
+                .claims(setClaims(customUserDetail, tokenType, deviceId))
                 .issuer(customUserDetail.getUsername())
                 .id(UUID.randomUUID().toString())
                 .build();
@@ -98,7 +100,8 @@ public class SecurityUtil {
 
     public SignedJWT verifyToken(String token, TokenType tokenType) throws ParseException, JOSEException {
         if (!StringUtils.hasText(token)) {
-            throw new AppException(ErrorCode.TOKEN_IS_BLANK);
+            log.info("Token {} with type {} is empty", token, tokenType);
+            throw new AppException(ErrorCode.INVALID_TOKEN);
         }
 
         SignedJWT signedJWT = SignedJWT.parse(token);
@@ -109,18 +112,29 @@ public class SecurityUtil {
         String deviceIdFromToken = signedJWT.getJWTClaimsSet().getClaim("deviceId").toString();
 
         if (!(verified && signedJWT.getJWTClaimsSet().getExpirationTime().after(new Date()))) {
-            log.info("Token is not verify or expire : {}", token);
+
+            log.info("Token {} with type {} invalid", token, tokenType);
+
+            if (tokenType.equals(TokenType.REFRESH_TOKEN)) {
+                ServletRequestAttributes attrs = (ServletRequestAttributes)
+                        RequestContextHolder.getRequestAttributes();
+                if (attrs != null) {
+                    HttpServletResponse response = attrs.getResponse();
+                    CookieUtil.clearAllAuthCookies(response);
+                }
+            }
+
             throw new AppException(ErrorCode.INVALID_TOKEN);
         }
 
         if (redisService.existsKey(tokenId)) {
-            log.info("Account is logout with tokenId,token : {} {}", tokenId, token);
+            log.info("Token {} with type {} is revoke", token, tokenType);
             throw new AppException(ErrorCode.ACCOUNT_IS_LOGOUT);
         }
 
         Optional<UserDevice> device = userDeviceRepository.findByDeviceId(deviceIdFromToken);
-        if(device.isEmpty() || !device.get().isActive()){
-            log.info("Account of you login on device other, device id not found: {}", device);
+        if (device.isEmpty() || !device.get().isActive()) {
+            log.info("Your account with deviceId {} is located in a remote location.", deviceIdFromToken);
             throw new AppException(ErrorCode.ACCOUNT_LOGINED);
         }
 
@@ -144,12 +158,12 @@ public class SecurityUtil {
                 .collect(Collectors.joining(" "));
     }
 
-    private Consumer<Map<String, Object>> setClaims(CustomUserDetail customUserDetail,TokenType tokenType,String deviceId) {
+    private Consumer<Map<String, Object>> setClaims(CustomUserDetail customUserDetail, TokenType tokenType, String deviceId) {
         return stringObjectMap -> {
             stringObjectMap.put("scope", getAuthorities(customUserDetail));
             stringObjectMap.put("loginAt", LocalDateTime.now().toString());
             stringObjectMap.put("typeToken", tokenType);
-            if(deviceId!=null){
+            if (deviceId != null) {
                 stringObjectMap.put("deviceId", deviceId);
             }
         };
@@ -158,5 +172,10 @@ public class SecurityUtil {
     public static String extractUsernameByToken(String token) throws ParseException {
         SignedJWT signedJWT = SignedJWT.parse(token);
         return signedJWT.getJWTClaimsSet().getIssuer();
+    }
+
+    public static String extractDeviceIdByToken(String token) throws ParseException {
+        SignedJWT signedJWT = SignedJWT.parse(token);
+        return signedJWT.getJWTClaimsSet().getClaim("deviceId").toString();
     }
 }

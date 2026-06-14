@@ -9,4 +9,6 @@ public interface QuestionService {
     void save(SaveQuestionListReq saveQuestionListReq);
 
     List<QuestionExamUser> exam(Long quizId);
+
+    void delete(List<Long> ids);
 }

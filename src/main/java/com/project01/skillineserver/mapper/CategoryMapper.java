@@ -1,27 +1,38 @@
 package com.project01.skillineserver.mapper;
 
+import com.project01.skillineserver.dto.projection.CategoryProjection;
 import com.project01.skillineserver.dto.reponse.CategoryResponse;
-import com.project01.skillineserver.entity.CategoryEntity;
+import com.project01.skillineserver.utils.DateUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class CategoryMapper {
 
 
     @Value("${domain.server}")
     private String DOMAIN_SERVER;
 
-    public CategoryResponse toCategoriesResponse(CategoryEntity category) {
+    private final DateUtil dateUtil;
 
-        String urlThumbnail = "";
+    public CategoryResponse toCategoriesResponse(CategoryProjection category) {
 
-        if(category.getPath()!=null){
-            urlThumbnail = DOMAIN_SERVER+category.getPath();
-        }
+        String timeCreatedConvert = dateUtil.format(category.getCreatedAt());
+        String timeUpdatedConvert = dateUtil.format(category.getUpdatedAt());
 
-        return new CategoryResponse(category.getId(), category.getName(), urlThumbnail,category.isActive());
+        return CategoryResponse.builder()
+                .id(category.getId())
+                .name(category.getName())
+                .urlThumbnail(DOMAIN_SERVER + category.getPath())
+                .slug(category.getSlug())
+                .isActive(category.getIsActive())
+                .createdAt(timeCreatedConvert)
+                .updatedAt(timeUpdatedConvert)
+                .build();
     }
+
 }
