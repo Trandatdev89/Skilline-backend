@@ -13,17 +13,18 @@
             <column name="phone" value="0123456789"/>
             <column name="address" value="Hanoi"/>
             <column name="fullname" value="Administrator"/>
-            <column name="is_disable" valueNumeric="1"/>
+            <column name="enabled" valueNumeric="1"/>
             <column name="is_account_non_expired" valueNumeric="1"/>
             <column name="is_credentials_non_expired" valueNumeric="1"/>
-            <column name="is_locked" valueNumeric="1"/>
+            <column name="account_non_locked" valueNumeric="1"/>
             <column name="failed_login_attempts" valueNumeric="0"/>
             <column name="last_time_change_password" valueComputed="NOW()"/>
             <column name="lock_time" valueComputed="NOW()"/>
             <column name="role" value="ADMIN"/>
-            <column name="avatar" value="https://cdn-icons-png.freepik.com/512/2416/2416668.png"/>
             <column name="created_at" valueComputed="NOW()"/>
             <column name="updated_at" valueComputed="NOW()"/>
+            <column name="created_by" valueNumeric="1"/>
+            <column name="updated_by" valueNumeric="1"/>
         </insert>
     </changeSet>
 

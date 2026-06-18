@@ -4,12 +4,14 @@ import com.project01.skillineserver.enums.ExpireUnit;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.Normalizer;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
+import java.util.Locale;
 
-public class CalculatorUtil {
+public class ComputeUtil {
 
     public static BigDecimal computedPriceWhenDiscount(BigDecimal originalPrice, BigDecimal discount) {
         BigDecimal discountAmount = originalPrice.multiply(discount)
@@ -42,5 +44,32 @@ public class CalculatorUtil {
                 return null;
             }
         }
+    }
+
+    public static String generateSlug(String input) {
+
+        if (input == null || input.isBlank()) {
+            return "";
+        }
+
+        String slug = input
+                .toLowerCase(Locale.ROOT)
+                .trim();
+
+        slug = slug.replace("đ", "d")
+                .replace("Đ", "d");
+
+        slug = Normalizer.normalize(slug, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "");
+
+        slug = slug.replaceAll("[^a-z0-9\\s-]", "");
+
+        slug = slug.replaceAll("\\s+", "-");
+
+        slug = slug.replaceAll("-+", "-");
+
+        slug = slug.replaceAll("^-|-$", "");
+
+        return slug;
     }
 }

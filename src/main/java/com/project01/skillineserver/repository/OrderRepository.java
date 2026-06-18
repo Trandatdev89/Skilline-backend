@@ -3,11 +3,13 @@ package com.project01.skillineserver.repository;
 import com.project01.skillineserver.dto.projection.OrderProjection;
 import com.project01.skillineserver.entity.CourseEntity;
 import com.project01.skillineserver.entity.OrderEntity;
+import com.project01.skillineserver.enums.OrderStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.Instant;
 import java.util.List;
 
 
@@ -55,4 +57,6 @@ public interface OrderRepository extends JpaRepository<OrderEntity, String> {
             where od.orderId = :orderId
             """)
     List<CourseEntity> getOrderDetailByOrderId(String orderId);
+
+    List<OrderEntity> findAllByStatusAndExpiresAtBefore(OrderStatus status, Instant now);
 }

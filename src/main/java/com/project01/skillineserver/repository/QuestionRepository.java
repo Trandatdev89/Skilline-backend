@@ -22,7 +22,8 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Long> 
             qu.type as type,
             qu.score as score,
             an.id as answerId,
-            an.content as answerContent
+            an.content as answerContent,
+            an.is_correct as isCorrect            
             from questions qu
             inner join answer an on qu.id=an.question_id
             where qu.quiz_id=?1

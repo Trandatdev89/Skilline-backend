@@ -83,19 +83,19 @@ public class CourseController {
                 .build();
     }
 
-    @GetMapping(value = "/{id}")
-    public ApiResponse<CourseResponse> getCourseById(@PathVariable Long id) {
-        return ApiResponse.<CourseResponse>builder()
+    @GetMapping(value = "/{ids}")
+    public ApiResponse<List<CourseResponse>> getCourseByIds(@PathVariable List<Long> ids) {
+        return ApiResponse.<List<CourseResponse>>builder()
                 .code(200)
                 .message("Success")
-                .data(courseService.getCourseById(id))
+                .data(courseService.getCourseByIds(ids))
                 .build();
     }
 
     @GetMapping(value = "/search-advance")
     public ApiResponse<PageResponse<?>> searchAdvanceCourse(@RequestParam(defaultValue = "0") int page,
                                                             @RequestParam(defaultValue = "20") int size,
-                                                            @RequestParam(defaultValue = "id,desc") String sort,
+                                                            @RequestParam(required = false) String sort,
                                                             @RequestParam(required = false) String... search) {
 
         return ApiResponse.<PageResponse<?>>builder()

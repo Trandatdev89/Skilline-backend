@@ -10,7 +10,6 @@ import com.project01.skillineserver.repository.UserRepository;
 import com.project01.skillineserver.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -57,9 +56,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public AuthResponse me() {
-
-        CustomUserDetail customUserDetail = (CustomUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public AuthResponse me(CustomUserDetail customUserDetail) {
 
         UserEntity userEntityInUserDetail = customUserDetail.getUser();
 
@@ -69,6 +66,8 @@ public class UserServiceImpl implements UserService {
                 .authenticated(true)
                 .avatar(userEntityInUserDetail.getAvatarAssetId())
                 .username(userEntityInUserDetail.getUsername())
+                .email(userEntityInUserDetail.getEmail())
+                .phone(userEntityInUserDetail.getPhone())
                 .build();
     }
 

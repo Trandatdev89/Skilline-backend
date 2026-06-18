@@ -118,6 +118,7 @@ public class QuestionServiceImpl implements QuestionService {
                     AnswerRes.builder()
                             .answerId(row.getAnswerId())
                             .content(row.getAnswerContent())
+                            .isCorrect(row.getIsCorrect())
                             .build()
             );
         }

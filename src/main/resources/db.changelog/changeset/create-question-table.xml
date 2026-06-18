@@ -14,6 +14,10 @@
             <column name="type" type="varchar(225)"/>
             <column name="position" type="int"/>
             <column name="score" type="double"/>
+            <column name="created_at" type="timestamp"/>
+            <column name="updated_at" type="timestamp"/>
+            <column name="created_by" type="bigint"/>
+            <column name="updated_by" type="bigint"/>
         </createTable>
 
         <addForeignKeyConstraint

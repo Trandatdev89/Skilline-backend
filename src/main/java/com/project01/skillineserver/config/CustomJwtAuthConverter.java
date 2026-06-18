@@ -5,7 +5,6 @@ import com.project01.skillineserver.enums.ErrorCode;
 import com.project01.skillineserver.excepion.CustomException.AppException;
 import com.project01.skillineserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.bson.json.StrictJsonWriter;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

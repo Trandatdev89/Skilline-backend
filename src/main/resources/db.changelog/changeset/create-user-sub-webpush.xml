@@ -13,6 +13,10 @@
             <column name="endpoint" type="varchar(225)"/>
             <column name="p256dh" type="varchar(225)"/>
             <column name="auth" type="varchar(225)"/>
+            <column name="created_at" type="timestamp"/>
+            <column name="updated_at" type="timestamp"/>
+            <column name="created_by" type="bigint"/>
+            <column name="updated_by" type="bigint"/>
         </createTable>
 
         <addForeignKeyConstraint

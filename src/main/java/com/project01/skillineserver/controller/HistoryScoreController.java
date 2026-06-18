@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/api/history-score-user")
 public class HistoryScoreController {
 
-    private final AttemptAnswerService historyScoreUserService;
+    private final AttemptAnswerService attemptAnswerService;
 
     @GetMapping(value = "/exam")
     @PreAuthorize("@authorizationService.isCanAccessApi()")
@@ -27,7 +27,7 @@ public class HistoryScoreController {
 
         return ApiResponse.<HistoryExamUser>builder()
                 .message("Get history exam user success!")
-                .data(historyScoreUserService.getHistoryScoreExamOfUser(attemptQuizId))
+                .data(attemptAnswerService.getHistoryScoreExamOfUser(attemptQuizId))
                 .code(200)
                 .build();
     }

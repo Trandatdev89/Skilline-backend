@@ -155,6 +155,8 @@ public class AuthServiceImpl implements AuthService {
                 .deviceId(currentDeviceId)
                 .role(user.getUser().getRole())
                 .avatar(user.getUser().getAvatarAssetId())
+                .email(user.getUser().getEmail())
+                .phone(user.getUser().getPhone())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
@@ -254,7 +256,6 @@ public class AuthServiceImpl implements AuthService {
         user.setFullname(registerDTO.getFullname());
         user.setPhone(registerDTO.getPhone());
         user.setLastTimeChangePassword(Instant.now());
-        user.setLockTime(Instant.now());
         user.setRole(registerDTO.getRole());
 
         UserEntity userCreated = userRepository.save(user);
@@ -270,7 +271,7 @@ public class AuthServiceImpl implements AuthService {
             userRepository.deleteById(userId);
             throw new AppException(ErrorCode.INVALID_TOKEN);
         }
-        user.setDisable(true);
+        user.setEnabled(true);
         userRepository.save(user);
     }
 
@@ -301,7 +302,7 @@ public class AuthServiceImpl implements AuthService {
 
         if (countLoginFail >= AppConstants.MAX_FAILED_ATTEMPTS) {
             user.setLockTime(Instant.now());
-            user.setLocked(false);
+            user.setAccountNonLocked(false);
         } else {
             user.setFailedLoginAttempts(countLoginFail);
         }
@@ -318,29 +319,26 @@ public class AuthServiceImpl implements AuthService {
     private boolean isAccountStillLocked(UserEntity user) {
         boolean isCheck = true;
 
-        if(user.getLockTime() == null){
-            return isCheck;
-        }
-
         Instant now = Instant.now();
-        Instant unlockTime = user.getLockTime().plus(120, ChronoUnit.SECONDS);
+        Instant unlockTime = user.getLockTime().plus(AppConstants.LOCK_TIME_DURATION, ChronoUnit.SECONDS);
 
         if (now.isAfter(unlockTime)) {
-            user.setLocked(true);
+            user.setAccountNonLocked(true);
             user.setLockTime(null);
             user.setFailedLoginAttempts(0);
             isCheck = false;
+            userRepository.save(user);
         }
         return isCheck;
     }
 
     private boolean isPasswordExpire(UserEntity user){
+        if (user.getLastTimeChangePassword() == null) return false;
         Instant now = Instant.now();
-        Instant lastTimeChangePassword = null;
-        if ( user.getLastTimeChangePassword()!=null){
-            lastTimeChangePassword = Instant.now();
-        }
-        if(now.isAfter(lastTimeChangePassword.plus(AppConstants.CHANGE_PASSWORD_PERIODIC,ChronoUnit.SECONDS))){
+        Instant expireTime = user.getLastTimeChangePassword()
+                .plus(AppConstants.CHANGE_PASSWORD_PERIODIC, ChronoUnit.DAYS);
+
+        if (now.isAfter(expireTime)) {
             user.setCredentialsNonExpired(false);
             userRepository.save(user);
             return true;

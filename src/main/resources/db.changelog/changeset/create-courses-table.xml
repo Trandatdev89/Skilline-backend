@@ -10,7 +10,7 @@
                 <constraints primaryKey="true" />
             </column>
             <column name="title" type="varchar(255)"/>
-            <column name="description" type="varchar(255)"/>
+            <column name="description" type="text"/>
             <column name="level" type="varchar(255)"/>
             <column name="price_original" type="DECIMAL(10,0)"/>
             <column name="discount" type="decimal"/>
@@ -22,6 +22,10 @@
             <column name="is_delete" type="TINYINT(1)"/>
             <column name="rate" type="double"/>
             <column name="category_id" type="bigint"/>
+            <column name="created_at" type="timestamp"/>
+            <column name="updated_at" type="timestamp"/>
+            <column name="created_by" type="bigint"/>
+            <column name="updated_by" type="bigint"/>
         </createTable>
 
         <addForeignKeyConstraint

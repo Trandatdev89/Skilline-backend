@@ -30,6 +30,6 @@ public class EnrollmentEntity {
     @Column(name = "progress_percent", nullable = false)
     private Integer progressPercent = 0;
 
-    @Column(name = "time_expire", nullable = false)
+    @Column(name = "time_expire")
     private Instant timeExpire;
 }

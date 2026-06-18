@@ -41,9 +41,9 @@ public class UserEntity extends BaseEntity<Long> {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    private boolean isLocked = false;
+    private boolean accountNonLocked = true;
 
-    private boolean isDisable = false;
+    private boolean enabled = false;
 
     private boolean isAccountNonExpired = true;
 

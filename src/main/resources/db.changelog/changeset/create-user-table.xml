@@ -15,12 +15,13 @@
             <column name="phone" type="varchar(255)"/>
             <column name="address" type="varchar(255)"/>
             <column name="fullname" type="varchar(255)"/>
-            <column name="avatar" type="varchar(255)"/>
             <column name="avatar_asset_id" type="varchar(255)"/>
             <column name="created_at" type="timestamp"/>
             <column name="updated_at" type="timestamp"/>
-            <column name="is_locked" type="TINYINT(1)"/>
-            <column name="is_disable" type="TINYINT(1)"/>
+            <column name="created_by" type="bigint"/>
+            <column name="updated_by" type="bigint"/>
+            <column name="account_non_locked" type="TINYINT(1)"/>
+            <column name="enabled" type="TINYINT(1)"/>
             <column name="role" type="VARCHAR(20)"/>
             <column name="is_account_non_expired" type="TINYINT(1)"/>
             <column name="is_credentials_non_expired" type="TINYINT(1)"/>

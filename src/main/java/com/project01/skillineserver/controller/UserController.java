@@ -46,11 +46,11 @@ public class UserController {
 
     @GetMapping(value = "/me")
     @PreAuthorize("@authorizationService.isCanAccessApi()")
-    public ApiResponse<AuthResponse> me(HttpServletRequest request) {
+    public ApiResponse<AuthResponse> me(@AuthenticationPrincipal CustomUserDetail customUserDetail) {
         return ApiResponse.<AuthResponse>builder()
                 .code(200)
                 .message("Token Valid!")
-                .data(userService.me())
+                .data(userService.me(customUserDetail))
                 .build();
     }
 
