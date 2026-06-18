@@ -56,7 +56,7 @@ public class LectureServiceImpl implements LectureService {
 
         //handle Video upload only if new file
         if(lectureReq.videoFile()!=null){
-            Map<String,Object> videoInfo = resolveVideoPath(lectureReq.videoFile());
+            Map<String,Object> videoInfo = resolveVideoPath(lectureReq.videoFile(),lectureEntity.getImage(),lectureEntity.getFilePath());
             if (videoInfo != null) {
                 lectureEntity.setFilePath((String) videoInfo.get("filePath"));
                 lectureEntity.setImage((String) videoInfo.get("image"));
@@ -102,12 +102,12 @@ public class LectureServiceImpl implements LectureService {
         lectureRepository.deleteAllByLectureIdIn(lectureIds);
     }
 
-    private Map<String,Object> resolveVideoPath(MultipartFile inputFile){
+    private Map<String,Object> resolveVideoPath(MultipartFile inputFile,String imagePath,String videoPath){
         if(inputFile==null || inputFile.isEmpty()){
             return null;
         }
         try{
-            return uploadUtil.generateVideoUrl(inputFile);
+            return uploadUtil.generateVideoUrl(inputFile,imagePath,videoPath);
         }catch (InterruptedException e){
             Thread.currentThread().interrupt();
             throw new AppException(ErrorCode.VIDEO_PROCESSING_FAILED);

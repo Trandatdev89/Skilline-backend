@@ -11,6 +11,7 @@ import com.project01.skillineserver.excepion.CustomException.AppException;
 import com.project01.skillineserver.mapper.CategoryMapper;
 import com.project01.skillineserver.repository.CategoryRepository;
 import com.project01.skillineserver.service.CategoryService;
+import com.project01.skillineserver.utils.ComputeUtil;
 import com.project01.skillineserver.utils.MapUtil;
 import com.project01.skillineserver.utils.UploadUtil;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +47,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         categoryInDB.setName(category.name());
         categoryInDB.setActive(true);
-        categoryInDB.setSlug(category.slug());
+        categoryInDB.setSlug(ComputeUtil.generateSlug(category.name()));
         categoryInDB.setPath(pathImage);
 
         categoryRepository.save(categoryInDB);
@@ -101,7 +102,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     private String resolveImagePath(Object inputPath, String exitingPath) throws IOException {
         if (inputPath instanceof MultipartFile multipartFile) {
-            return uploadUtil.createPathFile(multipartFile, FileType.IMAGE);
+            return uploadUtil.createPathFile(multipartFile,exitingPath,FileType.IMAGE);
         } else {
             return exitingPath;
         }

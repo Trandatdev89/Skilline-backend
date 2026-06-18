@@ -12,7 +12,7 @@ import com.project01.skillineserver.repository.CourseRepository;
 import com.project01.skillineserver.service.CourseService;
 import com.project01.skillineserver.specification.SearchCriteria;
 import com.project01.skillineserver.specification.SearchSpecification;
-import com.project01.skillineserver.utils.CalculatorUtil;
+import com.project01.skillineserver.utils.ComputeUtil;
 import com.project01.skillineserver.utils.MapUtil;
 import com.project01.skillineserver.utils.UploadUtil;
 import lombok.RequiredArgsConstructor;
@@ -62,7 +62,7 @@ public class CourseServiceImpl implements CourseService {
         courseEntityInDB.setPublishStatus(courseReq.publishStatus());
         courseEntityInDB.setAccessDurationUnit(courseReq.accessDurationUnit());
         courseEntityInDB.setAccessDurationValue(courseReq.accessDurationValue());
-        courseEntityInDB.setPriceDiscount(CalculatorUtil
+        courseEntityInDB.setPriceDiscount(ComputeUtil
                 .computedPriceWhenDiscount(courseReq.price(), courseReq.discount()));
         courseEntityInDB.setThumbnail_url(pathImage);
 
@@ -82,13 +82,12 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public CourseResponse getCourseById(Long id) {
-        CourseEntity course = courseRepository.findByCourseId(id)
-                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
+    public List<CourseResponse> getCourseByIds(List<Long> ids) {
+        List<CourseEntity> course = courseRepository.findAllByCourseIdIn(ids);
 
-        List<CourseResponse> courseResponses = handleComputedThumbnailAssetOfCourses(List.of(course));
+        List<CourseResponse> courseResponses = handleComputedThumbnailAssetOfCourses(course);
 
-        return courseResponses.getFirst();
+        return courseResponses;
     }
 
     @Override
@@ -113,10 +112,13 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public PageResponse<CourseResponse> searchAdvanceCourse(String[] search, int page, int size, String sort) {
 
-        Pageable pageable = PageRequest.of(page - 1, size);
+        Sort sortField = MapUtil.parseSort(sort);
 
-        Page<CourseEntity> listCourseResponses = null;
-        Specification<CourseEntity> specification = Specification.where(null);
+        PageRequest pageRequest = PageRequest.of(page - 1, size, sortField);
+
+        Specification<CourseEntity> specification = Specification
+                .where((root, query, criteriaBuilder)
+                        -> criteriaBuilder.equal(root.get("isDelete"), false));
 
         if (search != null && search.length > 0) {
 
@@ -131,18 +133,13 @@ public class CourseServiceImpl implements CourseService {
             }
 
             for (SearchCriteria searchOpt : searchCriterias) {
-
                 specification = specification.and((root, query, criteriaBuilder) ->
                         new SearchSpecification<CourseEntity>(searchOpt).toPredicate(root, query, criteriaBuilder)
                 );
             }
-
-            listCourseResponses = courseRepository.findAll(specification, pageable);
-
-        } else {
-            listCourseResponses = courseRepository.findAll(pageable);
         }
 
+        Page<CourseEntity> listCourseResponses = courseRepository.findAll(specification, pageRequest);
 
         List<CourseResponse> courseResponseList = handleComputedThumbnailAssetOfCourses(listCourseResponses.getContent());
 
@@ -153,7 +150,6 @@ public class CourseServiceImpl implements CourseService {
                 .totalPages(listCourseResponses.getTotalPages())
                 .totalElements(listCourseResponses.getTotalElements())
                 .build();
-
     }
 
     @Override
@@ -202,7 +198,7 @@ public class CourseServiceImpl implements CourseService {
 
     private String resolvePathFile(Object inputFile, String pathFile) throws IOException {
         if (inputFile instanceof MultipartFile multipartFile) {
-            return uploadUtil.createPathFile(multipartFile, FileType.IMAGE).toString();
+            return uploadUtil.createPathFile(multipartFile, pathFile,FileType.IMAGE);
         } else {
             return pathFile;
         }

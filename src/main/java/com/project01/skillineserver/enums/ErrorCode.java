@@ -42,7 +42,8 @@ public enum ErrorCode {
     MEDIA_ASSET_NOT_FOUND(1029, "Assest not found!", HttpStatus.NOT_FOUND),
     MEDIA_ASSET_ALREADY_PROCESSED(1030, "Assest not found!", HttpStatus.BAD_REQUEST),
     COURSE_NOT_PUBLISHER(1031, "Course dont public!", HttpStatus.BAD_REQUEST),
-    COURSE_BOUGHT_ALREADY(1032, "You have bought course already!", HttpStatus.BAD_REQUEST),
+    COURSE_BOUGHT_ALREADY(1032, "One of the courses has already been purchased." +
+            "\nplease delete it to continue with the purchase.", HttpStatus.BAD_REQUEST),
     PAYMENT_FAILED(1033, "", HttpStatus.INTERNAL_SERVER_ERROR),
     MAIL_CONFIG_NOT_FOUND(1034, "You not yet config mail", HttpStatus.NOT_FOUND),
     ANSWER_NOT_EXISTS(1035, "This is answer not exits, maybe that is delete!", HttpStatus.BAD_REQUEST),

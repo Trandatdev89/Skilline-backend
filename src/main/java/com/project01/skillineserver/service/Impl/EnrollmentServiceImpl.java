@@ -10,7 +10,7 @@ import com.project01.skillineserver.mapper.CourseMapper;
 import com.project01.skillineserver.repository.CourseRepository;
 import com.project01.skillineserver.repository.EnrollmentRepository;
 import com.project01.skillineserver.service.EnrollmentService;
-import com.project01.skillineserver.utils.CalculatorUtil;
+import com.project01.skillineserver.utils.ComputeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -90,7 +90,9 @@ public class EnrollmentServiceImpl implements EnrollmentService {
                 .map(item -> EnrollmentEntity.builder()
                         .userId(userId)
                         .courseId(item.getId())
-                        .timeExpire(CalculatorUtil.computedTimeExpireEnrollment(item.getAccessDurationValue()
+                        .timeExpire(item.getAccessDurationUnit() == null
+                                ? null
+                                : ComputeUtil.computedTimeExpireEnrollment(item.getAccessDurationValue()
                                 , item.getAccessDurationUnit()))
                         .enrolledAt(Instant.now())
                         .progressPercent(0)

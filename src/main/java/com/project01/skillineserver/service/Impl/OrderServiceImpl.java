@@ -80,11 +80,6 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderEntity saveOrder(OrderReq orderReq, Long userId) {
-
-        if (userId == null) {
-            throw new AppException(ErrorCode.USER_NOT_FOUND);
-        }
-
         if (orderReq.getCourseId().isEmpty()) {
             throw new AppException(ErrorCode.COURSE_EMPTY);
         }
@@ -105,7 +100,7 @@ public class OrderServiceImpl implements OrderService {
                 .userId(user.getId())
                 .status(OrderStatus.PENDING)
                 .totalPrice(orderReq.getTotalPrice())
-                .expiresAt(Instant.now().plus(7, ChronoUnit.DAYS))
+                .expiresAt(Instant.now().plus(30, ChronoUnit.MINUTES))
                 .build();
 
         OrderEntity order = orderRepository.save(orderEntity);
@@ -122,13 +117,6 @@ public class OrderServiceImpl implements OrderService {
         }
 
         orderDetailRepository.saveAll(orderDetailEntities);
-
-        paymentService.createPayment( new PaymentReq( PaymentMethod.VNPAY,
-                order.getId(), PaymentStatus.SUCCESS,
-                orderReq.getTotalPrice(), null, null));
-
-        log.info("Published transaction payment event for order [{}]",
-                order.getId());
 
         return order;
     }

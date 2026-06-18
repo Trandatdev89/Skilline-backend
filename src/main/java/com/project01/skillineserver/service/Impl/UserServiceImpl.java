@@ -57,9 +57,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public AuthResponse me() {
-
-        CustomUserDetail customUserDetail = (CustomUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public AuthResponse me(CustomUserDetail customUserDetail) {
 
         UserEntity userEntityInUserDetail = customUserDetail.getUser();
 
@@ -69,6 +67,8 @@ public class UserServiceImpl implements UserService {
                 .authenticated(true)
                 .avatar(userEntityInUserDetail.getAvatar())
                 .username(userEntityInUserDetail.getUsername())
+                .email(userEntityInUserDetail.getEmail())
+                .phone(userEntityInUserDetail.getPhone())
                 .build();
     }
 

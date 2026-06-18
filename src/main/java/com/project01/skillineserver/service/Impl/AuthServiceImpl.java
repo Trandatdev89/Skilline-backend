@@ -155,6 +155,8 @@ public class AuthServiceImpl implements AuthService {
                 .deviceId(currentDeviceId)
                 .role(user.getUser().getRole())
                 .avatar(user.getUser().getAvatar())
+                .email(user.getUser().getEmail())
+                .phone(user.getUser().getPhone())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();

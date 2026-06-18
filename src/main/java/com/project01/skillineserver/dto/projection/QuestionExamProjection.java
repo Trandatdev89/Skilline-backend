@@ -9,4 +9,5 @@ public interface QuestionExamProjection {
     QuestionType getType();
     Long getAnswerId();
     String getAnswerContent();
+    Boolean getIsCorrect();
 }

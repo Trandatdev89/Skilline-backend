@@ -12,7 +12,7 @@ public interface CourseService {
 
     void delete(List<Long> courseId);
 
-    CourseResponse getCourseById(Long id);
+    List<CourseResponse> getCourseByIds(List<Long> id);
 
     PageResponse<CourseResponse> getCourses(int page, int size, String sort, String keyword, Long categoryId);
 

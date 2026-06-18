@@ -5,6 +5,7 @@ import com.project01.skillineserver.enums.FileType;
 import com.project01.skillineserver.excepion.CustomException.AppException;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -23,6 +24,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 @Component
+@Slf4j
 public class UploadUtil {
 
     @Value("${upload.directory.video}")
@@ -47,9 +49,15 @@ public class UploadUtil {
         }
     }
 
-    public Map<String,Object> generateVideoUrl(MultipartFile lectureFile) throws IOException, InterruptedException {
+    public Map<String,Object> generateVideoUrl(MultipartFile lectureFile,String imagePathInDb,String videoPathInDb) throws IOException, InterruptedException {
         Map<String,Object> claimVideo = new HashMap<>();
-        String pathVideo = createPathFile(lectureFile, FileType.VIDEO);
+
+        if(StringUtils.hasText(imagePathInDb)){
+            Path oldFilePath = Paths.get(imagePath+"/"+imagePathInDb).normalize().toAbsolutePath();
+            Files.deleteIfExists(oldFilePath);
+        }
+
+        String pathVideo = createPathFile(lectureFile,videoPathInDb,FileType.VIDEO);
 
         String durationVideo = getVideoDuration(pathVideo);
         String imageVideo = extractThumbnail(pathVideo);
@@ -115,8 +123,13 @@ public class UploadUtil {
 
     }
 
-    public String createPathFile(MultipartFile lectureFile, FileType fileType) throws IOException {
+    public String createPathFile(MultipartFile lectureFile,String pathFileInDb,FileType fileType) throws IOException {
 
+        if(StringUtils.hasText(pathFileInDb)){
+            Path oldFilePath = Paths.get(pathFileInDb).normalize().toAbsolutePath();
+            Files.deleteIfExists(oldFilePath);
+            log.info("Delete File old in DB with path : {}",oldFilePath.toString());
+        }
 
         String originFileName = lectureFile.getOriginalFilename();
         Path folderUpload;

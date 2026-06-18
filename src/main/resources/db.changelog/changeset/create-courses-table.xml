@@ -10,7 +10,7 @@
                 <constraints primaryKey="true" />
             </column>
             <column name="title" type="varchar(255)"/>
-            <column name="description" type="varchar(255)"/>
+            <column name="description" type="text"/>
             <column name="level" type="varchar(255)"/>
             <column name="price_original" type="DECIMAL(10,0)"/>
             <column name="discount" type="decimal"/>
