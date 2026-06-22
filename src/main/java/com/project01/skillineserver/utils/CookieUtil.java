@@ -12,7 +12,7 @@ public class CookieUtil {
 
     public static void setAccessTokenCookieHttpOnly(String accessToken, HttpServletResponse response){
         Cookie accessTokenCookie = new Cookie(AppConstants.ACCESS_TOKEN, accessToken);
-//        accessTokenCookie.setHttpOnly(true);
+        accessTokenCookie.setHttpOnly(true);
         accessTokenCookie.setSecure(false);
         accessTokenCookie.setPath("/");
         accessTokenCookie.setMaxAge(30 * 24 * 60 * 60); //1 ngay
@@ -22,7 +22,7 @@ public class CookieUtil {
 
     public static void setRefreshTokenCookieHttpOnly(String refreshTokenCookieHttpOnly, HttpServletResponse response){
         Cookie refreshTokenCookie = new Cookie(AppConstants.REFRESH_TOKEN, refreshTokenCookieHttpOnly);
-//        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setHttpOnly(true);
         refreshTokenCookie.setSecure(false);
         refreshTokenCookie.setPath("/");
         refreshTokenCookie.setMaxAge(30 * 24 * 60 * 60);
