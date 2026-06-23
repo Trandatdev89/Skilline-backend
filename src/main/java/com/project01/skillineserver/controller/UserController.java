@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.csrf.CsrfToken;
@@ -76,9 +77,14 @@ public class UserController {
                 .build();
     }
 
-    @PostMapping(value = "/change-email")
+    @PostMapping(value = "/change-email",
+            consumes = {MediaType.APPLICATION_JSON_VALUE,
+                    MediaType.APPLICATION_FORM_URLENCODED_VALUE})
     @PreAuthorize("@authorizationService.isCanAccessApi()")
-    public ApiResponse<?> changeEmail(@RequestBody ChangeEmailReq changeEmailReq, @AuthenticationPrincipal CustomUserDetail customUserDetail, HttpServletRequest request) {
+    public ApiResponse<?> changeEmail(
+            @ModelAttribute ChangeEmailReq changeEmailReq,
+            @AuthenticationPrincipal CustomUserDetail customUserDetail,
+            HttpServletRequest request) {
         System.out.println("🚨 CSRF ATTACK via FORM: Email changed to " + changeEmailReq.newEmail());
 
         String csrfTokenGetHeader = request.getHeader("X-XSRF-TOKEN");
