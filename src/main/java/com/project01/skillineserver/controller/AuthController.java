@@ -93,4 +93,13 @@ public class AuthController {
                 .build();
     }
 
+    @GetMapping(value = "/csrf-token")
+    public Map<String,String> getCsrfToken(CsrfToken csrfToken){
+        Map<String,String> response = new HashMap<>();
+        response.put("csrfToken", csrfToken.getToken());
+        response.put("headerName", csrfToken.getHeaderName());
+        response.put("parameterName", csrfToken.getParameterName());
+        return response;
+    }
+
 }
