@@ -4,6 +4,7 @@ Dự án e-learning full-stack gồm:
 - **Backend**: Spring Boot 3.2.5, Java 21, MySQL, Redis, Liquibase
 - **Frontend**: Vue 3 + TypeScript + Vite, Element Plus
 
+[Xem Report-CSRF.pdf](Report-CSRF.pdf)
 ---
 
 ## Mục lục
