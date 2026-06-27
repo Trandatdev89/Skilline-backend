@@ -6,6 +6,8 @@ Dự án e-learning full-stack gồm:
 
 ---
 
+# [Xem Report-Stored-XSS.pdf](Report-Stored-XSS.pdf)
+
 ## Mục lục
 
 1. [Yêu cầu công cụ](#1-yêu-cầu-công-cụ)
