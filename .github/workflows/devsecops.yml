@@ -1,0 +1,74 @@
+name: DevSecOps Pipeline - Backend
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  semgrep-scan:
+    name: "🔍 Semgrep SAST Scan"
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── 1. Checkout source code ──────────────────────────────
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      # ── 2. Tải custom rules từ repo Frontend ─────────────────
+      #    Rules được giữ trong repo Frontend để dùng chung
+      - name: Download custom Semgrep rules
+        run: |
+          mkdir -p semgrep-rules
+          curl -sSL https://raw.githubusercontent.com/Trandatdev89/Skilline-frontend/main/semgrep-rules/xss-rules.yaml \
+            -o semgrep-rules/xss-rules.yaml
+          echo "✅ Rules downloaded:"
+          cat semgrep-rules/xss-rules.yaml | grep "id:" | awk '{print "   -", $2}'
+
+      # ── 3. Cài Python (cho quality gate script) ──────────────
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # ── 4. Cài Semgrep ───────────────────────────────────────
+      - name: Install Semgrep
+        run: pip install semgrep
+
+      # ── 5. Chạy Semgrep scan với custom rules ────────────────
+      - name: Run Semgrep scan
+        run: |
+          semgrep scan \
+            --config semgrep-rules/xss-rules.yaml \
+            --json \
+            --output semgrep-output.json \
+            --verbose \
+            src/
+        continue-on-error: true   # không dừng ở đây, để Quality Gate quyết định
+
+      # ── 6. Hiển thị kết quả scan dạng text để xem log ────────
+      - name: Show scan results (text)
+        run: |
+          semgrep scan \
+            --config semgrep-rules/xss-rules.yaml \
+            src/ || true
+
+      # ── 7. Upload artifact để lưu kết quả scan ───────────────
+      - name: Upload Semgrep output
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-results-backend
+          path: semgrep-output.json
+          retention-days: 30
+
+      # ── 8. Tải Quality Gate script ───────────────────────────
+      - name: Download Quality Gate script
+        run: |
+          curl -sSL https://raw.githubusercontent.com/Trandatdev89/Skilline-frontend/main/semgrep-rules/quality_gate.py \
+            -o quality_gate.py
+
+      # ── 9. Chạy Quality Gate → PASS hoặc BLOCK pipeline ──────
+      - name: Run Quality Gate
+        run: python quality_gate.py semgrep-output.json
+        # exit code 1 → pipeline fail → không deploy
