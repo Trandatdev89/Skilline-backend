@@ -1,0 +1,68 @@
+name: DevSecOps Pipeline - Backend
+
+on:
+  push:
+    branches: [ feature/xss-attack ]
+  pull_request:
+    branches: [ feature/xss-attack ]
+
+jobs:
+  semgrep-scan:
+    name: "🔍 Semgrep SAST Scan"
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── 1. Checkout source code ──────────────────────────────
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      # ── 2. Download custom rules từ Frontend repo (branch feature/xss) ──
+      - name: Download custom Semgrep rules
+        run: |
+          mkdir -p semgrep-rules
+          curl -sSL https://raw.githubusercontent.com/Trandatdev89/Skilline-frontend/feature/xss/semgrep-rules/xss-rules.yaml \
+            -o semgrep-rules/xss-rules.yaml
+          curl -sSL https://raw.githubusercontent.com/Trandatdev89/Skilline-frontend/feature/xss/semgrep-rules/quality_gate.py \
+            -o semgrep-rules/quality_gate.py
+          echo "✅ Rules downloaded:"
+          cat semgrep-rules/xss-rules.yaml | grep "id:" | awk '{print "   -", $2}'
+
+      # ── 3. Cài Python ────────────────────────────────────────
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # ── 4. Cài Semgrep ───────────────────────────────────────
+      - name: Install Semgrep
+        run: pip install semgrep
+
+      # ── 5. Chạy Semgrep scan trên Java source ────────────────
+      - name: Run Semgrep scan
+        run: |
+          semgrep scan \
+            --config semgrep-rules/xss-rules.yaml \
+            --json \
+            --output semgrep-output.json \
+            --verbose \
+            src/
+        continue-on-error: true
+
+      # ── 6. Hiển thị kết quả scan dạng text ───────────────────
+      - name: Show scan results (text)
+        run: |
+          semgrep scan \
+            --config semgrep-rules/xss-rules.yaml \
+            src/ || true
+
+      # ── 7. Upload artifact ───────────────────────────────────
+      - name: Upload Semgrep output
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-results-backend
+          path: semgrep-output.json
+          retention-days: 30
+
+      # ── 8. Chạy Quality Gate ─────────────────────────────────
+      - name: Run Quality Gate
+        run: python semgrep-rules/quality_gate.py semgrep-output.json
