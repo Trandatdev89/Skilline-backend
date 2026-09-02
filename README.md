@@ -4,9 +4,8 @@ Dự án e-learning full-stack gồm:
 - **Backend**: Spring Boot 3.2.5, Java 21, MySQL, Redis, Liquibase
 - **Frontend**: Vue 3 + TypeScript + Vite, Element Plus
 
+[Xem Report-CSRF.pdf](Report-CSRF.pdf)
 ---
-
-# [Xem Report-Stored-XSS.pdf](Report-Stored-XSS.pdf)
 
 ## Mục lục
 
@@ -48,11 +47,11 @@ cd thư mục
 # Xem danh sách các nhánh
 git branch -a
 
-# Checkout đúng  nhánh feature/xss
-git checkout feature/xss
+# Checkout đúng  nhánh csrf-attack
+git checkout csrf-attack
 
 # Kéo code mới nhất
-git pull origin feature/xss
+git pull origin csrf-attack
 
 # Clone repo be
 git clone https://github.com/Trandatdev89/Skilline-backend.git
@@ -61,11 +60,11 @@ cd thư mục
 # Xem danh sách các nhánh
 git branch -a
 
-# Checkout đúng  nhánh feature/xss
-git checkout feature/xss-attack
+# Checkout đúng  nhánh csrf-attack
+git checkout feature/csrf-attack
 
 # Kéo code mới nhất
-git pull origin feature/xss-attack
+git pull origin feature/csrf-attack
 ```
 
 ## 3. Cấu hình Backend (`skilline-server`)
