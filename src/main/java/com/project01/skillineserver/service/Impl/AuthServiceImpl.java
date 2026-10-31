@@ -21,6 +21,7 @@ import com.project01.skillineserver.service.EmailService;
 import com.project01.skillineserver.utils.AuthenticationUtil;
 import com.project01.skillineserver.utils.CookieUtil;
 import com.project01.skillineserver.utils.SecurityUtil;
+import com.project01.skillineserver.utils.XssSanitizer;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -249,11 +250,11 @@ public class AuthServiceImpl implements AuthService {
         }
 
         UserEntity user = new UserEntity();
-        user.setUsername(registerDTO.getUsername());
+        user.setUsername(XssSanitizer.cleanText(registerDTO.getUsername()));
         user.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
-        user.setAddress(registerDTO.getAddress());
+        user.setAddress(XssSanitizer.cleanText(registerDTO.getAddress()));
         user.setEmail(registerDTO.getEmail());
-        user.setFullname(registerDTO.getFullname());
+        user.setFullname(XssSanitizer.cleanText(registerDTO.getFullname()));
         user.setPhone(registerDTO.getPhone());
         user.setLastTimeChangePassword(Instant.now());
         user.setRole(registerDTO.getRole());

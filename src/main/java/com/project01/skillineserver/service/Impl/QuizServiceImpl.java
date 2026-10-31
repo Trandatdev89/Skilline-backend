@@ -10,6 +10,7 @@ import com.project01.skillineserver.repository.QuizAttemptRepository;
 import com.project01.skillineserver.repository.QuizRepository;
 import com.project01.skillineserver.service.QuizService;
 import com.project01.skillineserver.utils.MapUtil;
+import com.project01.skillineserver.utils.XssSanitizer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -39,8 +40,8 @@ public class QuizServiceImpl implements QuizService {
                 .flatMap(quizRepository::findById)
                 .orElseGet(QuizEntity::new);
 
-        quizEntity.setTitle(quizReq.title());
-        quizEntity.setDescription(quizReq.desc());
+        quizEntity.setTitle(XssSanitizer.cleanText(quizReq.title()));
+        quizEntity.setDescription(XssSanitizer.cleanText(quizReq.desc()));
         quizEntity.setLectureId(quizReq.lectureId());
         quizEntity.setTimeLimit(quizReq.timeLimit());
         quizEntity.setMaxAttempt(quizReq.maxAttempt());

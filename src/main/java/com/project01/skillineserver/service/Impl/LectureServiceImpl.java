@@ -12,6 +12,7 @@ import com.project01.skillineserver.service.LectureService;
 import com.project01.skillineserver.service.MediaService;
 import com.project01.skillineserver.utils.MapUtil;
 import com.project01.skillineserver.utils.UploadUtil;
+import com.project01.skillineserver.utils.XssSanitizer;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +48,7 @@ public class LectureServiceImpl implements LectureService {
 
         Integer maxPositionLectureOfCourse = lectureRepository.findMaxPosition(lectureReq.courseId());
 
-        lectureEntity.setTitle(lectureReq.title());
+        lectureEntity.setTitle(XssSanitizer.cleanText(lectureReq.title()));
         lectureEntity.setPosition(maxPositionLectureOfCourse != null ? maxPositionLectureOfCourse + 1 : 0);
         lectureEntity.setCourseId(lectureReq.courseId());
         lectureEntity.setDurationSeconds(lectureReq.durationSeconds());

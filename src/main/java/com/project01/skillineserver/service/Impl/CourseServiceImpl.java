@@ -15,6 +15,7 @@ import com.project01.skillineserver.specification.SearchSpecification;
 import com.project01.skillineserver.utils.ComputeUtil;
 import com.project01.skillineserver.utils.MapUtil;
 import com.project01.skillineserver.utils.UploadUtil;
+import com.project01.skillineserver.utils.XssSanitizer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
@@ -52,12 +53,12 @@ public class CourseServiceImpl implements CourseService {
         String pathImage = resolvePathFile(courseReq.thumbnail(), courseEntityInDB.getThumbnail_url());
 
         courseEntityInDB.setCategoryId(courseReq.categoryId());
-        courseEntityInDB.setDescription(courseReq.description());
+        courseEntityInDB.setDescription(XssSanitizer.cleanText(courseReq.description()));
         courseEntityInDB.setDelete(false);
         courseEntityInDB.setPriceOriginal(courseReq.price());
         courseEntityInDB.setLevel(courseReq.level());
         courseEntityInDB.setDiscount(courseReq.discount());
-        courseEntityInDB.setTitle(courseReq.title());
+        courseEntityInDB.setTitle(XssSanitizer.cleanText(courseReq.title()));
         courseEntityInDB.setRate(courseReq.rate());
         courseEntityInDB.setPublishStatus(courseReq.publishStatus());
         courseEntityInDB.setAccessDurationUnit(courseReq.accessDurationUnit());

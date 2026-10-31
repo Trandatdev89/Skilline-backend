@@ -10,6 +10,7 @@ import com.project01.skillineserver.repository.UserRepository;
 import com.project01.skillineserver.service.ReviewService;
 import com.project01.skillineserver.utils.AuthenticationUtil;
 import com.project01.skillineserver.utils.DateUtil;
+import com.project01.skillineserver.utils.XssSanitizer;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +37,7 @@ public class ReviewServiceImpl implements ReviewService {
         reviewRepository.save(ReviewEntity.builder()
                 .courseId(reviewReq.courseId())
                 .userId(customUserDetail.getUser().getId())
-                .comment(reviewReq.comment())
+                .comment(XssSanitizer.cleanText(reviewReq.comment()))
                 .rating(reviewReq.rating())
                 .build());
     }

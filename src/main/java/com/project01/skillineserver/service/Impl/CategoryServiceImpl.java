@@ -14,6 +14,7 @@ import com.project01.skillineserver.service.CategoryService;
 import com.project01.skillineserver.utils.ComputeUtil;
 import com.project01.skillineserver.utils.MapUtil;
 import com.project01.skillineserver.utils.UploadUtil;
+import com.project01.skillineserver.utils.XssSanitizer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -45,7 +46,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         String pathImage = resolveImagePath(category.path(), categoryInDB.getPath());
 
-        categoryInDB.setName(category.name());
+        categoryInDB.setName(XssSanitizer.cleanText(category.name()));
         categoryInDB.setActive(true);
         categoryInDB.setSlug(ComputeUtil.generateSlug(category.name()));
         categoryInDB.setPath(pathImage);

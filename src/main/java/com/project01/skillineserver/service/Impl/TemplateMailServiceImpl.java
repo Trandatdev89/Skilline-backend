@@ -7,6 +7,7 @@ import com.project01.skillineserver.enums.ErrorCode;
 import com.project01.skillineserver.excepion.CustomException.AppException;
 import com.project01.skillineserver.repository.TemplateMailRepository;
 import com.project01.skillineserver.service.TemplateMailService;
+import com.project01.skillineserver.utils.XssSanitizer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,7 @@ public class TemplateMailServiceImpl implements TemplateMailService {
                 .orElseGet(EmailTemplate::new);
 
         emailTemplate.setType(templateMailReq.getType());
-        emailTemplate.setHtmlContent(templateMailReq.getHtmlContent());
+        emailTemplate.setHtmlContent(XssSanitizer.cleanRichHtml(templateMailReq.getHtmlContent()));
         emailTemplate.setSubject(templateMailReq.getSubject());
         emailTemplate.setActive(templateMailReq.isActive());
         emailTemplate.setLanguage(templateMailReq.getLanguage());

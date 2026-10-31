@@ -21,7 +21,7 @@ public class ReviewEntity extends BaseEntity<Long> {
     private Long userId;
 
     @Column(columnDefinition = "TEXT")
-    private String comment;   // ← KHÔNG sanitize → lỗ hổng cố ý
+    private String comment;   // da duoc lam sach bang XssSanitizer.cleanText() o ReviewServiceImpl
 
     private Integer rating;
 }
