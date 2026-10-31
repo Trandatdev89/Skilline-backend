@@ -1,0 +1,16 @@
+# ==================================================================
+# threshold.yaml - Chinh sach Quality Gate (Policy as Code)
+# Sua file nay de thay doi do nghiem ngat, KHONG can sua quality_gate.py
+# ==================================================================
+
+# check_id chua chuoi nay -> nang len muc Critical (bat ke severity goc)
+critical_rule_pattern: "stored-xss"
+
+levels:
+  Critical:
+    block_at: 1     # >= 1 phat hien Critical  -> chan pipeline
+  High:
+    block_at: 3     # >= 3 phat hien High      -> chan pipeline
+  Medium:
+    warn_at: 10     # >= 10 phat hien Medium   -> chi canh bao, khong chan
+  Low: {}           # chi ghi nhan

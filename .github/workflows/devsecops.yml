@@ -1,68 +1,80 @@
+# ==================================================================
+# DevSecOps Pipeline - Backend (Spring Boot)
+# build -> semgrep --test -> semgrep scan -> Quality Gate -> artifact
+# ==================================================================
 name: DevSecOps Pipeline - Backend
 
 on:
   push:
-    branches: [ feature/xss-attack,feature/xss-defense ]
+    branches: [ main, "feature/**" ]
   pull_request:
-    branches: [ feature/xss-attack,feature/xss-defense ]
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+env:
+  SEMGREP_VERSION: "1.183.0"
+  PYYAML_VERSION: "6.0.3"
 
 jobs:
-  semgrep-scan:
-    name: "🔍 Semgrep SAST Scan"
+  # ── Buoc 1-3: checkout, JDK 21, bien dich (fail fast) ─────────────
+  build:
+    name: build
     runs-on: ubuntu-latest
-
     steps:
-      # ── 1. Checkout source code ──────────────────────────────
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      # ── 2. Download custom rules từ Frontend repo (branch feature/xss) ──
-      - name: Download custom Semgrep rules
-        run: |
-          mkdir -p semgrep-rules
-          curl -sSL https://raw.githubusercontent.com/Trandatdev89/Skilline-frontend/feature/xss/semgrep-rules/xss-rules.yaml \
-            -o semgrep-rules/xss-rules.yaml
-          curl -sSL https://raw.githubusercontent.com/Trandatdev89/Skilline-frontend/feature/xss/semgrep-rules/quality_gate.py \
-            -o semgrep-rules/quality_gate.py
-          echo "✅ Rules downloaded:"
-          cat semgrep-rules/xss-rules.yaml | grep "id:" | awk '{print "   -", $2}'
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
 
-      # ── 3. Cài Python ────────────────────────────────────────
+      - name: Compile (mvn compile)
+        run: |
+          chmod +x mvnw
+          ./mvnw -B -q -DskipTests compile
+
+  # ── Buoc 4-6: Semgrep + Quality Gate ─────────────────────────────
+  security-scan:
+    name: security-scan
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
 
-      # ── 4. Cài Semgrep ───────────────────────────────────────
-      - name: Install Semgrep
-        run: pip install semgrep
+      - name: Install Semgrep + PyYAML (ghim phien ban)
+        run: pip install "semgrep==${SEMGREP_VERSION}" "pyyaml==${PYYAML_VERSION}"
 
-      # ── 5. Chạy Semgrep scan trên Java source ────────────────
-      - name: Run Semgrep scan
+      - name: Test custom rules (semgrep --test)
+        run: semgrep --test --metrics=off semgrep-rules/
+
+      - name: Run Semgrep scan (springboot-xss.yaml -> src/)
         run: |
           semgrep scan \
-            --config semgrep-rules/xss-rules.yaml \
-            --json \
-            --output semgrep-output.json \
-            --verbose \
+            --metrics=off \
+            --config semgrep-rules/springboot-xss.yaml \
+            --json --output semgrep-report.json \
             src/
-        continue-on-error: true
 
-      # ── 6. Hiển thị kết quả scan dạng text ───────────────────
-      - name: Show scan results (text)
-        run: |
-          semgrep scan \
-            --config semgrep-rules/xss-rules.yaml \
-            src/ || true
+      - name: Run custom Quality Gate
+        run: python scripts/quality_gate.py semgrep-report.json --config threshold.yaml
 
-      # ── 7. Upload artifact ───────────────────────────────────
-      - name: Upload Semgrep output
+      - name: Upload Semgrep report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: semgrep-results-backend
-          path: semgrep-output.json
+          name: semgrep-report-backend
+          path: |
+            semgrep-report.json
+            quality-gate-result.json
           retention-days: 30
-
-      # ── 8. Chạy Quality Gate ─────────────────────────────────
-      - name: Run Quality Gate
-        run: python semgrep-rules/quality_gate.py semgrep-output.json

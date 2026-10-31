@@ -1,0 +1,88 @@
+rules:
+  # ==================================================================
+  # RULE B1 - Stored XSS phia Spring Boot (taint mode: source -> sink)
+  # Source   : getter chuoi van ban cua DTO/Request nguoi dung gui len
+  # Sanitizer: Jsoup.clean / HtmlUtils.htmlEscape / Encode.forHtml / XssSanitizer.*
+  # Sink     : $REPO.save(...) / $REPO.saveAll(...) -> du lieu ghi xuong DB
+  # ==================================================================
+  - id: springboot-stored-xss-unsanitized-input
+    mode: taint
+    languages: [java]
+    severity: ERROR
+    message: >-
+      [Stored XSS] Gia tri '$GETTER' lay tu request/DTO duoc luu xuong CSDL
+      qua $REPO.$SAVE(...) ma khong di qua ham lam sach. Neu gia tri nay duoc
+      hien thi lai tren giao dien, ke tan cong co the chen script doc hai.
+      Khac phuc: XssSanitizer.cleanText(...) hoac Jsoup.clean(..., Safelist.none())
+      truoc khi gan vao entity.
+    metadata:
+      category: security
+      cwe: "CWE-79: Improper Neutralization of Input During Web Page Generation"
+      owasp: "A03:2021 - Injection"
+      confidence: MEDIUM
+      references:
+        - https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html
+    pattern-sources:
+      - patterns:
+          - pattern-inside: |
+              $RET $METHOD(..., $TYPE $REQ, ...) { ... }
+          - metavariable-regex:
+              metavariable: $TYPE
+              regex: ^\w*(Req|Request|DTO|Dto)$
+          - pattern: $REQ.$GETTER()
+          - metavariable-regex:
+              metavariable: $GETTER
+              regex: (?i)^(get)?\w*(comment|content|title|desc|name|address|bio|note|message)\w*$
+    pattern-sanitizers:
+      - pattern: Jsoup.clean(...)
+      - pattern: HtmlUtils.htmlEscape(...)
+      - pattern: Encode.forHtml(...)
+      - pattern: XssSanitizer.$CLEAN(...)
+      - pattern: $UTIL.generateSlug(...)
+      # Ket qua tra cuu (findBy..., loadUserByUsername, existsBy...) la du lieu
+      # doc lai tu CSDL, khong phai noi dung nguoi dung vua gui -> cat taint
+      - patterns:
+          - pattern: $SERVICE.$LOOKUP(...)
+          - metavariable-regex:
+              metavariable: $LOOKUP
+              regex: ^(find|load|exists|count)\w*$
+    pattern-propagators:
+      # entity.setX(tainted) -> entity bi nhiem
+      - pattern: $ENTITY.$SETTER($FROM)
+        from: $FROM
+        to: $ENTITY
+    pattern-sinks:
+      - patterns:
+          - pattern: $REPO.$SAVE($ARG)
+          - metavariable-regex:
+              metavariable: $SAVE
+              regex: ^(save|saveAndFlush|saveAll)$
+          - focus-metavariable: $ARG
+
+  # ==================================================================
+  # RULE B2 - Ve sinh dau vao: @RequestBody thieu @Valid / @Validated
+  # Khong phai lo hong XSS truc tiep -> WARNING (muc Medium, chi canh bao)
+  # ==================================================================
+  - id: springboot-requestbody-missing-valid
+    languages: [java]
+    severity: WARNING
+    message: >-
+      Tham so @RequestBody '$PARAM' khong duoc danh dau @Valid/@Validated nen cac
+      rang buoc (@NotBlank, @Size, ...) tren DTO se khong duoc kiem tra.
+      Day la lop phong ve bo sung (input validation), khong thay the sanitize.
+    metadata:
+      category: security
+      cwe: "CWE-20: Improper Input Validation"
+      owasp: "A03:2021 - Injection"
+      confidence: HIGH
+    patterns:
+      - pattern: |
+          $RET $METHOD(..., @RequestBody $TYPE $PARAM, ...) { ... }
+      - pattern-not: |
+          $RET $METHOD(..., @Valid @RequestBody $TYPE $PARAM, ...) { ... }
+      - pattern-not: |
+          $RET $METHOD(..., @RequestBody @Valid $TYPE $PARAM, ...) { ... }
+      - pattern-not: |
+          $RET $METHOD(..., @Validated @RequestBody $TYPE $PARAM, ...) { ... }
+      - pattern-not: |
+          $RET $METHOD(..., @RequestBody @Validated $TYPE $PARAM, ...) { ... }
